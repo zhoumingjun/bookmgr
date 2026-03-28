@@ -10,6 +10,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/zhoumingjun/bookmgr/backend/config"
+	"github.com/zhoumingjun/bookmgr/backend/database"
 	"github.com/zhoumingjun/bookmgr/backend/handler"
 	"github.com/zhoumingjun/bookmgr/backend/middleware"
 	"github.com/zhoumingjun/bookmgr/backend/repository"
@@ -20,6 +21,8 @@ import (
 func main() {
 	fx.New(
 		config.Module,
+		database.Module,
+		database.SeedModule,
 		handler.Module,
 		service.Module,
 		repository.Module,

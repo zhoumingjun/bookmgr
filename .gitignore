@@ -10,6 +10,7 @@ Thumbs.db
 
 # Go
 backend/tmp/
+backend/server
 
 # Frontend
 frontend/node_modules/

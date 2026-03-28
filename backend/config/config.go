@@ -11,18 +11,22 @@ var Module = fx.Options(
 )
 
 type Config struct {
-	Port        string
-	DatabaseURL string
-	JWTSecret   string
-	UploadDir   string
+	Port          string
+	DatabaseURL   string
+	JWTSecret     string
+	UploadDir     string
+	AdminUsername string
+	AdminPassword string
 }
 
 func New() *Config {
 	return &Config{
-		Port:        getEnv("PORT", "8080"),
-		DatabaseURL: getEnv("DATABASE_URL", "postgres://bookmgr:bookmgr@localhost:5432/bookmgr?sslmode=disable"),
-		JWTSecret:   getEnv("JWT_SECRET", "dev-secret-change-in-production"),
-		UploadDir:   getEnv("UPLOAD_DIR", "./uploads"),
+		Port:          getEnv("PORT", "8080"),
+		DatabaseURL:   getEnv("DATABASE_URL", "postgres://bookmgr:bookmgr@localhost:5432/bookmgr?sslmode=disable"),
+		JWTSecret:     getEnv("JWT_SECRET", "dev-secret-change-in-production"),
+		UploadDir:     getEnv("UPLOAD_DIR", "./uploads"),
+		AdminUsername: getEnv("ADMIN_USERNAME", "admin"),
+		AdminPassword: getEnv("ADMIN_PASSWORD", "changeme"),
 	}
 }
 
