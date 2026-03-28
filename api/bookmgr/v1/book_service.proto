@@ -1,0 +1,178 @@
+syntax = "proto3";
+
+package bookmgr.v1;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/api/httpbody.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/zhoumingjun/bookmgr/gen/api/bookmgr/v1;bookmgrv1";
+
+// BookService manages book resources.
+service BookService {
+  // ListBooks returns a paginated list of books.
+  rpc ListBooks(ListBooksRequest) returns (ListBooksResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/books"
+    };
+  }
+
+  // GetBook returns a single book by ID.
+  rpc GetBook(GetBookRequest) returns (GetBookResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/books/{id}"
+    };
+  }
+
+  // CreateBook creates a new book record. Admin only.
+  rpc CreateBook(CreateBookRequest) returns (CreateBookResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/books"
+      body: "*"
+    };
+  }
+
+  // UpdateBook updates an existing book's metadata. Admin only.
+  rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse) {
+    option (google.api.http) = {
+      patch: "/api/v1/books/{book.id}"
+      body: "*"
+    };
+  }
+
+  // DeleteBook removes a book and its file. Admin only.
+  rpc DeleteBook(DeleteBookRequest) returns (DeleteBookResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/books/{id}"
+    };
+  }
+
+  // DownloadBook returns the book's PDF file as binary content.
+  rpc DownloadBook(DownloadBookRequest) returns (DownloadBookResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/books/{id}/download"
+    };
+  }
+}
+
+// Book represents a book resource.
+message Book {
+  // The unique identifier of the book.
+  string id = 1;
+
+  // The title of the book.
+  string title = 2;
+
+  // The author of the book.
+  string author = 3;
+
+  // A description of the book.
+  string description = 4;
+
+  // URL to the book's cover image.
+  string cover_url = 5;
+
+  // The ID of the user who uploaded this book.
+  string uploader_id = 6;
+
+  // When the book was created.
+  google.protobuf.Timestamp create_time = 7;
+
+  // When the book was last updated.
+  google.protobuf.Timestamp update_time = 8;
+}
+
+// ListBooksRequest is the request for ListBooks.
+message ListBooksRequest {
+  // Maximum number of books to return. Default 20.
+  int32 page_size = 1 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 100
+  }];
+
+  // Token for the next page of results.
+  string page_token = 2;
+}
+
+// ListBooksResponse is the response for ListBooks.
+message ListBooksResponse {
+  // The list of books.
+  repeated Book books = 1;
+
+  // Token for the next page. Empty if no more results.
+  string next_page_token = 2;
+}
+
+// GetBookRequest is the request for GetBook.
+message GetBookRequest {
+  // The ID of the book to retrieve.
+  string id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+// GetBookResponse is the response for GetBook.
+message GetBookResponse {
+  // The requested book.
+  Book book = 1;
+}
+
+// CreateBookRequest is the request for CreateBook.
+message CreateBookRequest {
+  // The title of the book.
+  string title = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+
+  // The author of the book.
+  string author = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+
+  // A description of the book.
+  string description = 3 [(buf.validate.field).string.max_len = 4096];
+}
+
+// CreateBookResponse is the response for CreateBook.
+message CreateBookResponse {
+  // The created book.
+  Book book = 1;
+}
+
+// UpdateBookRequest is the request for UpdateBook.
+message UpdateBookRequest {
+  // The book with updated fields.
+  Book book = 1 [(buf.validate.field).required = true];
+
+  // The fields to update.
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+// UpdateBookResponse is the response for UpdateBook.
+message UpdateBookResponse {
+  // The updated book.
+  Book book = 1;
+}
+
+// DeleteBookRequest is the request for DeleteBook.
+message DeleteBookRequest {
+  // The ID of the book to delete.
+  string id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+// DeleteBookResponse is the response for DeleteBook.
+message DeleteBookResponse {}
+
+// DownloadBookRequest is the request for DownloadBook.
+message DownloadBookRequest {
+  // The ID of the book to download.
+  string id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+// DownloadBookResponse is the response for DownloadBook.
+message DownloadBookResponse {
+  // The HTTP body containing the PDF file.
+  google.api.HttpBody http_body = 1;
+}

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package bookmgr.v1;
+
+option go_package = "github.com/zhoumingjun/bookmgr/gen/api/bookmgr/v1;bookmgrv1";
+
+// Role represents the access level of a user in the system.
+enum Role {
+  // Default value, should not be used.
+  ROLE_UNSPECIFIED = 0;
+  // Regular user with read-only access to books.
+  ROLE_USER = 1;
+  // Administrator with full CRUD access.
+  ROLE_ADMIN = 2;
+}

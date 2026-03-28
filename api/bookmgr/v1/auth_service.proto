@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package bookmgr.v1;
+
+import "bookmgr/v1/common.proto";
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/zhoumingjun/bookmgr/gen/api/bookmgr/v1;bookmgrv1";
+
+// AuthService handles user registration and authentication.
+service AuthService {
+  // Register creates a new user account.
+  rpc Register(RegisterRequest) returns (RegisterResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/register"
+      body: "*"
+    };
+  }
+
+  // Login authenticates a user and returns a JWT token.
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/login"
+      body: "*"
+    };
+  }
+}
+
+// RegisterRequest is the request message for Register.
+message RegisterRequest {
+  // The username for the new account.
+  string username = 1 [(buf.validate.field).string = {
+    min_len: 3
+    max_len: 64
+    pattern: "^[a-zA-Z0-9_-]+$"
+  }];
+
+  // The email address for the new account.
+  string email = 2 [(buf.validate.field).string.email = true];
+
+  // The password for the new account.
+  string password = 3 [(buf.validate.field).string = {
+    min_len: 6
+    max_len: 128
+  }];
+}
+
+// RegisterResponse is the response message for Register.
+message RegisterResponse {
+  // The unique identifier of the created user.
+  string id = 1;
+
+  // The username of the created user.
+  string username = 2;
+
+  // The email of the created user.
+  string email = 3;
+
+  // The role assigned to the created user.
+  Role role = 4;
+}
+
+// LoginRequest is the request message for Login.
+message LoginRequest {
+  // The username to authenticate with.
+  string username = 1 [(buf.validate.field).string.min_len = 1];
+
+  // The password to authenticate with.
+  string password = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+// LoginResponse is the response message for Login.
+message LoginResponse {
+  // The JWT token for subsequent authenticated requests.
+  string token = 1;
+}

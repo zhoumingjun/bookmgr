@@ -1,9 +1,18 @@
 FROM golang:1.26-alpine AS builder
 WORKDIR /app
-COPY go.mod go.sum ./
-RUN GOPROXY=https://goproxy.cn,direct go mod download
-COPY . .
-RUN CGO_ENABLED=0 go build -o server ./cmd/server
+
+# Copy workspace files
+COPY go.work go.work.sum* ./
+COPY backend/go.mod backend/go.sum ./backend/
+COPY gen/go.mod gen/go.sum ./gen/
+
+# Download all workspace dependencies at once
+RUN GOPROXY=https://goproxy.cn,direct go mod download -x
+
+COPY backend/ ./backend/
+COPY gen/ ./gen/
+
+RUN CGO_ENABLED=0 go build -o /app/server ./backend/cmd/server
 
 FROM alpine:3.21
 RUN apk --no-cache add ca-certificates
