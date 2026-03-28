@@ -5,28 +5,36 @@ A web-based book management system where administrators can manage users and boo
 and users can browse and read books through a web console.
 
 ## Tech Stack
-- **Backend**: Go 1.26+ | Chi router v5 | Ent ORM | uber-go/fx (DI) | golang-jwt/jwt v5
+- **Backend**: Go 1.26+ | gRPC + grpc-gateway | Chi router v5 (non-API routes) | Ent ORM | uber-go/fx (DI) | golang-jwt/jwt v5
+- **API Definition**: Protocol Buffers | buf (lint, breaking, generate) | AIP compliant (aip.dev)
 - **Frontend**: React 19 | TypeScript | Vite | React Router
-- **Database**: PostgreSQL 16
+- **Database**: PostgreSQL 16 | Atlas (migration)
 - **File Storage**: Local filesystem (Docker volume)
 - **Deployment**: Docker Compose
 
 ## Project Structure
 ```
 bookmgr/
+├── api/                       # Proto API definitions (source of truth)
+│   └── bookmgr/v1/           # API v1 proto files
+│       ├── auth_service.proto
+│       ├── book_service.proto
+│       ├── user_service.proto
+│       └── common.proto       # Shared types (pagination, etc.)
+├── gen/                       # Generated code (proto, grpc-gateway, openapi)
 ├── docs/                      # Project documentation
 ├── openspec/                  # OpenSpec spec-driven workflow
 ├── backend/
 │   ├── cmd/server/main.go     # Entry point (fx.New bootstrap)
-│   ├── handler/               # HTTP handlers (Chi routes)
+│   ├── handler/               # gRPC service implementations
 │   ├── service/               # Business logic layer
 │   ├── repository/            # Data access layer (wraps Ent client)
+│   ├── database/              # DB connection, migration, seeding
 │   ├── ent/                   # Ent ORM (schema/ is hand-written, rest is generated)
 │   │   └── schema/            # Ent schema definitions
 │   ├── middleware/             # JWT auth, CORS, logging middleware
 │   ├── storage/               # File storage abstraction
 │   ├── config/                # Config loading (env vars)
-│   ├── migrations/            # Database migrations
 │   ├── go.mod
 │   └── Dockerfile
 └── frontend/
@@ -40,7 +48,14 @@ bookmgr/
     └── Dockerfile
 ```
 
-## Key Commands
+### Key Commands
+
+### Proto / API
+```bash
+buf lint                       # Lint proto files (AIP rules)
+buf breaking --against '.git#branch=main'  # Detect breaking API changes
+buf generate                   # Generate Go, gRPC, gateway, OpenAPI code
+```
 
 ### Backend
 ```bash
@@ -80,11 +95,23 @@ All components wired through fx. Each package exports a `Module` variable.
 
 ### Layered Architecture
 ```
-HTTP Request -> middleware/ -> handler/ -> service/ -> repository/ -> ent/ -> PostgreSQL
+gRPC Request -> gRPC service (handler/) -> service/ -> repository/ -> ent/ -> PostgreSQL
+HTTP Request -> Chi (middleware/) -> grpc-gateway -> gRPC service -> service/ -> repository/ -> ent/ -> PostgreSQL
 ```
-- **handler/**: HTTP concerns only (parse request, call service, write response)
+- **handler/**: gRPC service implementations (proto-generated interfaces)
 - **service/**: Business logic, validation, orchestration
 - **repository/**: Data access, wraps Ent client queries
+- **Chi router**: Handles non-API routes (/healthz), middleware (logging, recovery, CORS), mounts grpc-gateway for /api/v1
+
+### API Design (gRPC + grpc-gateway)
+- API defined in Protocol Buffers under `api/bookmgr/v1/`
+- Follows Google AIP standards (aip.dev) — resource-oriented design
+- grpc-gateway generates REST endpoints, mounted on Chi under `/api/v1`
+- OpenAPI spec auto-generated from proto annotations
+- `buf breaking` enforces backward compatibility on every change
+- Pagination: token-based (AIP-158) with `page_size` and `page_token`
+- Errors: `google.rpc.Status` model (AIP-193), auto-mapped to HTTP status by gateway
+- Validation: protovalidate for declarative request validation in proto files
 
 ### Ent ORM
 - Schema definitions in `backend/ent/schema/`
@@ -104,11 +131,13 @@ One React app with React Router:
 - Admin routes additionally check role=admin
 
 ### API Conventions
-- All API routes under `/api/v1/`
-- JSON request/response bodies
-- Standard error format: `{"error": "message", "code": "ERROR_CODE"}`
-- Pagination: `?page=1&per_page=20`
-- File upload: multipart/form-data
+- All API defined in proto files under `api/bookmgr/v1/`
+- REST endpoints auto-generated via grpc-gateway under `/api/v1/`
+- Error model: `google.rpc.Status` (AIP-193)
+- Pagination: `page_size` + `page_token` (AIP-158)
+- Resource naming: AIP-122 (e.g., `books/{book}`, `users/{user}`)
+- File upload: multipart/form-data via custom HTTP endpoint (grpc-gateway httpbody)
+- Breaking changes detected by `buf breaking` before merge
 
 ## Code Conventions
 - Go: follow standard Go conventions, gofmt, no global state

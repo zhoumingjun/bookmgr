@@ -34,6 +34,8 @@ rules:
   proposal:
     - Always consider both admin and user-facing impacts
     - Reference specific API endpoints when describing backend changes
+    - Any API change must be marked as BREAKING or backward-compatible in the proposal
+    - Any DB schema change must include a migration plan
   tasks:
     - Each task should be completable in under 2 hours
     - Group tasks by layer: schema/backend/frontend
