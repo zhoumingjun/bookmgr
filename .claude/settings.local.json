@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "WebSearch",
+      "Bash(go version:*)",
+      "Bash(npm --version)",
+      "Bash(git --version)",
+      "Bash(npm list:*)",
+      "Bash(docker --version)",
+      "Bash(docker compose:*)",
+      "Bash(openspec --help)",
+      "Bash(openspec init:*)",
+      "Bash(go list:*)",
+      "Bash(curl -sL \"https://proxy.golang.org/github.com/go-chi/chi/v5/@latest\")",
+      "Bash(curl -sL \"https://proxy.golang.org/entgo.io/ent/@latest\")",
+      "Bash(curl -sL \"https://proxy.golang.org/go.uber.org/fx/@latest\")",
+      "Bash(curl -sL \"https://proxy.golang.org/github.com/golang-jwt/jwt/v5/@latest\")",
+      "Bash(node:*)",
+      "Bash(go get:*)",
+      "Bash(openspec --version)",
+      "Bash(openspec schemas:*)",
+      "Bash(git init:*)",
+      "Bash(go mod:*)",
+      "Bash(GOPROXY=https://goproxy.cn,direct go get github.com/go-chi/chi/v5 go.uber.org/fx entgo.io/ent github.com/golang-jwt/jwt/v5 github.com/lib/pq)",
+      "Bash(GOPROXY=https://goproxy.cn,direct go mod tidy 2>&1)",
+      "Bash(go build:*)",
+      "Bash(npm create:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}

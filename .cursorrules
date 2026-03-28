@@ -1,0 +1,33 @@
+# Bookmgr - Book Management System
+
+## Tech Stack
+- Backend: Go 1.26+ | Chi v5 | Ent ORM | uber-go/fx | golang-jwt/jwt v5
+- Frontend: React 19 | TypeScript | Vite | React Router
+- Database: PostgreSQL 16 | Deployment: Docker Compose
+
+## Architecture
+- NO internal/ directory in backend
+- Layers: handler/ -> service/ -> repository/ -> ent/ -> PostgreSQL
+- All DI via uber-go/fx (each package exports a Module variable)
+- Frontend: single React app, routes split /admin/* and /console/*
+- JWT auth: middleware validates Bearer token, claims {sub, role, exp}
+
+## Conventions
+- Go: gofmt, error wrapping with fmt.Errorf("context: %w", err), no global state
+- TypeScript: strict mode, functional components, hooks only
+- API: /api/v1/ prefix, JSON bodies, standard error format {"error","code"}
+- Ent schemas in backend/ent/schema/, generated code committed
+- Run `go generate ./ent` after schema changes
+
+## Key Paths
+- Entry point: backend/cmd/server/main.go
+- Ent schemas: backend/ent/schema/
+- Handlers: backend/handler/
+- Services: backend/service/
+- Frontend pages: frontend/src/pages/admin/, frontend/src/pages/console/
+
+## Key Commands
+- Backend: `cd backend && go run ./cmd/server`
+- Frontend: `cd frontend && npm run dev`
+- Docker: `docker compose up -d`
+- Ent codegen: `cd backend && go generate ./ent`

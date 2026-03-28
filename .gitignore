@@ -1,0 +1,30 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Go
+backend/tmp/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+
+# Environment
+.env
+*.env.local
+
+# Uploads
+uploads/
+
+# Docker
+docker-data/
+
+# Logs
+*.log

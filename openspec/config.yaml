@@ -1,0 +1,40 @@
+schema: spec-driven
+
+context: |
+  # Bookmgr - Book Management System
+
+  ## Tech Stack
+  - Backend: Go 1.26+ with Chi router (v5), Ent ORM, uber-go/fx (DI)
+  - Frontend: React 19 + TypeScript + Vite, single SPA with route-based admin/console separation
+  - Database: PostgreSQL 16
+  - Auth: JWT (golang-jwt/jwt/v5)
+  - File Storage: Local filesystem (Docker volume for persistence)
+  - Deployment: Docker Compose
+
+  ## Architecture
+  - NO internal/ directory in the backend
+  - Backend follows handler -> service -> repository layered architecture
+  - All dependencies injected via uber-go/fx
+  - Frontend is a single React app with /admin/* and /console/* route namespaces
+  - REST API endpoints under /api/v1/
+
+  ## Key Conventions
+  - Go: cmd/, handler/, service/, repository/, ent/, config/, middleware/, storage/
+  - Frontend: pages/admin/ and pages/console/ for route-based code splitting
+  - Ent schemas define the data model; generated code is committed
+  - JWT middleware protects all /api/v1/ routes except login/register
+  - Admin routes require role=admin claim in JWT
+
+  ## Domain Entities
+  - User (id, username, email, password_hash, role, created_at, updated_at)
+  - Book (id, title, author, description, cover_url, file_path, uploader_id, created_at, updated_at)
+  - UserRole: admin, user
+
+rules:
+  proposal:
+    - Always consider both admin and user-facing impacts
+    - Reference specific API endpoints when describing backend changes
+  tasks:
+    - Each task should be completable in under 2 hours
+    - Group tasks by layer: schema/backend/frontend
+    - Include test tasks where appropriate
