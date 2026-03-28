@@ -31,8 +31,6 @@ services:
       DATABASE_URL: "postgres://bookmgr:bookmgr@postgres:5432/bookmgr?sslmode=disable"
       JWT_SECRET: "change-me-in-production"
       UPLOAD_DIR: "/app/uploads"
-    ports:
-      - "8080:8080"
     volumes:
       - uploads:/app/uploads
 
@@ -44,8 +42,24 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
+
+  kong:
+    image: kong/kong-gateway:3.9
+    container_name: bookmgr-kong
+    restart: unless-stopped
+    depends_on:
+      - backend
+      - frontend
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /etc/kong/kong.yml
+      KONG_PROXY_LISTEN: "0.0.0.0:8000"
+      KONG_ADMIN_LISTEN: "off"
+      KONG_LOG_LEVEL: info
+    volumes:
+      - ./kong/kong.yml:/etc/kong/kong.yml:ro
     ports:
-      - "3000:80"
+      - "8000:8000"
 
 volumes:
   pgdata:
