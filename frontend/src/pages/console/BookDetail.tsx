@@ -1,42 +1,93 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Card, Button, Descriptions, Typography, Spin, Space, Grid, Empty } from 'antd';
+import { ArrowLeftOutlined, DownloadOutlined, ReadOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { getBook, downloadBookUrl, type BookDTO } from '../../api/books';
 
+const { Title } = Typography;
+const { useBreakpoint } = Grid;
+
 export default function BookDetailPage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [book, setBook] = useState<BookDTO | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [showReader, setShowReader] = useState(false);
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
 
   useEffect(() => {
     if (!id) return;
     getBook(id)
       .then(res => setBook(res.book))
-      .catch(() => setError('Failed to load book'))
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <div style={{ padding: 24 }}>Loading...</div>;
-  if (error) return <div style={{ padding: 24, color: 'red' }}>{error}</div>;
-  if (!book) return <div style={{ padding: 24 }}>Book not found</div>;
+  if (loading) return <Spin style={{ display: 'block', marginTop: 48 }} />;
+  if (!book) return <Empty description="Book not found" />;
+
+  const token = localStorage.getItem('token');
+  const pdfUrl = `${downloadBookUrl(book.id)}?access_token=${token}`;
 
   function handleDownload() {
-    const token = localStorage.getItem('token');
-    const url = downloadBookUrl(book!.id);
     const a = document.createElement('a');
-    a.href = `${url}?access_token=${token}`;
+    a.href = pdfUrl;
     a.download = `${book!.title}.pdf`;
     a.click();
   }
 
   return (
-    <div style={{ padding: 24, maxWidth: 600 }}>
-      <Link to="/console/books" style={{ display: 'inline-block', marginBottom: 16 }}>Back to catalog</Link>
-      <h2>{book.title}</h2>
-      <p style={{ color: '#666' }}>by {book.author}</p>
-      {book.description && <p>{book.description}</p>}
-      <p style={{ fontSize: 14, color: '#999' }}>Added {new Date(book.create_time).toLocaleDateString()}</p>
-      <button onClick={handleDownload}>Download PDF</button>
+    <div>
+      <Button
+        type="text"
+        icon={<ArrowLeftOutlined />}
+        onClick={() => navigate('/console/books')}
+        style={{ marginBottom: 16 }}
+      >
+        {t('bookDetail.back')}
+      </Button>
+
+      <Card>
+        <Title level={4} style={{ marginTop: 0 }}>{book.title}</Title>
+        <Descriptions column={isMobile ? 1 : 2} style={{ marginBottom: 16 }}>
+          <Descriptions.Item label={t('books.author')}>{book.author}</Descriptions.Item>
+          <Descriptions.Item label={t('bookDetail.addedAt')}>
+            {new Date(book.create_time).toLocaleDateString()}
+          </Descriptions.Item>
+          {book.description && (
+            <Descriptions.Item label={t('books.description')} span={2}>
+              {book.description}
+            </Descriptions.Item>
+          )}
+        </Descriptions>
+
+        <Space wrap>
+          <Button type="primary" icon={<ReadOutlined />} onClick={() => setShowReader(!showReader)}>
+            {t('bookDetail.readOnline')}
+          </Button>
+          <Button icon={<DownloadOutlined />} onClick={handleDownload}>
+            {t('bookDetail.download')}
+          </Button>
+        </Space>
+      </Card>
+
+      {showReader && (
+        <Card style={{ marginTop: 16 }} styles={{ body: { padding: 0 } }}>
+          <iframe
+            src={pdfUrl}
+            style={{
+              width: '100%',
+              height: isMobile ? '60vh' : '80vh',
+              border: 'none',
+              borderRadius: 8,
+            }}
+            title={book.title}
+          />
+        </Card>
+      )}
     </div>
   );
 }

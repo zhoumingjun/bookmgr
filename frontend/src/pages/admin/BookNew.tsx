@@ -1,61 +1,68 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Card, Form, Input, Button, Upload, message, Typography } from 'antd';
+import { InboxOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { createBook, uploadBookFile } from '../../api/books';
 
-export default function BookNewPage() {
-  const [title, setTitle] = useState('');
-  const [author, setAuthor] = useState('');
-  const [description, setDescription] = useState('');
-  const [file, setFile] = useState<File | null>(null);
-  const [error, setError] = useState('');
-  const [saving, setSaving] = useState(false);
-  const navigate = useNavigate();
+const { Title } = Typography;
+const { Dragger } = Upload;
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+export default function BookNewPage() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [file, setFile] = useState<File | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  async function handleSubmit(values: { title: string; author: string; description?: string }) {
     setSaving(true);
-    setError('');
     try {
-      const res = await createBook(title, author, description);
+      const res = await createBook(values.title, values.author, values.description || '');
       if (file) {
         await uploadBookFile(res.book.id, file);
       }
+      message.success(t('bookNew.success'));
       navigate('/admin/books');
     } catch {
-      setError('Failed to create book');
+      message.error(t('bookNew.error'));
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <div style={{ padding: 24, maxWidth: 600 }}>
-      <h2>Add Book</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: 12 }}>
-          <label>Title<br />
-            <input value={title} onChange={e => setTitle(e.target.value)} required style={{ width: '100%' }} />
-          </label>
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <label>Author<br />
-            <input value={author} onChange={e => setAuthor(e.target.value)} required style={{ width: '100%' }} />
-          </label>
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <label>Description<br />
-            <textarea value={description} onChange={e => setDescription(e.target.value)} rows={4} style={{ width: '100%' }} />
-          </label>
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <label>PDF File<br />
-            <input type="file" accept=".pdf" onChange={e => setFile(e.target.files?.[0] || null)} />
-          </label>
-        </div>
-        <button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Create Book'}</button>
-        <button type="button" onClick={() => navigate('/admin/books')} style={{ marginLeft: 8 }}>Cancel</button>
-      </form>
+    <div>
+      <Title level={4}>{t('bookNew.title')}</Title>
+      <Card style={{ maxWidth: 600 }}>
+        <Form onFinish={handleSubmit} layout="vertical">
+          <Form.Item label={t('bookNew.bookTitle')} name="title" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item label={t('bookNew.author')} name="author" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item label={t('bookNew.description')} name="description">
+            <Input.TextArea rows={4} />
+          </Form.Item>
+          <Form.Item label={t('bookNew.file')}>
+            <Dragger
+              accept=".pdf"
+              maxCount={1}
+              beforeUpload={(f) => { setFile(f); return false; }}
+              onRemove={() => setFile(null)}
+            >
+              <p className="ant-upload-drag-icon"><InboxOutlined /></p>
+              <p className="ant-upload-text">{t('bookNew.fileTip')}</p>
+            </Dragger>
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={saving} style={{ marginRight: 8 }}>
+              {t('bookNew.submit')}
+            </Button>
+            <Button onClick={() => navigate('/admin/books')}>{t('bookNew.cancel')}</Button>
+          </Form.Item>
+        </Form>
+      </Card>
     </div>
   );
 }

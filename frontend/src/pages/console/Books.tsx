@@ -1,64 +1,91 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { Card, Row, Col, Pagination, Typography, Empty, Spin } from 'antd';
+import { BookOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { listBooks, type BookDTO } from '../../api/books';
 
-export default function ConsoleBooksPage() {
-  const [books, setBooks] = useState<BookDTO[]>([]);
-  const [nextToken, setNextToken] = useState('');
-  const [prevTokens, setPrevTokens] = useState<string[]>([]);
-  const [currentToken, setCurrentToken] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+const { Title, Text, Paragraph } = Typography;
+const { Meta } = Card;
 
-  async function loadBooks(token: string) {
+export default function ConsoleBooksPage() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [books, setBooks] = useState<BookDTO[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const pageSize = 12;
+
+  // We use token-based pagination from the API but track page number for display
+  const [tokenMap, setTokenMap] = useState<Record<number, string>>({ 1: '' });
+
+  async function loadBooks(pageNum: number) {
     setLoading(true);
-    setError('');
     try {
-      const res = await listBooks(20, token);
+      const token = tokenMap[pageNum] || '';
+      const res = await listBooks(pageSize, token);
       setBooks(res.books || []);
-      setNextToken(res.next_page_token || '');
+      if (res.next_page_token) {
+        setTokenMap(prev => ({ ...prev, [pageNum + 1]: res.next_page_token }));
+        setTotal((pageNum) * pageSize + pageSize); // estimate
+      } else {
+        setTotal((pageNum - 1) * pageSize + (res.books?.length || 0));
+      }
     } catch {
-      setError('Failed to load books');
+      // ignore
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => { loadBooks(currentToken); }, [currentToken]);
-
-  function handleNext() {
-    setPrevTokens(prev => [...prev, currentToken]);
-    setCurrentToken(nextToken);
-  }
-
-  function handlePrev() {
-    const prev = [...prevTokens];
-    const token = prev.pop() || '';
-    setPrevTokens(prev);
-    setCurrentToken(token);
-  }
+  useEffect(() => { loadBooks(page); }, [page]);
 
   return (
-    <div style={{ padding: 24 }}>
-      <h2>Book Catalog</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {loading ? <p>Loading...</p> : (
+    <div>
+      <Title level={4}>{t('catalog.title')}</Title>
+      {loading ? (
+        <Spin style={{ display: 'block', marginTop: 48 }} />
+      ) : books.length === 0 ? (
+        <Empty description={t('catalog.empty')} />
+      ) : (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 16 }}>
-            {books.map(b => (
-              <Link to={`/console/books/${b.id}`} key={b.id} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <div style={{ border: '1px solid #ddd', borderRadius: 8, padding: 16 }}>
-                  <h3 style={{ margin: '0 0 8px' }}>{b.title}</h3>
-                  <p style={{ margin: '0 0 4px', color: '#666' }}>{b.author}</p>
-                  {b.description && <p style={{ margin: 0, fontSize: 14, color: '#999' }}>{b.description.slice(0, 100)}{b.description.length > 100 ? '...' : ''}</p>}
-                </div>
-              </Link>
+          <Row gutter={[16, 16]}>
+            {books.map(book => (
+              <Col xs={24} sm={12} md={8} lg={6} key={book.id}>
+                <Card
+                  hoverable
+                  onClick={() => navigate(`/console/books/${book.id}`)}
+                  style={{ height: '100%' }}
+                >
+                  <div style={{ textAlign: 'center', marginBottom: 16, color: '#ff6a00' }}>
+                    <BookOutlined style={{ fontSize: 48 }} />
+                  </div>
+                  <Meta
+                    title={book.title}
+                    description={
+                      <>
+                        <Text type="secondary">{t('catalog.by')}{book.author}</Text>
+                        {book.description && (
+                          <Paragraph type="secondary" ellipsis={{ rows: 2 }} style={{ marginTop: 8, marginBottom: 0, fontSize: 13 }}>
+                            {book.description}
+                          </Paragraph>
+                        )}
+                      </>
+                    }
+                  />
+                </Card>
+              </Col>
             ))}
-          </div>
-          {books.length === 0 && <p>No books available.</p>}
-          <div style={{ marginTop: 16 }}>
-            <button onClick={handlePrev} disabled={prevTokens.length === 0} style={{ marginRight: 8 }}>Previous</button>
-            <button onClick={handleNext} disabled={!nextToken}>Next</button>
+          </Row>
+          <div style={{ marginTop: 24, textAlign: 'center' }}>
+            <Pagination
+              current={page}
+              pageSize={pageSize}
+              total={total}
+              onChange={setPage}
+              showSizeChanger={false}
+            />
           </div>
         </>
       )}

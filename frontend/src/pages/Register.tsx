@@ -1,19 +1,17 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Card, Form, Input, Button, Typography, message, ConfigProvider, Grid } from 'antd';
-import { UserOutlined, LockOutlined, GlobalOutlined } from '@ant-design/icons';
+import { UserOutlined, LockOutlined, MailOutlined, GlobalOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import zhCN from 'antd/locale/zh_CN';
 import enUS from 'antd/locale/en_US';
-import { useAuth } from '../auth/AuthContext';
-import { login } from '../api/auth';
+import { register } from '../api/auth';
 
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const { t, i18n } = useTranslation();
-  const { login: setToken } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const screens = useBreakpoint();
@@ -25,15 +23,14 @@ export default function LoginPage() {
     localStorage.setItem('lang', next);
   }
 
-  async function handleSubmit(values: { username: string; password: string }) {
+  async function handleSubmit(values: { username: string; email: string; password: string }) {
     setLoading(true);
     try {
-      const res = await login(values.username, values.password);
-      setToken(res.token);
-      const payload = JSON.parse(atob(res.token.split('.')[1]));
-      navigate(payload.role === 'admin' ? '/admin' : '/console', { replace: true });
+      await register(values.username, values.email, values.password);
+      message.success(t('register.success'));
+      navigate('/login');
     } catch {
-      message.error(t('login.error'));
+      message.error(t('register.error'));
     } finally {
       setLoading(false);
     }
@@ -61,24 +58,42 @@ export default function LoginPage() {
         <Card style={{ width: '100%', maxWidth: 400 }} styles={{ body: { padding: isMobile ? 24 : 32 } }}>
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
             <Title level={3} style={{ margin: 0 }}>{t('app.title')}</Title>
-            <Text type="secondary">{t('app.subtitle')}</Text>
+            <Text type="secondary">{t('register.title')}</Text>
           </div>
           <Form onFinish={handleSubmit} layout="vertical" size="large">
             <Form.Item name="username" rules={[{ required: true }]}>
-              <Input prefix={<UserOutlined />} placeholder={t('login.username')} />
+              <Input prefix={<UserOutlined />} placeholder={t('register.username')} />
             </Form.Item>
-            <Form.Item name="password" rules={[{ required: true }]}>
-              <Input.Password prefix={<LockOutlined />} placeholder={t('login.password')} />
+            <Form.Item name="email" rules={[{ required: true, type: 'email' }]}>
+              <Input prefix={<MailOutlined />} placeholder={t('register.email')} />
+            </Form.Item>
+            <Form.Item name="password" rules={[{ required: true, min: 6 }]}>
+              <Input.Password prefix={<LockOutlined />} placeholder={t('register.password')} />
+            </Form.Item>
+            <Form.Item
+              name="confirmPassword"
+              dependencies={['password']}
+              rules={[
+                { required: true },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || getFieldValue('password') === value) return Promise.resolve();
+                    return Promise.reject(new Error(t('register.passwordMismatch')));
+                  },
+                }),
+              ]}
+            >
+              <Input.Password prefix={<LockOutlined />} placeholder={t('register.confirmPassword')} />
             </Form.Item>
             <Form.Item>
               <Button type="primary" htmlType="submit" block loading={loading}>
-                {t('login.submit')}
+                {t('register.submit')}
               </Button>
             </Form.Item>
           </Form>
           <div style={{ textAlign: 'center' }}>
-            <Text type="secondary">{t('login.noAccount')} </Text>
-            <Link to="/register">{t('login.register')}</Link>
+            <Text type="secondary">{t('register.hasAccount')} </Text>
+            <Link to="/login">{t('register.login')}</Link>
           </div>
         </Card>
       </div>

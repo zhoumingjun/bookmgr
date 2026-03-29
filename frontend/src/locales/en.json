@@ -1,0 +1,128 @@
+{
+  "app": {
+    "title": "BookMgr",
+    "subtitle": "Book Management System"
+  },
+  "nav": {
+    "userManagement": "Users",
+    "bookManagement": "Books",
+    "bookCatalog": "Book Catalog"
+  },
+  "user": {
+    "profile": "Profile",
+    "logout": "Logout",
+    "role": "Role",
+    "roleAdmin": "Admin",
+    "roleUser": "User"
+  },
+  "lang": {
+    "zh": "中文",
+    "en": "English"
+  },
+  "login": {
+    "title": "Login",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Login",
+    "noAccount": "Don't have an account?",
+    "register": "Register",
+    "error": "Invalid username or password"
+  },
+  "register": {
+    "title": "Register",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "submit": "Register",
+    "hasAccount": "Already have an account?",
+    "login": "Login",
+    "success": "Registered successfully, please login",
+    "error": "Registration failed",
+    "passwordMismatch": "Passwords do not match"
+  },
+  "users": {
+    "title": "User Management",
+    "username": "Username",
+    "email": "Email",
+    "role": "Role",
+    "createdAt": "Created",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Delete user \"{{name}}\"?",
+    "deleteSuccess": "User deleted",
+    "deleteFailed": "Failed to delete user",
+    "loadFailed": "Failed to load users"
+  },
+  "userEdit": {
+    "title": "Edit User",
+    "role": "Role",
+    "newPassword": "New Password",
+    "newPasswordPlaceholder": "Leave empty to keep current",
+    "save": "Save",
+    "cancel": "Cancel",
+    "success": "User updated",
+    "error": "Update failed",
+    "loadFailed": "Failed to load user"
+  },
+  "books": {
+    "title": "Book Management",
+    "bookTitle": "Title",
+    "author": "Author",
+    "description": "Description",
+    "createdAt": "Created",
+    "actions": "Actions",
+    "add": "Add Book",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Delete book \"{{name}}\"?",
+    "deleteSuccess": "Book deleted",
+    "deleteFailed": "Failed to delete book",
+    "loadFailed": "Failed to load books"
+  },
+  "bookNew": {
+    "title": "Add Book",
+    "bookTitle": "Title",
+    "author": "Author",
+    "description": "Description",
+    "file": "PDF File",
+    "fileTip": "Click or drag PDF file here",
+    "submit": "Create",
+    "cancel": "Cancel",
+    "success": "Book created",
+    "error": "Failed to create book"
+  },
+  "bookEdit": {
+    "title": "Edit Book",
+    "bookTitle": "Title",
+    "author": "Author",
+    "description": "Description",
+    "replaceFile": "Replace PDF File",
+    "fileTip": "Click or drag new PDF file",
+    "save": "Save",
+    "cancel": "Cancel",
+    "success": "Book updated",
+    "error": "Update failed",
+    "loadFailed": "Failed to load book"
+  },
+  "catalog": {
+    "title": "Book Catalog",
+    "empty": "No books available",
+    "by": "by "
+  },
+  "bookDetail": {
+    "back": "Back to catalog",
+    "download": "Download PDF",
+    "readOnline": "Read Online",
+    "addedAt": "Added",
+    "noFile": "No file uploaded for this book"
+  },
+  "common": {
+    "loading": "Loading...",
+    "confirm": "OK",
+    "cancel": "Cancel",
+    "yes": "Yes",
+    "no": "No"
+  }
+}

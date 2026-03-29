@@ -1,0 +1,128 @@
+{
+  "app": {
+    "title": "BookMgr",
+    "subtitle": "图书管理系统"
+  },
+  "nav": {
+    "userManagement": "用户管理",
+    "bookManagement": "书籍管理",
+    "bookCatalog": "图书浏览"
+  },
+  "user": {
+    "profile": "个人信息",
+    "logout": "退出登录",
+    "role": "角色",
+    "roleAdmin": "管理员",
+    "roleUser": "普通用户"
+  },
+  "lang": {
+    "zh": "中文",
+    "en": "English"
+  },
+  "login": {
+    "title": "登录",
+    "username": "用户名",
+    "password": "密码",
+    "submit": "登录",
+    "noAccount": "没有账号？",
+    "register": "注册",
+    "error": "用户名或密码错误"
+  },
+  "register": {
+    "title": "注册",
+    "username": "用户名",
+    "email": "邮箱",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "submit": "注册",
+    "hasAccount": "已有账号？",
+    "login": "登录",
+    "success": "注册成功，请登录",
+    "error": "注册失败",
+    "passwordMismatch": "两次密码不一致"
+  },
+  "users": {
+    "title": "用户管理",
+    "username": "用户名",
+    "email": "邮箱",
+    "role": "角色",
+    "createdAt": "创建时间",
+    "actions": "操作",
+    "edit": "编辑",
+    "delete": "删除",
+    "deleteConfirm": "确定删除用户 \"{{name}}\" 吗？",
+    "deleteSuccess": "用户已删除",
+    "deleteFailed": "删除失败",
+    "loadFailed": "加载用户列表失败"
+  },
+  "userEdit": {
+    "title": "编辑用户",
+    "role": "角色",
+    "newPassword": "新密码",
+    "newPasswordPlaceholder": "留空则不修改",
+    "save": "保存",
+    "cancel": "取消",
+    "success": "用户已更新",
+    "error": "更新失败",
+    "loadFailed": "加载用户信息失败"
+  },
+  "books": {
+    "title": "书籍管理",
+    "bookTitle": "书名",
+    "author": "作者",
+    "description": "描述",
+    "createdAt": "创建时间",
+    "actions": "操作",
+    "add": "添加图书",
+    "edit": "编辑",
+    "delete": "删除",
+    "deleteConfirm": "确定删除图书 \"{{name}}\" 吗？",
+    "deleteSuccess": "图书已删除",
+    "deleteFailed": "删除失败",
+    "loadFailed": "加载图书列表失败"
+  },
+  "bookNew": {
+    "title": "添加图书",
+    "bookTitle": "书名",
+    "author": "作者",
+    "description": "描述",
+    "file": "PDF 文件",
+    "fileTip": "点击或拖拽 PDF 文件到此区域",
+    "submit": "创建",
+    "cancel": "取消",
+    "success": "图书已创建",
+    "error": "创建失败"
+  },
+  "bookEdit": {
+    "title": "编辑图书",
+    "bookTitle": "书名",
+    "author": "作者",
+    "description": "描述",
+    "replaceFile": "替换 PDF 文件",
+    "fileTip": "点击或拖拽新的 PDF 文件",
+    "save": "保存",
+    "cancel": "取消",
+    "success": "图书已更新",
+    "error": "更新失败",
+    "loadFailed": "加载图书信息失败"
+  },
+  "catalog": {
+    "title": "图书目录",
+    "empty": "暂无图书",
+    "by": "作者："
+  },
+  "bookDetail": {
+    "back": "返回目录",
+    "download": "下载 PDF",
+    "readOnline": "在线阅读",
+    "addedAt": "添加时间",
+    "noFile": "此图书暂未上传文件"
+  },
+  "common": {
+    "loading": "加载中...",
+    "confirm": "确定",
+    "cancel": "取消",
+    "yes": "是",
+    "no": "否"
+  }
+}

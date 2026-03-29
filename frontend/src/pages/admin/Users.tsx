@@ -1,25 +1,31 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Table, Tag, Button, Popconfirm, message, Typography, Grid } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { listUsers, deleteUser, type UserDTO } from '../../api/users';
 
+const { Title } = Typography;
+const { useBreakpoint } = Grid;
+
 export default function UsersPage() {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<UserDTO[]>([]);
   const [nextToken, setNextToken] = useState('');
   const [prevTokens, setPrevTokens] = useState<string[]>([]);
   const [currentToken, setCurrentToken] = useState('');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
 
   async function loadUsers(token: string) {
     setLoading(true);
-    setError('');
     try {
       const res = await listUsers(20, token);
       setUsers(res.users || []);
       setNextToken(res.next_page_token || '');
     } catch {
-      setError('Failed to load users');
+      message.error(t('users.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -27,68 +33,73 @@ export default function UsersPage() {
 
   useEffect(() => { loadUsers(currentToken); }, [currentToken]);
 
-  function handleNext() {
-    setPrevTokens(prev => [...prev, currentToken]);
-    setCurrentToken(nextToken);
-  }
-
-  function handlePrev() {
-    const prev = [...prevTokens];
-    const token = prev.pop() || '';
-    setPrevTokens(prev);
-    setCurrentToken(token);
-  }
-
-  async function handleDelete(id: string, username: string) {
-    if (!confirm(`Delete user "${username}"?`)) return;
+  async function handleDelete(id: string) {
     try {
       await deleteUser(id);
+      message.success(t('users.deleteSuccess'));
       loadUsers(currentToken);
     } catch {
-      setError('Failed to delete user');
+      message.error(t('users.deleteFailed'));
     }
   }
 
+  const columns = [
+    { title: t('users.username'), dataIndex: 'username', key: 'username' },
+    ...(!isMobile ? [{ title: t('users.email'), dataIndex: 'email', key: 'email' }] : []),
+    {
+      title: t('users.role'), dataIndex: 'role', key: 'role',
+      render: (role: string) => (
+        <Tag color={role === 'ROLE_ADMIN' ? 'orange' : 'blue'}>
+          {role === 'ROLE_ADMIN' ? t('user.roleAdmin') : t('user.roleUser')}
+        </Tag>
+      ),
+    },
+    ...(!isMobile ? [{
+      title: t('users.createdAt'), dataIndex: 'create_time', key: 'create_time',
+      render: (v: string) => new Date(v).toLocaleDateString(),
+    }] : []),
+    {
+      title: t('users.actions'), key: 'actions',
+      render: (_: unknown, record: UserDTO) => (
+        <span>
+          <Button type="link" size="small" onClick={() => navigate(`/admin/users/${record.id}`)}>
+            {t('users.edit')}
+          </Button>
+          <Popconfirm
+            title={t('users.deleteConfirm', { name: record.username })}
+            onConfirm={() => handleDelete(record.id)}
+          >
+            <Button type="link" size="small" danger>{t('users.delete')}</Button>
+          </Popconfirm>
+        </span>
+      ),
+    },
+  ];
+
   return (
-    <div style={{ padding: 24 }}>
-      <h2>User Management</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {loading ? <p>Loading...</p> : (
-        <>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th style={thStyle}>Username</th>
-                <th style={thStyle}>Email</th>
-                <th style={thStyle}>Role</th>
-                <th style={thStyle}>Created</th>
-                <th style={thStyle}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map(u => (
-                <tr key={u.id}>
-                  <td style={tdStyle}>{u.username}</td>
-                  <td style={tdStyle}>{u.email}</td>
-                  <td style={tdStyle}>{u.role}</td>
-                  <td style={tdStyle}>{new Date(u.create_time).toLocaleDateString()}</td>
-                  <td style={tdStyle}>
-                    <button onClick={() => navigate(`/admin/users/${u.id}`)} style={{ marginRight: 8 }}>Edit</button>
-                    <button onClick={() => handleDelete(u.id, u.username)}>Delete</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div style={{ marginTop: 16 }}>
-            <button onClick={handlePrev} disabled={prevTokens.length === 0} style={{ marginRight: 8 }}>Previous</button>
-            <button onClick={handleNext} disabled={!nextToken}>Next</button>
-          </div>
-        </>
-      )}
+    <div>
+      <Title level={4}>{t('users.title')}</Title>
+      <Table
+        dataSource={users}
+        columns={columns}
+        rowKey="id"
+        loading={loading}
+        pagination={false}
+        size={isMobile ? 'small' : 'middle'}
+        scroll={isMobile ? { x: 480 } : undefined}
+      />
+      <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+        <Button disabled={prevTokens.length === 0} onClick={() => {
+          const prev = [...prevTokens];
+          const token = prev.pop() || '';
+          setPrevTokens(prev);
+          setCurrentToken(token);
+        }}>{t('common.cancel') === '取消' ? '上一页' : 'Previous'}</Button>
+        <Button disabled={!nextToken} onClick={() => {
+          setPrevTokens(prev => [...prev, currentToken]);
+          setCurrentToken(nextToken);
+        }}>{t('common.cancel') === '取消' ? '下一页' : 'Next'}</Button>
+      </div>
     </div>
   );
 }
-
-const thStyle: React.CSSProperties = { textAlign: 'left', padding: 8, borderBottom: '2px solid #ccc' };
-const tdStyle: React.CSSProperties = { padding: 8, borderBottom: '1px solid #eee' };

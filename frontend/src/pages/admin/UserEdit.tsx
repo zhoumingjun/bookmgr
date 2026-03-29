@@ -1,79 +1,89 @@
-import { useEffect, useState, type FormEvent } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Card, Form, Input, Select, Button, message, Typography, Spin } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { getUser, updateUser } from '../../api/users';
 
+const { Title } = Typography;
+
 export default function UserEditPage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [role, setRole] = useState('ROLE_USER');
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
+  const [form] = Form.useForm();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
+  const [originalRole, setOriginalRole] = useState('');
 
   useEffect(() => {
     if (!id) return;
     getUser(id).then(res => {
-      setUsername(res.user.username);
-      setEmail(res.user.email);
-      setRole(res.user.role);
-      setLoading(false);
-    }).catch(() => {
-      setError('Failed to load user');
-      setLoading(false);
-    });
+      form.setFieldsValue({
+        username: res.user.username,
+        email: res.user.email,
+        role: res.user.role,
+      });
+      setOriginalRole(res.user.role);
+    }).catch(() => message.error(t('userEdit.loadFailed')))
+      .finally(() => setLoading(false));
   }, [id]);
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
+  async function handleSubmit(values: { role: string; password?: string }) {
     if (!id) return;
     setSaving(true);
-    setError('');
     try {
-      const fields: Record<string, string> = { role };
-      const mask = ['role'];
-      if (password) {
-        fields.password = password;
-        mask.push('password');
+      const mask: string[] = [];
+      const fields: Record<string, string> = {};
+      if (values.role !== originalRole) {
+        mask.push('role');
+        fields.role = values.role;
       }
-      await updateUser(id, fields, mask);
+      if (values.password) {
+        mask.push('password');
+        fields.password = values.password;
+      }
+      if (mask.length > 0) {
+        await updateUser(id, fields, mask);
+      }
+      message.success(t('userEdit.success'));
       navigate('/admin/users');
     } catch {
-      setError('Failed to update user');
+      message.error(t('userEdit.error'));
     } finally {
       setSaving(false);
     }
   }
 
-  if (loading) return <p style={{ padding: 24 }}>Loading...</p>;
+  if (loading) return <Spin style={{ display: 'block', marginTop: 48 }} />;
 
   return (
-    <div style={{ maxWidth: 500, padding: 24 }}>
-      <h2>Edit User</h2>
-      <p><strong>Username:</strong> {username}</p>
-      <p><strong>Email:</strong> {email}</p>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: 12 }}>
-          <label htmlFor="role" style={{ display: 'block', marginBottom: 4 }}>Role</label>
-          <select id="role" value={role} onChange={e => setRole(e.target.value)} style={{ padding: 8 }}>
-            <option value="ROLE_USER">User</option>
-            <option value="ROLE_ADMIN">Admin</option>
-          </select>
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <label htmlFor="password" style={{ display: 'block', marginBottom: 4 }}>New Password (leave blank to keep)</label>
-          <input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} style={{ width: '100%', padding: 8 }} />
-        </div>
-        <button type="submit" disabled={saving} style={{ padding: '8px 24px', marginRight: 8 }}>
-          {saving ? 'Saving...' : 'Save'}
-        </button>
-        <button type="button" onClick={() => navigate('/admin/users')} style={{ padding: '8px 24px' }}>
-          Cancel
-        </button>
-      </form>
+    <div>
+      <Title level={4}>{t('userEdit.title')}</Title>
+      <Card style={{ maxWidth: 500 }}>
+        <Form form={form} onFinish={handleSubmit} layout="vertical">
+          <Form.Item label={t('users.username')} name="username">
+            <Input disabled />
+          </Form.Item>
+          <Form.Item label={t('users.email')} name="email">
+            <Input disabled />
+          </Form.Item>
+          <Form.Item label={t('userEdit.role')} name="role" rules={[{ required: true }]}>
+            <Select>
+              <Select.Option value="ROLE_USER">{t('user.roleUser')}</Select.Option>
+              <Select.Option value="ROLE_ADMIN">{t('user.roleAdmin')}</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item label={t('userEdit.newPassword')} name="password">
+            <Input.Password placeholder={t('userEdit.newPasswordPlaceholder')} />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={saving} style={{ marginRight: 8 }}>
+              {t('userEdit.save')}
+            </Button>
+            <Button onClick={() => navigate('/admin/users')}>{t('userEdit.cancel')}</Button>
+          </Form.Item>
+        </Form>
+      </Card>
     </div>
   );
 }
