@@ -2,6 +2,11 @@
 .DS_Store
 Thumbs.db
 
+# Root node artifacts (accidental installs)
+/node_modules/
+/package.json
+/package-lock.json
+
 # IDE
 .idea/
 .vscode/
