@@ -27,7 +27,7 @@ func NewAuthHandler(authService *service.AuthService) *AuthHandler {
 func (h *AuthHandler) Register(ctx context.Context, req *bookmgrv1.RegisterRequest) (*bookmgrv1.RegisterResponse, error) {
 	u, err := h.authService.Register(ctx, req.GetUsername(), req.GetEmail(), req.GetPassword())
 	if err != nil {
-		if strings.Contains(err.Error(), "duplicate") || strings.Contains(err.Error(), "unique") {
+		if strings.Contains(strings.ToLower(err.Error()), "duplicate") || strings.Contains(strings.ToLower(err.Error()), "unique") {
 			return nil, status.Errorf(codes.AlreadyExists, "user already exists")
 		}
 		return nil, status.Errorf(codes.Internal, "registration failed: %v", err)

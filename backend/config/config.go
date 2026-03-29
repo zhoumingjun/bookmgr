@@ -17,6 +17,7 @@ type Config struct {
 	UploadDir     string
 	AdminUsername string
 	AdminPassword string
+	DataDir       string
 }
 
 func New() *Config {

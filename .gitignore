@@ -29,6 +29,11 @@ frontend/.env.local
 # Uploads
 uploads/
 
+# Standalone build artifacts
+bin/
+backend/embed/frontend_dist/*
+!backend/embed/frontend_dist/.gitkeep
+
 # Docker
 docker-data/
 
