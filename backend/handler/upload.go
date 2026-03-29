@@ -26,12 +26,18 @@ func NewUploadHandler(bookService *service.BookService, jwtService *service.JWTS
 
 // Download handles GET /api/v1/books/{id}/download — streams the PDF file.
 func (h *UploadHandler) Download(w http.ResponseWriter, r *http.Request) {
-	authHeader := r.Header.Get("Authorization")
-	if len(authHeader) < 8 || authHeader[:7] != "Bearer " {
+	// Extract token from Authorization header or access_token query parameter (for iframe/direct links).
+	var token string
+	if authHeader := r.Header.Get("Authorization"); len(authHeader) > 7 && authHeader[:7] == "Bearer " {
+		token = authHeader[7:]
+	} else if qt := r.URL.Query().Get("access_token"); qt != "" {
+		token = qt
+	}
+	if token == "" {
 		http.Error(w, `{"code":16,"message":"missing authorization"}`, http.StatusUnauthorized)
 		return
 	}
-	if _, err := h.jwtService.ValidateToken(authHeader[7:]); err != nil {
+	if _, err := h.jwtService.ValidateToken(token); err != nil {
 		http.Error(w, `{"code":16,"message":"invalid token"}`, http.StatusUnauthorized)
 		return
 	}

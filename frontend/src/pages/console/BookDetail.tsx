@@ -1,9 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Button, Descriptions, Typography, Spin, Space, Grid, Empty } from 'antd';
-import { ArrowLeftOutlined, DownloadOutlined, ReadOutlined } from '@ant-design/icons';
+import { Card, Button, Descriptions, Typography, Spin, Space, Grid, Empty, InputNumber } from 'antd';
+import {
+  ArrowLeftOutlined,
+  DownloadOutlined,
+  ReadOutlined,
+  LeftOutlined,
+  RightOutlined,
+  ZoomInOutlined,
+  ZoomOutOutlined,
+} from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { getBook, downloadBookUrl, type BookDTO } from '../../api/books';
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
+import { getBook, downloadBookBlob, downloadBookUrl, type BookDTO } from '../../api/books';
+
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url,
+).toString();
 
 const { Title } = Typography;
 const { useBreakpoint } = Grid;
@@ -18,6 +34,22 @@ export default function BookDetailPage() {
   const screens = useBreakpoint();
   const isMobile = !screens.md;
 
+  // PDF state
+  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [numPages, setNumPages] = useState(0);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [scale, setScale] = useState(isMobile ? 0.8 : 1.2);
+
+  const pdfUrl = useMemo(() => (pdfBlob ? URL.createObjectURL(pdfBlob) : null), [pdfBlob]);
+
+  // Cleanup object URL on unmount
+  useEffect(() => {
+    return () => {
+      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+    };
+  }, [pdfUrl]);
+
   useEffect(() => {
     if (!id) return;
     getBook(id)
@@ -26,18 +58,37 @@ export default function BookDetailPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <Spin style={{ display: 'block', marginTop: 48 }} />;
-  if (!book) return <Empty description="Book not found" />;
-
-  const token = localStorage.getItem('token');
-  const pdfUrl = `${downloadBookUrl(book.id)}?access_token=${token}`;
+  async function handleReadOnline() {
+    if (showReader) {
+      setShowReader(false);
+      return;
+    }
+    if (!pdfBlob && id) {
+      setPdfLoading(true);
+      try {
+        const blob = await downloadBookBlob(id);
+        setPdfBlob(blob);
+      } catch {
+        // ignore
+      } finally {
+        setPdfLoading(false);
+      }
+    }
+    setShowReader(true);
+  }
 
   function handleDownload() {
+    if (!book) return;
+    const token = localStorage.getItem('token');
+    const url = `${downloadBookUrl(book.id)}?access_token=${token}`;
     const a = document.createElement('a');
-    a.href = pdfUrl;
-    a.download = `${book!.title}.pdf`;
+    a.href = url;
+    a.download = `${book.title}.pdf`;
     a.click();
   }
+
+  if (loading) return <Spin style={{ display: 'block', marginTop: 48 }} />;
+  if (!book) return <Empty description="Book not found" />;
 
   return (
     <div>
@@ -65,7 +116,12 @@ export default function BookDetailPage() {
         </Descriptions>
 
         <Space wrap>
-          <Button type="primary" icon={<ReadOutlined />} onClick={() => setShowReader(!showReader)}>
+          <Button
+            type="primary"
+            icon={<ReadOutlined />}
+            onClick={handleReadOnline}
+            loading={pdfLoading}
+          >
             {t('bookDetail.readOnline')}
           </Button>
           <Button icon={<DownloadOutlined />} onClick={handleDownload}>
@@ -74,18 +130,61 @@ export default function BookDetailPage() {
         </Space>
       </Card>
 
-      {showReader && (
-        <Card style={{ marginTop: 16 }} styles={{ body: { padding: 0 } }}>
-          <iframe
-            src={pdfUrl}
+      {showReader && pdfUrl && (
+        <Card style={{ marginTop: 16 }} styles={{ body: { padding: isMobile ? 8 : 16 } }}>
+          {/* Controls */}
+          <Space
             style={{
-              width: '100%',
-              height: isMobile ? '60vh' : '80vh',
-              border: 'none',
-              borderRadius: 8,
+              marginBottom: 12,
+              display: 'flex',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
             }}
-            title={book.title}
-          />
+          >
+            <Button
+              icon={<LeftOutlined />}
+              disabled={pageNumber <= 1}
+              onClick={() => setPageNumber(p => p - 1)}
+            />
+            <Space size={4}>
+              <InputNumber
+                min={1}
+                max={numPages || 1}
+                value={pageNumber}
+                onChange={v => v && setPageNumber(v)}
+                style={{ width: 60 }}
+                size="small"
+              />
+              <span>/ {numPages}</span>
+            </Space>
+            <Button
+              icon={<RightOutlined />}
+              disabled={pageNumber >= numPages}
+              onClick={() => setPageNumber(p => p + 1)}
+            />
+            <Button
+              icon={<ZoomOutOutlined />}
+              disabled={scale <= 0.5}
+              onClick={() => setScale(s => Math.round((s - 0.2) * 10) / 10)}
+            />
+            <span>{Math.round(scale * 100)}%</span>
+            <Button
+              icon={<ZoomInOutlined />}
+              disabled={scale >= 3}
+              onClick={() => setScale(s => Math.round((s + 0.2) * 10) / 10)}
+            />
+          </Space>
+
+          {/* PDF Viewer */}
+          <div style={{ overflow: 'auto', textAlign: 'center' }}>
+            <Document
+              file={pdfUrl}
+              onLoadSuccess={({ numPages: n }) => setNumPages(n)}
+              loading={<Spin style={{ marginTop: 48 }} />}
+            >
+              <Page pageNumber={pageNumber} scale={scale} />
+            </Document>
+          </div>
         </Card>
       )}
     </div>

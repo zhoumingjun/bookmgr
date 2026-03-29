@@ -75,3 +75,8 @@ export async function uploadBookFile(bookId: string, file: File): Promise<{ id: 
 export function downloadBookUrl(bookId: string): string {
   return `/api/v1/books/${bookId}/download`;
 }
+
+export async function downloadBookBlob(bookId: string): Promise<Blob> {
+  const { data } = await apiClient.get(`/books/${bookId}/download`, { responseType: 'blob' });
+  return data;
+}
