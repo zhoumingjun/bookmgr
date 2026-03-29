@@ -45,6 +45,7 @@ func NewRouter(health *handler.HealthHandler, upload *handler.UploadHandler, gwM
 
 	r.Get("/healthz", health.Health)
 	r.Post("/api/v1/books/{id}/upload", upload.Upload)
+	r.Get("/api/v1/books/{id}/download", upload.Download)
 
 	// Mount grpc-gateway — it handles /api/v1/* paths as defined in proto HTTP annotations
 	r.Mount("/", gwMux)
