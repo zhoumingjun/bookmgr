@@ -88,12 +88,21 @@ npm run lint                  # ESLint
 npm test                      # Vitest
 ```
 
-### Docker
+### Docker / Environment Management
 ```bash
-docker compose up -d          # Start all services
-docker compose down           # Stop all services
-docker compose up -d --build  # Rebuild and start
-docker compose logs -f        # Follow logs
+# Environment management via scripts/env.sh
+./scripts/env.sh prod up        # Start prod (port 8000)
+./scripts/env.sh prod down      # Stop prod
+./scripts/env.sh prod rebuild   # Rebuild and start prod
+./scripts/env.sh prod logs      # Follow prod logs
+
+./scripts/env.sh test up        # Start test (port 9000, clean DB)
+./scripts/env.sh test down      # Stop test
+./scripts/env.sh test run       # up → API BDD + E2E BDD → down
+./scripts/env.sh test run-api   # Run API BDD only
+./scripts/env.sh test run-e2e   # Run E2E BDD only
+
+./scripts/env.sh status         # Show both environments
 ```
 
 ## Architecture Decisions

@@ -1,0 +1,19 @@
+_format_version: "3.0"
+
+services:
+  - name: backend-service
+    url: http://backend:8080
+    routes:
+      - name: backend-route
+        paths:
+          - /api
+          - /healthz
+        strip_path: false
+
+  - name: frontend-service
+    url: http://frontend:80
+    routes:
+      - name: frontend-route
+        paths:
+          - /
+        strip_path: false

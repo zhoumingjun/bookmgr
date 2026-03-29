@@ -1,0 +1,64 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: "no"
+    environment:
+      POSTGRES_USER: bookmgr_test
+      POSTGRES_PASSWORD: testpass
+      POSTGRES_DB: bookmgr_test
+    ports:
+      - "5532:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bookmgr_test"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build:
+      context: ../../../
+      dockerfile: backend/Dockerfile
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: "8080"
+      DATABASE_URL: "postgres://bookmgr_test:testpass@postgres:5432/bookmgr_test?sslmode=disable"
+      JWT_SECRET: "test-secret-deterministic"
+      UPLOAD_DIR: "/app/uploads"
+      ADMIN_PASSWORD: "changeme"
+    tmpfs:
+      - /app/uploads
+
+  frontend:
+    build:
+      context: ../../../frontend
+      dockerfile: Dockerfile
+    restart: "no"
+    depends_on:
+      - backend
+
+  kong:
+    image: kong/kong-gateway:3.9
+    restart: "no"
+    depends_on:
+      - backend
+      - frontend
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /etc/kong/kong.yml
+      KONG_PROXY_LISTEN: "0.0.0.0:8000"
+      KONG_ADMIN_LISTEN: "off"
+      KONG_LOG_LEVEL: info
+    volumes:
+      - ./kong/kong.yml:/etc/kong/kong.yml:ro
+    ports:
+      - "9000:8000"
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10

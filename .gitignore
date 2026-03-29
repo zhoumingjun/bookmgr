@@ -27,5 +27,15 @@ uploads/
 # Docker
 docker-data/
 
+# Ops — prod .env (test .env is committed with deterministic values)
+ops/cd/prod/.env
+
+# E2E test artifacts
+e2e/node_modules/
+e2e/.features-gen/
+e2e/test-results/
+e2e/playwright-report/
+e2e/cucumber-report/
+
 # Logs
 *.log

@@ -1,0 +1,15 @@
+{
+  "name": "bookmgr-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "npx bddgen && npx playwright test",
+    "bddgen": "npx bddgen",
+    "report": "npx playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.0",
+    "playwright-bdd": "^8.5.0",
+    "typescript": "^5.8.0"
+  }
+}
