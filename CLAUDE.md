@@ -30,6 +30,7 @@ bookmgr/
 │   ├── service/               # Business logic layer
 │   ├── repository/            # Data access layer (wraps Ent client)
 │   ├── database/              # DB connection, migration, seeding
+│   ├── migrations/            # Atlas versioned SQL migrations (embedded in binary)
 │   ├── ent/                   # Ent ORM (schema/ is hand-written, rest is generated)
 │   │   └── schema/            # Ent schema definitions
 │   ├── middleware/             # JWT auth, CORS, logging middleware
@@ -55,6 +56,17 @@ bookmgr/
 buf lint                       # Lint proto files (AIP rules)
 buf breaking --against '.git#branch=main'  # Detect breaking API changes
 buf generate                   # Generate Go, gRPC, gateway, OpenAPI code
+```
+
+### Database Migrations
+```bash
+cd backend
+# After changing Ent schemas, generate a new migration:
+atlas migrate diff <migration_name> --env ent
+# Verify migration integrity:
+atlas migrate validate --dir file://migrations
+# Rehash after manual edits:
+atlas migrate hash --dir file://migrations
 ```
 
 ### Backend
@@ -117,6 +129,13 @@ HTTP Request -> Chi (middleware/) -> grpc-gateway -> gRPC service -> service/ ->
 - Schema definitions in `backend/ent/schema/`
 - Generated code in `backend/ent/` (committed to git)
 - Run `go generate ./ent` after any schema change
+
+### Atlas Versioned Migrations
+- Migration SQL files in `backend/migrations/` (committed to git, reviewed in PRs)
+- `atlas.hcl` configures Ent provider for diffing schema against migrations
+- Migrations embedded in Go binary via `//go:embed` and applied programmatically at startup
+- Revision tracking via `atlas_schema_revisions` table in PostgreSQL
+- Workflow: change Ent schema → `go generate ./ent` → `atlas migrate diff --env ent "<name>"` → review SQL → commit
 
 ### Frontend Single-App Architecture
 One React app with React Router:
