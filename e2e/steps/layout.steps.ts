@@ -6,12 +6,13 @@ const { Given, When, Then } = createBdd();
 // --- When ---
 
 When('我点击用户下拉菜单', async ({ page }) => {
-  // The user dropdown trigger button in the header
-  await page.locator('header').getByRole('button').filter({ has: page.locator('.anticon-user') }).click();
+  // The user dropdown button shows username with a down arrow in the header
+  await page.locator('header').getByRole('button', { name: /down/ }).click();
 });
 
 When('我点击语言切换按钮', async ({ page }) => {
-  await page.locator('header').getByRole('button').filter({ has: page.locator('.anticon-global') }).click();
+  // The language button shows "中文" or "EN" in the header
+  await page.locator('header').getByRole('button', { name: /中文|EN/ }).click();
 });
 
 When('我刷新页面', async ({ page }) => {
@@ -44,11 +45,11 @@ Then('我应该看到退出登录选项', async ({ page }) => {
 });
 
 Then('页面应该显示中文界面', async ({ page }) => {
-  await expect(page.getByText('图书浏览')).toBeVisible();
+  await expect(page.getByRole('heading', { name: '图书目录' })).toBeVisible();
 });
 
 Then('页面应该显示英文界面', async ({ page }) => {
-  await expect(page.getByText('Book Catalog')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Book Catalog' })).toBeVisible();
 });
 
 Then('语言偏好应该保存到 localStorage', async ({ page }) => {

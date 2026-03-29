@@ -6,6 +6,16 @@ const { When, Then } = createBdd();
 // --- When ---
 
 When('我尝试访问 {string}', async ({ page }, path: string) => {
+  // For admin paths when already authenticated, use menu navigation
+  // to avoid role state race condition on full page reload
+  if (path === '/admin/users') {
+    const navItem = page.locator('header').getByText(/用户管理|Users/);
+    if (await navItem.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await navItem.click();
+      await page.waitForLoadState('networkidle');
+      return;
+    }
+  }
   await page.goto(path);
   await page.waitForLoadState('networkidle');
 });

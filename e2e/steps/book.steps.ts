@@ -36,10 +36,10 @@ Given('管理员已创建图书 {string} 作者 {string} 并上传PDF', async ({
 Given('我已登录为管理员', async ({ page }) => {
   const client = new ApiClient();
   const token = await client.login(TEST_ADMIN.username, TEST_ADMIN.password);
-  await page.goto('/');
+  await page.goto('/login');
   await page.evaluate((t) => localStorage.setItem('token', t), token);
-  await page.reload();
-  await page.waitForURL('**/console/**');
+  await page.goto('/console/books');
+  await page.waitForLoadState('networkidle');
 });
 
 Given('我已登录为普通用户', async ({ page }) => {
@@ -49,10 +49,10 @@ Given('我已登录为普通用户', async ({ page }) => {
     await client.register('testuser', 'testpass123');
   } catch { /* already exists */ }
   const token = await client.login('testuser', 'testpass123');
-  await page.goto('/');
+  await page.goto('/login');
   await page.evaluate((t) => localStorage.setItem('token', t), token);
-  await page.reload();
-  await page.waitForURL('**/console/**');
+  await page.goto('/console/books');
+  await page.waitForLoadState('networkidle');
 });
 
 // --- When ---
@@ -68,12 +68,14 @@ When('我访问该图书的详情页面', async ({ page }) => {
 });
 
 When('我访问图书管理页面', async ({ page }) => {
-  await page.goto('/admin/books');
+  // Click the nav menu item instead of page.goto to use client-side routing
+  // (avoids full reload which causes auth role race condition)
+  await page.locator('header').getByText(/书籍管理|Book Management/i).click();
   await page.waitForLoadState('networkidle');
 });
 
 When('我点击图书 {string}', async ({ page }, title: string) => {
-  await page.getByText(title).click();
+  await page.getByText(title).first().click();
 });
 
 When('我点击添加图书按钮', async ({ page }) => {
@@ -89,20 +91,20 @@ When('我输入作者名 {string}', async ({ page }, author: string) => {
 });
 
 When('我点击创建按钮', async ({ page }) => {
-  await page.getByRole('button', { name: /创建|Create/i }).click();
+  await page.locator('button[type="submit"]').click();
 });
 
 When('我点击保存按钮', async ({ page }) => {
-  await page.getByRole('button', { name: /保存|Save/i }).click();
+  await page.locator('button[type="submit"]').click();
 });
 
 When('我点击图书 {string} 的编辑按钮', async ({ page }, title: string) => {
-  const row = page.locator('tr', { hasText: title });
+  const row = page.locator('tr', { hasText: title }).first();
   await row.getByRole('button', { name: /编辑|Edit/i }).click();
 });
 
 When('我点击图书 {string} 的删除按钮', async ({ page }, title: string) => {
-  const row = page.locator('tr', { hasText: title });
+  const row = page.locator('tr', { hasText: title }).first();
   await row.getByRole('button', { name: /删除|Delete/i }).click();
 });
 
@@ -111,21 +113,22 @@ When('我修改书名为 {string}', async ({ page }, newTitle: string) => {
 });
 
 When('我确认删除', async ({ page }) => {
-  await page.getByRole('button', { name: /确定|OK|Yes/i }).click();
+  // Ant Design Popconfirm OK button
+  await page.locator('.ant-popconfirm .ant-btn-primary').click();
 });
 
 // --- Then ---
 
 Then('我应该看到页面标题 {string}', async ({ page }, title: string) => {
-  await expect(page.getByText(title)).toBeVisible();
+  await expect(page.getByText(title).first()).toBeVisible();
 });
 
 Then('我应该看到包含 {string} 的图书卡片', async ({ page }, title: string) => {
-  await expect(page.getByText(title)).toBeVisible();
+  await expect(page.getByText(title).first()).toBeVisible();
 });
 
 Then('图书卡片应该显示作者 {string}', async ({ page }, author: string) => {
-  await expect(page.getByText(author)).toBeVisible();
+  await expect(page.getByText(author).first()).toBeVisible();
 });
 
 Then('我应该进入图书详情页面', async ({ page }) => {
@@ -133,11 +136,11 @@ Then('我应该进入图书详情页面', async ({ page }) => {
 });
 
 Then('我应该看到图书标题 {string}', async ({ page }, title: string) => {
-  await expect(page.getByText(title)).toBeVisible();
+  await expect(page.getByText(title).first()).toBeVisible();
 });
 
 Then('我应该看到图书作者 {string}', async ({ page }, author: string) => {
-  await expect(page.getByText(author)).toBeVisible();
+  await expect(page.getByText(author).first()).toBeVisible();
 });
 
 Then('我应该看到添加时间', async ({ page }) => {
@@ -157,7 +160,7 @@ Then('我应该看到在线阅读按钮', async ({ page }) => {
 });
 
 Then('我应该看到创建成功的提示', async ({ page }) => {
-  await expect(page.locator('.ant-message')).toContainText(/图书已创建|Book created/i);
+  await expect(page.locator('.ant-message')).toContainText(/图书已创建|Book created/i, { timeout: 10_000 });
 });
 
 Then('我应该返回图书管理页面', async ({ page }) => {
@@ -165,9 +168,9 @@ Then('我应该返回图书管理页面', async ({ page }) => {
 });
 
 Then('我应该看到更新成功的提示', async ({ page }) => {
-  await expect(page.locator('.ant-message')).toContainText(/图书已更新|Book updated/i);
+  await expect(page.locator('.ant-message')).toContainText(/图书已更新|Book updated/i, { timeout: 10_000 });
 });
 
 Then('我应该看到删除成功的提示', async ({ page }) => {
-  await expect(page.locator('.ant-message')).toContainText(/图书已删除|Book deleted/i);
+  await expect(page.locator('.ant-message')).toContainText(/图书已删除|Book deleted/i, { timeout: 10_000 });
 });

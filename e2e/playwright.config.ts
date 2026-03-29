@@ -1,7 +1,10 @@
 import { defineConfig } from '@playwright/test';
 import { defineBddConfig, cucumberReporter } from 'playwright-bdd';
 
+import path from 'path';
+
 const testDir = defineBddConfig({
+  featuresRoot: path.resolve(__dirname, '../features'),
   features: '../features/**/*.feature',
   steps: './steps/**/*.ts',
   language: 'zh-CN',
@@ -19,8 +22,10 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'chromium',
-      use: { browserName: 'chromium' },
+      name: 'chrome',
+      use: {
+        channel: 'chrome',
+      },
     },
   ],
   reporter: [

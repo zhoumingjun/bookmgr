@@ -11,7 +11,7 @@
 - [x] 1.9 创建 backend/test/bdd/features_test.go（godog.TestSuite 入口，//go:build bdd，排除 @e2e-only），go get godog
 - [x] 1.10 创建 Go helpers（backend/test/bdd/helpers/client.go: HTTPClient 封装 + LoginAs；testdata.go: 常量；testdata/sample.pdf）
 - [x] 1.11 更新 .gitignore（ops/cd/prod/.env, e2e/.features-gen/, e2e/test-results/, e2e/playwright-report/）
-- [ ] 1.12 验证：scripts/env.sh test up + wait 成功，scripts/env.sh prod up 成功，两环境同时运行互不干扰
+- [x] 1.12 验证：scripts/env.sh test up + wait 成功，scripts/env.sh prod up 成功，两环境同时运行互不干扰
 
 ## Phase 2: E2E BDD Features（Playwright）
 
@@ -27,7 +27,7 @@
 - [x] 2.10 实现 e2e/steps/common.steps.ts — 权限部分（URL 重定向断言、菜单可见性检查）
 - [x] 2.11 编写 features/界面布局/导航栏.feature 和 features/界面布局/国际化.feature
 - [x] 2.12 实现 e2e/steps/layout.steps.ts（导航菜单内容、下拉菜单、语言切换、localStorage 验证）
-- [ ] 2.13 全量 E2E 运行：scripts/env.sh test run-e2e，调试失败用例，生成 HTML 报告
+- [x] 2.13 全量 E2E 运行：scripts/env.sh test run-e2e，调试失败用例，生成 HTML 报告
 
 ## Phase 3: API BDD Features（Go godog）
 
@@ -35,5 +35,5 @@
 - [x] 3.2 实现 backend/test/bdd/steps/auth_steps.go（注册 API 步骤：缺少字段、密码过短、用户名重复；登录 API 步骤：JWT 验证）
 - [x] 3.3 实现 backend/test/bdd/steps/book_steps.go（图书 CRUD、multipart 上传、Bearer/access_token 下载、分页、404 检查）
 - [x] 3.4 实现 backend/test/bdd/steps/user_steps.go（用户列表、角色更新、密码更新后重新登录、自删除防护、权限拒绝）
-- [ ] 3.5 全量 API BDD 运行：scripts/env.sh test run-api，调试失败用例
-- [ ] 3.6 集成验证：scripts/env.sh test run 跑完整流程（API + E2E），验证退出码
+- [x] 3.5 全量 API BDD 运行：scripts/env.sh test run-api，调试失败用例
+- [x] 3.6 集成验证：scripts/env.sh test run 跑完整流程（API + E2E），验证退出码

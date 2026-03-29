@@ -27,11 +27,11 @@ export class ApiClient {
     return this.token;
   }
 
-  async register(username: string, password: string): Promise<UserResponse> {
+  async register(username: string, password: string, email?: string): Promise<UserResponse> {
     const res = await fetch(`${BASE_URL}/api/v1/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username, password, email: email || `${username}@test.com` }),
     });
     if (!res.ok) throw new Error(`Register failed: ${res.status}`);
     return (await res.json()) as UserResponse;
