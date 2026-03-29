@@ -51,15 +51,16 @@ export default function AppLayout() {
   const antdLocale = i18n.language === 'zh' ? zhCN : enUS;
 
   const navItems = useMemo(() => {
-    if (isAdmin) {
-      return [
-        { key: '/admin/users', icon: <TeamOutlined />, label: t('nav.userManagement') },
-        { key: '/admin/books', icon: <BookOutlined />, label: t('nav.bookManagement') },
-      ];
-    }
-    return [
+    const items = [
       { key: '/console/books', icon: <BookOutlined />, label: t('nav.bookCatalog') },
     ];
+    if (isAdmin) {
+      items.push(
+        { key: '/admin/users', icon: <TeamOutlined />, label: t('nav.userManagement') },
+        { key: '/admin/books', icon: <BookOutlined />, label: t('nav.bookManagement') },
+      );
+    }
+    return items;
   }, [isAdmin, t]);
 
   const selectedKey = navItems.find(item => location.pathname.startsWith(item.key))?.key || navItems[0]?.key;
@@ -170,7 +171,7 @@ export default function AppLayout() {
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',
                 }}
-                onClick={() => navigate(isAdmin ? '/admin/users' : '/console/books')}
+                onClick={() => navigate('/console/books')}
               >
                 {t('app.title')}
               </div>

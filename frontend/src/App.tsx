@@ -19,20 +19,20 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route element={<ProtectedRoute requireAdmin><AppLayout /></ProtectedRoute>}>
-            <Route path="/admin/users" element={<UsersPage />} />
-            <Route path="/admin/users/:id" element={<UserEditPage />} />
-            <Route path="/admin/books" element={<BooksPage />} />
-            <Route path="/admin/books/new" element={<BookNewPage />} />
-            <Route path="/admin/books/:id" element={<BookEditPage />} />
-            <Route path="/admin" element={<Navigate to="/admin/users" replace />} />
-          </Route>
           <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+            {/* Console routes — all authenticated users */}
             <Route path="/console/books" element={<ConsoleBooksPage />} />
             <Route path="/console/books/:id" element={<BookDetailPage />} />
             <Route path="/console" element={<Navigate to="/console/books" replace />} />
+            {/* Admin routes — admin only */}
+            <Route path="/admin/users" element={<ProtectedRoute requireAdmin><UsersPage /></ProtectedRoute>} />
+            <Route path="/admin/users/:id" element={<ProtectedRoute requireAdmin><UserEditPage /></ProtectedRoute>} />
+            <Route path="/admin/books" element={<ProtectedRoute requireAdmin><BooksPage /></ProtectedRoute>} />
+            <Route path="/admin/books/new" element={<ProtectedRoute requireAdmin><BookNewPage /></ProtectedRoute>} />
+            <Route path="/admin/books/:id" element={<ProtectedRoute requireAdmin><BookEditPage /></ProtectedRoute>} />
+            <Route path="/admin" element={<Navigate to="/admin/users" replace />} />
           </Route>
-          <Route path="/" element={<Navigate to="/console" replace />} />
+          <Route path="/" element={<Navigate to="/console/books" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

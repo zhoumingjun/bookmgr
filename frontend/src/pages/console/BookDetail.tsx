@@ -1,54 +1,26 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Button, Descriptions, Typography, Spin, Space, Grid, Empty, InputNumber } from 'antd';
-import {
-  ArrowLeftOutlined,
-  DownloadOutlined,
-  ReadOutlined,
-  LeftOutlined,
-  RightOutlined,
-  ZoomInOutlined,
-  ZoomOutOutlined,
-} from '@ant-design/icons';
+import { Card, Button, Descriptions, Typography, Spin, Space, Grid, Empty } from 'antd';
+import { ArrowLeftOutlined, DownloadOutlined, ReadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { Document, Page, pdfjs } from 'react-pdf';
-import 'react-pdf/dist/Page/AnnotationLayer.css';
-import 'react-pdf/dist/Page/TextLayer.css';
+import { PDFViewer } from '@embedpdf/react-pdf-viewer';
 import { getBook, downloadBookBlob, downloadBookUrl, type BookDTO } from '../../api/books';
-
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url,
-).toString();
 
 const { Title } = Typography;
 const { useBreakpoint } = Grid;
 
 export default function BookDetailPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [book, setBook] = useState<BookDTO | null>(null);
   const [loading, setLoading] = useState(true);
   const [showReader, setShowReader] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
+  const [viewerReady, setViewerReady] = useState(false);
   const screens = useBreakpoint();
   const isMobile = !screens.md;
-
-  // PDF state
-  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
-  const [pdfLoading, setPdfLoading] = useState(false);
-  const [numPages, setNumPages] = useState(0);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [scale, setScale] = useState(isMobile ? 0.8 : 1.2);
-
-  const pdfUrl = useMemo(() => (pdfBlob ? URL.createObjectURL(pdfBlob) : null), [pdfBlob]);
-
-  // Cleanup object URL on unmount
-  useEffect(() => {
-    return () => {
-      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
-    };
-  }, [pdfUrl]);
 
   useEffect(() => {
     if (!id) return;
@@ -58,16 +30,36 @@ export default function BookDetailPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  // Cleanup blob URL on unmount
+  useEffect(() => {
+    return () => {
+      if (pdfBlobUrl) URL.revokeObjectURL(pdfBlobUrl);
+    };
+  }, [pdfBlobUrl]);
+
+  // Delay mounting PDFViewer until container is in the DOM and laid out
+  useEffect(() => {
+    if (!showReader || !pdfBlobUrl) {
+      setViewerReady(false);
+      return;
+    }
+    // Wait for the container div to be laid out before mounting the viewer
+    const frameId = requestAnimationFrame(() => {
+      setViewerReady(true);
+    });
+    return () => cancelAnimationFrame(frameId);
+  }, [showReader, pdfBlobUrl]);
+
   async function handleReadOnline() {
     if (showReader) {
       setShowReader(false);
       return;
     }
-    if (!pdfBlob && id) {
+    if (!pdfBlobUrl && id) {
       setPdfLoading(true);
       try {
         const blob = await downloadBookBlob(id);
-        setPdfBlob(blob);
+        setPdfBlobUrl(URL.createObjectURL(blob));
       } catch {
         // ignore
       } finally {
@@ -89,6 +81,8 @@ export default function BookDetailPage() {
 
   if (loading) return <Spin style={{ display: 'block', marginTop: 48 }} />;
   if (!book) return <Empty description="Book not found" />;
+
+  const pdfLocale = i18n.language === 'zh' ? 'zh-CN' : 'en';
 
   return (
     <div>
@@ -130,62 +124,21 @@ export default function BookDetailPage() {
         </Space>
       </Card>
 
-      {showReader && pdfUrl && (
-        <Card style={{ marginTop: 16 }} styles={{ body: { padding: isMobile ? 8 : 16 } }}>
-          {/* Controls */}
-          <Space
-            style={{
-              marginBottom: 12,
-              display: 'flex',
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-            }}
-          >
-            <Button
-              icon={<LeftOutlined />}
-              disabled={pageNumber <= 1}
-              onClick={() => setPageNumber(p => p - 1)}
+      {showReader && pdfBlobUrl && (
+        <div style={{ marginTop: 16, height: isMobile ? '60vh' : '80vh', width: '100%' }}>
+          {viewerReady ? (
+            <PDFViewer
+              config={{
+                src: pdfBlobUrl,
+                tabBar: 'never',
+                theme: { preference: 'light' },
+                i18n: { defaultLocale: pdfLocale },
+              }}
             />
-            <Space size={4}>
-              <InputNumber
-                min={1}
-                max={numPages || 1}
-                value={pageNumber}
-                onChange={v => v && setPageNumber(v)}
-                style={{ width: 60 }}
-                size="small"
-              />
-              <span>/ {numPages}</span>
-            </Space>
-            <Button
-              icon={<RightOutlined />}
-              disabled={pageNumber >= numPages}
-              onClick={() => setPageNumber(p => p + 1)}
-            />
-            <Button
-              icon={<ZoomOutOutlined />}
-              disabled={scale <= 0.5}
-              onClick={() => setScale(s => Math.round((s - 0.2) * 10) / 10)}
-            />
-            <span>{Math.round(scale * 100)}%</span>
-            <Button
-              icon={<ZoomInOutlined />}
-              disabled={scale >= 3}
-              onClick={() => setScale(s => Math.round((s + 0.2) * 10) / 10)}
-            />
-          </Space>
-
-          {/* PDF Viewer */}
-          <div style={{ overflow: 'auto', textAlign: 'center' }}>
-            <Document
-              file={pdfUrl}
-              onLoadSuccess={({ numPages: n }) => setNumPages(n)}
-              loading={<Spin style={{ marginTop: 48 }} />}
-            >
-              <Page pageNumber={pageNumber} scale={scale} />
-            </Document>
-          </div>
-        </Card>
+          ) : (
+            <Spin style={{ display: 'block', marginTop: 48 }} />
+          )}
+        </div>
       )}
     </div>
   );
