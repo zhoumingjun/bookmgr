@@ -11,6 +11,8 @@ import (
 	"google.golang.org/grpc/test/bufconn"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/zhoumingjun/bookmgr/backend/handler"
+	"github.com/zhoumingjun/bookmgr/backend/middleware"
 	bookmgrv1 "github.com/zhoumingjun/bookmgr/gen/api/bookmgr/v1"
 )
 
@@ -33,19 +35,22 @@ func NewBufListener() *BufListener {
 	return &BufListener{Listener: bufconn.Listen(bufSize)}
 }
 
-// NewGRPCServer creates a gRPC server with protovalidate interceptor and registers unimplemented service stubs.
-func NewGRPCServer() (*grpc.Server, error) {
+// NewGRPCServer creates a gRPC server with protovalidate interceptor and registers service implementations.
+func NewGRPCServer(authHandler *handler.AuthHandler, mw *middleware.Interceptors) (*grpc.Server, error) {
 	validator, err := protovalidate.New()
 	if err != nil {
 		return nil, err
 	}
 
 	srv := grpc.NewServer(
-		grpc.UnaryInterceptor(protovalidateUnaryInterceptor(validator)),
+		grpc.ChainUnaryInterceptor(
+			protovalidateUnaryInterceptor(validator),
+			mw.Auth,
+			mw.Role,
+		),
 	)
 
-	// Register unimplemented service stubs so that grpc-gateway can route to them.
-	bookmgrv1.RegisterAuthServiceServer(srv, &bookmgrv1.UnimplementedAuthServiceServer{})
+	bookmgrv1.RegisterAuthServiceServer(srv, authHandler)
 	bookmgrv1.RegisterBookServiceServer(srv, &bookmgrv1.UnimplementedBookServiceServer{})
 	bookmgrv1.RegisterUserServiceServer(srv, &bookmgrv1.UnimplementedUserServiceServer{})
 
