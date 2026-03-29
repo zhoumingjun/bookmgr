@@ -14,6 +14,9 @@ var adminMethods = map[string]bool{
 	"/bookmgr.v1.UserService/GetUser":    true,
 	"/bookmgr.v1.UserService/UpdateUser": true,
 	"/bookmgr.v1.UserService/DeleteUser": true,
+	"/bookmgr.v1.BookService/CreateBook": true,
+	"/bookmgr.v1.BookService/UpdateBook": true,
+	"/bookmgr.v1.BookService/DeleteBook": true,
 }
 
 // RoleInterceptor returns a gRPC unary interceptor that enforces admin role on admin-only RPCs.

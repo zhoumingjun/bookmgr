@@ -37,13 +37,14 @@ func main() {
 	).Run()
 }
 
-func NewRouter(health *handler.HealthHandler, gwMux *runtime.ServeMux) *chi.Mux {
+func NewRouter(health *handler.HealthHandler, upload *handler.UploadHandler, gwMux *runtime.ServeMux) *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(chimw.Logger)
 	r.Use(chimw.Recoverer)
 	r.Use(chimw.RequestID)
 
 	r.Get("/healthz", health.Health)
+	r.Post("/api/v1/books/{id}/upload", upload.Upload)
 
 	// Mount grpc-gateway — it handles /api/v1/* paths as defined in proto HTTP annotations
 	r.Mount("/", gwMux)

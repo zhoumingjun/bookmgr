@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/zhoumingjun/bookmgr/backend/ent/book"
 	"github.com/zhoumingjun/bookmgr/backend/ent/schema"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
@@ -14,6 +15,70 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	bookFields := schema.Book{}.Fields()
+	_ = bookFields
+	// bookDescTitle is the schema descriptor for title field.
+	bookDescTitle := bookFields[1].Descriptor()
+	// book.TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	book.TitleValidator = func() func(string) error {
+		validators := bookDescTitle.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(title string) error {
+			for _, fn := range fns {
+				if err := fn(title); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// bookDescAuthor is the schema descriptor for author field.
+	bookDescAuthor := bookFields[2].Descriptor()
+	// book.AuthorValidator is a validator for the "author" field. It is called by the builders before save.
+	book.AuthorValidator = func() func(string) error {
+		validators := bookDescAuthor.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(author string) error {
+			for _, fn := range fns {
+				if err := fn(author); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// bookDescDescription is the schema descriptor for description field.
+	bookDescDescription := bookFields[3].Descriptor()
+	// book.DefaultDescription holds the default value on creation for the description field.
+	book.DefaultDescription = bookDescDescription.Default.(string)
+	// bookDescCoverURL is the schema descriptor for cover_url field.
+	bookDescCoverURL := bookFields[4].Descriptor()
+	// book.DefaultCoverURL holds the default value on creation for the cover_url field.
+	book.DefaultCoverURL = bookDescCoverURL.Default.(string)
+	// bookDescFilePath is the schema descriptor for file_path field.
+	bookDescFilePath := bookFields[5].Descriptor()
+	// book.DefaultFilePath holds the default value on creation for the file_path field.
+	book.DefaultFilePath = bookDescFilePath.Default.(string)
+	// bookDescCreatedAt is the schema descriptor for created_at field.
+	bookDescCreatedAt := bookFields[7].Descriptor()
+	// book.DefaultCreatedAt holds the default value on creation for the created_at field.
+	book.DefaultCreatedAt = bookDescCreatedAt.Default.(func() time.Time)
+	// bookDescUpdatedAt is the schema descriptor for updated_at field.
+	bookDescUpdatedAt := bookFields[8].Descriptor()
+	// book.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	book.DefaultUpdatedAt = bookDescUpdatedAt.Default.(func() time.Time)
+	// book.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	book.UpdateDefaultUpdatedAt = bookDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// bookDescID is the schema descriptor for id field.
+	bookDescID := bookFields[0].Descriptor()
+	// book.DefaultID holds the default value on creation for the id field.
+	book.DefaultID = bookDescID.Default.(func() uuid.UUID)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescUsername is the schema descriptor for username field.

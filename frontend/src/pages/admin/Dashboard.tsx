@@ -7,6 +7,7 @@ export default function AdminDashboard() {
       <nav>
         <ul>
           <li><Link to="/admin/users">User Management</Link></li>
+          <li><Link to="/admin/books">Book Management</Link></li>
         </ul>
       </nav>
     </div>

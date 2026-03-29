@@ -8,4 +8,6 @@ var Module = fx.Options(
 	fx.Provide(NewHealthHandler),
 	fx.Provide(NewAuthHandler),
 	fx.Provide(NewUserHandler),
+	fx.Provide(NewBookHandler),
+	fx.Provide(NewUploadHandler),
 )
