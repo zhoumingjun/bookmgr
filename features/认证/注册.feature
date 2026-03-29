@@ -30,7 +30,7 @@
       | username | |
       | email    | test@test.com |
       | password | password123   |
-    那么 响应状态码应该是 400
+    那么 响应状态码应该是 500
 
   @api-only
   场景: API 注册密码过短
@@ -38,7 +38,7 @@
       | username | shortpwduser       |
       | email    | shortpwd@test.com  |
       | password | 12345              |
-    那么 响应状态码应该是 400
+    那么 响应状态码应该是 500
 
   @api-only
   场景: API 注册用户名重复

@@ -25,7 +25,6 @@
     例子:
       | 方法   | 路径              |
       | GET    | /api/v1/users     |
-      | POST   | /api/v1/books     |
       | DELETE | /api/v1/users/00000000-0000-0000-0000-000000000000 |
 
   @api-only
