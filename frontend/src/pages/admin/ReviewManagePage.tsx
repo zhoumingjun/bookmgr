@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Table, Tag, Button, message, Space, Typography, Modal, Input, Popconfirm, Spin } from 'antd';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { approveBook, rejectBook } from '../../api/reviews';
+import { approveBook, rejectBook } from '../../api/review';
 import { listBooks } from '../../api/books';
 
 const { Title, Text } = Typography;
