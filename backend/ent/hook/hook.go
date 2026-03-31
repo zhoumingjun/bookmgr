@@ -45,6 +45,18 @@ func (f BookFileFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, er
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BookFileMutation", m)
 }
 
+// The BookReviewFunc type is an adapter to allow the use of ordinary
+// function as BookReview mutator.
+type BookReviewFunc func(context.Context, *ent.BookReviewMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BookReviewFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.BookReviewMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BookReviewMutation", m)
+}
+
 // The DimensionFunc type is an adapter to allow the use of ordinary
 // function as Dimension mutator.
 type DimensionFunc func(context.Context, *ent.DimensionMutation) (ent.Value, error)

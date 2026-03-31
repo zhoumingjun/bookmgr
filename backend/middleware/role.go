@@ -23,10 +23,15 @@ var adminMethods = map[string]bool{
 	"/bookmgr.v1.FileService/UploadBookFile":       true,
 	"/bookmgr.v1.FileService/BatchUploadBookFiles": true,
 	"/bookmgr.v1.FileService/DeleteBookFile":        true,
+	"/bookmgr.v1.ReviewService/ApproveBook":         true,
+	"/bookmgr.v1.ReviewService/RejectBook":          true,
+	"/bookmgr.v1.ReviewService/ListPendingBooks":    true,
 }
 
 // superAdminMethods require super_admin role only.
-var superAdminMethods = map[string]bool{}
+var superAdminMethods = map[string]bool{
+	"/bookmgr.v1.ReviewService/RejectBook":  true,
+}
 
 // isAdmin checks if the role is admin or super_admin.
 func isAdmin(role string) bool {

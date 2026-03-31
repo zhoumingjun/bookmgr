@@ -19,6 +19,7 @@ import (
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookdimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookreview"
 	"github.com/zhoumingjun/bookmgr/backend/ent/dimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
@@ -34,6 +35,8 @@ type Client struct {
 	BookDimension *BookDimensionClient
 	// BookFile is the client for interacting with the BookFile builders.
 	BookFile *BookFileClient
+	// BookReview is the client for interacting with the BookReview builders.
+	BookReview *BookReviewClient
 	// Dimension is the client for interacting with the Dimension builders.
 	Dimension *DimensionClient
 	// User is the client for interacting with the User builders.
@@ -52,6 +55,7 @@ func (c *Client) init() {
 	c.Book = NewBookClient(c.config)
 	c.BookDimension = NewBookDimensionClient(c.config)
 	c.BookFile = NewBookFileClient(c.config)
+	c.BookReview = NewBookReviewClient(c.config)
 	c.Dimension = NewDimensionClient(c.config)
 	c.User = NewUserClient(c.config)
 }
@@ -149,6 +153,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Book:          NewBookClient(cfg),
 		BookDimension: NewBookDimensionClient(cfg),
 		BookFile:      NewBookFileClient(cfg),
+		BookReview:    NewBookReviewClient(cfg),
 		Dimension:     NewDimensionClient(cfg),
 		User:          NewUserClient(cfg),
 	}, nil
@@ -173,6 +178,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Book:          NewBookClient(cfg),
 		BookDimension: NewBookDimensionClient(cfg),
 		BookFile:      NewBookFileClient(cfg),
+		BookReview:    NewBookReviewClient(cfg),
 		Dimension:     NewDimensionClient(cfg),
 		User:          NewUserClient(cfg),
 	}, nil
@@ -203,21 +209,21 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Book.Use(hooks...)
-	c.BookDimension.Use(hooks...)
-	c.BookFile.Use(hooks...)
-	c.Dimension.Use(hooks...)
-	c.User.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.Book, c.BookDimension, c.BookFile, c.BookReview, c.Dimension, c.User,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.Book.Intercept(interceptors...)
-	c.BookDimension.Intercept(interceptors...)
-	c.BookFile.Intercept(interceptors...)
-	c.Dimension.Intercept(interceptors...)
-	c.User.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.Book, c.BookDimension, c.BookFile, c.BookReview, c.Dimension, c.User,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -229,6 +235,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.BookDimension.mutate(ctx, m)
 	case *BookFileMutation:
 		return c.BookFile.mutate(ctx, m)
+	case *BookReviewMutation:
+		return c.BookReview.mutate(ctx, m)
 	case *DimensionMutation:
 		return c.Dimension.mutate(ctx, m)
 	case *UserMutation:
@@ -387,6 +395,22 @@ func (c *BookClient) QueryFiles(_m *Book) *BookFileQuery {
 			sqlgraph.From(book.Table, book.FieldID, id),
 			sqlgraph.To(bookfile.Table, bookfile.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, book.FilesTable, book.FilesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryReviews queries the reviews edge of a Book.
+func (c *BookClient) QueryReviews(_m *Book) *BookReviewQuery {
+	query := (&BookReviewClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(book.Table, book.FieldID, id),
+			sqlgraph.To(bookreview.Table, bookreview.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, book.ReviewsTable, book.ReviewsColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -749,6 +773,171 @@ func (c *BookFileClient) mutate(ctx context.Context, m *BookFileMutation) (Value
 	}
 }
 
+// BookReviewClient is a client for the BookReview schema.
+type BookReviewClient struct {
+	config
+}
+
+// NewBookReviewClient returns a client for the BookReview from the given config.
+func NewBookReviewClient(c config) *BookReviewClient {
+	return &BookReviewClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `bookreview.Hooks(f(g(h())))`.
+func (c *BookReviewClient) Use(hooks ...Hook) {
+	c.hooks.BookReview = append(c.hooks.BookReview, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `bookreview.Intercept(f(g(h())))`.
+func (c *BookReviewClient) Intercept(interceptors ...Interceptor) {
+	c.inters.BookReview = append(c.inters.BookReview, interceptors...)
+}
+
+// Create returns a builder for creating a BookReview entity.
+func (c *BookReviewClient) Create() *BookReviewCreate {
+	mutation := newBookReviewMutation(c.config, OpCreate)
+	return &BookReviewCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of BookReview entities.
+func (c *BookReviewClient) CreateBulk(builders ...*BookReviewCreate) *BookReviewCreateBulk {
+	return &BookReviewCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *BookReviewClient) MapCreateBulk(slice any, setFunc func(*BookReviewCreate, int)) *BookReviewCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &BookReviewCreateBulk{err: fmt.Errorf("calling to BookReviewClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*BookReviewCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &BookReviewCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for BookReview.
+func (c *BookReviewClient) Update() *BookReviewUpdate {
+	mutation := newBookReviewMutation(c.config, OpUpdate)
+	return &BookReviewUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BookReviewClient) UpdateOne(_m *BookReview) *BookReviewUpdateOne {
+	mutation := newBookReviewMutation(c.config, OpUpdateOne, withBookReview(_m))
+	return &BookReviewUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BookReviewClient) UpdateOneID(id uuid.UUID) *BookReviewUpdateOne {
+	mutation := newBookReviewMutation(c.config, OpUpdateOne, withBookReviewID(id))
+	return &BookReviewUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for BookReview.
+func (c *BookReviewClient) Delete() *BookReviewDelete {
+	mutation := newBookReviewMutation(c.config, OpDelete)
+	return &BookReviewDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *BookReviewClient) DeleteOne(_m *BookReview) *BookReviewDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *BookReviewClient) DeleteOneID(id uuid.UUID) *BookReviewDeleteOne {
+	builder := c.Delete().Where(bookreview.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BookReviewDeleteOne{builder}
+}
+
+// Query returns a query builder for BookReview.
+func (c *BookReviewClient) Query() *BookReviewQuery {
+	return &BookReviewQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeBookReview},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a BookReview entity by its id.
+func (c *BookReviewClient) Get(ctx context.Context, id uuid.UUID) (*BookReview, error) {
+	return c.Query().Where(bookreview.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BookReviewClient) GetX(ctx context.Context, id uuid.UUID) *BookReview {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryBook queries the book edge of a BookReview.
+func (c *BookReviewClient) QueryBook(_m *BookReview) *BookQuery {
+	query := (&BookClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(bookreview.Table, bookreview.FieldID, id),
+			sqlgraph.To(book.Table, book.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, bookreview.BookTable, bookreview.BookColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryReviewer queries the reviewer edge of a BookReview.
+func (c *BookReviewClient) QueryReviewer(_m *BookReview) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(bookreview.Table, bookreview.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, bookreview.ReviewerTable, bookreview.ReviewerColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *BookReviewClient) Hooks() []Hook {
+	return c.hooks.BookReview
+}
+
+// Interceptors returns the client interceptors.
+func (c *BookReviewClient) Interceptors() []Interceptor {
+	return c.inters.BookReview
+}
+
+func (c *BookReviewClient) mutate(ctx context.Context, m *BookReviewMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&BookReviewCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&BookReviewUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&BookReviewUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&BookReviewDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown BookReview mutation op: %q", m.Op())
+	}
+}
+
 // DimensionClient is a client for the Dimension schema.
 type DimensionClient struct {
 	config
@@ -1098,9 +1287,9 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Book, BookDimension, BookFile, Dimension, User []ent.Hook
+		Book, BookDimension, BookFile, BookReview, Dimension, User []ent.Hook
 	}
 	inters struct {
-		Book, BookDimension, BookFile, Dimension, User []ent.Interceptor
+		Book, BookDimension, BookFile, BookReview, Dimension, User []ent.Interceptor
 	}
 )

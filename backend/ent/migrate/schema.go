@@ -34,6 +34,7 @@ var (
 		{Name: "view_count", Type: field.TypeInt, Default: 0},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "book_review_book", Type: field.TypeUUID, Nullable: true},
 		{Name: "uploader_id", Type: field.TypeUUID},
 	}
 	// BooksTable holds the schema information for the "books" table.
@@ -43,8 +44,14 @@ var (
 		PrimaryKey: []*schema.Column{BooksColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "books_users_books",
+				Symbol:     "books_book_reviews_book",
 				Columns:    []*schema.Column{BooksColumns[24]},
+				RefColumns: []*schema.Column{BookReviewsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "books_users_books",
+				Columns:    []*schema.Column{BooksColumns[25]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -81,6 +88,32 @@ var (
 		Columns:    BookFilesColumns,
 		PrimaryKey: []*schema.Column{BookFilesColumns[0]},
 	}
+	// BookReviewsColumns holds the columns for the "book_reviews" table.
+	BookReviewsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "book_id", Type: field.TypeUUID},
+		{Name: "reviewer_id", Type: field.TypeUUID},
+		{Name: "action", Type: field.TypeString, Size: 20},
+		{Name: "status_from", Type: field.TypeString, Size: 50},
+		{Name: "status_to", Type: field.TypeString, Size: 50},
+		{Name: "reason", Type: field.TypeString, Nullable: true, Size: 2147483647, Default: ""},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "book_reviews", Type: field.TypeUUID, Nullable: true},
+	}
+	// BookReviewsTable holds the schema information for the "book_reviews" table.
+	BookReviewsTable = &schema.Table{
+		Name:       "book_reviews",
+		Columns:    BookReviewsColumns,
+		PrimaryKey: []*schema.Column{BookReviewsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "book_reviews_books_reviews",
+				Columns:    []*schema.Column{BookReviewsColumns[8]},
+				RefColumns: []*schema.Column{BooksColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// DimensionsColumns holds the columns for the "dimensions" table.
 	DimensionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
@@ -115,12 +148,21 @@ var (
 		{Name: "role", Type: field.TypeEnum, Enums: []string{"super_admin", "admin", "teacher", "parent"}, Default: "teacher"},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "book_review_reviewer", Type: field.TypeUUID, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
 		Name:       "users",
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "users_book_reviews_reviewer",
+				Columns:    []*schema.Column{UsersColumns[7]},
+				RefColumns: []*schema.Column{BookReviewsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 		Indexes: []*schema.Index{
 			{
 				Name:    "user_username",
@@ -239,6 +281,7 @@ var (
 		BooksTable,
 		BookDimensionsTable,
 		BookFilesTable,
+		BookReviewsTable,
 		DimensionsTable,
 		UsersTable,
 		BookBookDimensionsTable,
@@ -249,8 +292,11 @@ var (
 )
 
 func init() {
-	BooksTable.ForeignKeys[0].RefTable = UsersTable
+	BooksTable.ForeignKeys[0].RefTable = BookReviewsTable
+	BooksTable.ForeignKeys[1].RefTable = UsersTable
+	BookReviewsTable.ForeignKeys[0].RefTable = BooksTable
 	DimensionsTable.ForeignKeys[0].RefTable = DimensionsTable
+	UsersTable.ForeignKeys[0].RefTable = BookReviewsTable
 	BookBookDimensionsTable.ForeignKeys[0].RefTable = BooksTable
 	BookBookDimensionsTable.ForeignKeys[1].RefTable = BookDimensionsTable
 	BookFileBookTable.ForeignKeys[0].RefTable = BookFilesTable

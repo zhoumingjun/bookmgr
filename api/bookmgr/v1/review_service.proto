@@ -1,0 +1,137 @@
+syntax = "proto3";
+
+package bookmgr.v1;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "bookmgr/v1/book_service.proto";
+
+option go_package = "github.com/zhoumingjun/bookmgr/gen/api/bookmgr/v1;bookmgrv1";
+
+// ReviewService manages book review (审核) workflows.
+service ReviewService {
+  // SubmitForReview submits a draft book for review.
+  rpc SubmitForReview(SubmitForReviewRequest) returns (SubmitForReviewResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/books/{book_id}:submit"
+      body: "*"
+    };
+  }
+
+  // ApproveBook approves a pending book.
+  rpc ApproveBook(ApproveBookRequest) returns (ApproveBookResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/books/{book_id}:approve"
+      body: "*"
+    };
+  }
+
+  // RejectBook rejects a pending book with a reason.
+  rpc RejectBook(RejectBookRequest) returns (RejectBookResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/books/{book_id}:reject"
+      body: "*"
+    };
+  }
+
+  // RecallReview recalls a pending book back to draft.
+  rpc RecallReview(RecallReviewRequest) returns (RecallReviewResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/books/{book_id}:recall"
+      body: "*"
+    };
+  }
+
+  // ListBookReviews returns the review history for a book.
+  rpc ListBookReviews(ListBookReviewsRequest) returns (ListBookReviewsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/books/{book_id}/reviews"
+    };
+  }
+
+  // ListPendingBooks returns all books awaiting review (admin only).
+  rpc ListPendingBooks(ListPendingBooksRequest) returns (ListPendingBooksResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/reviews/pending"
+    };
+  }
+}
+
+// BookReview represents a review action record.
+message BookReview {
+  string id = 1;
+  string book_id = 2;
+  string reviewer_id = 3;
+  string status_from = 4;
+  string status_to = 5;
+  string reason = 6;
+  google.protobuf.Timestamp created_at = 7;
+}
+
+// SubmitForReviewRequest is the request for SubmitForReview.
+message SubmitForReviewRequest {
+  string book_id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+// SubmitForReviewResponse is the response for SubmitForReview.
+message SubmitForReviewResponse {
+  Book book = 1;
+  BookReview review = 2;
+}
+
+// ApproveBookRequest is the request for ApproveBook.
+message ApproveBookRequest {
+  string book_id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+// ApproveBookResponse is the response for ApproveBook.
+message ApproveBookResponse {
+  Book book = 1;
+  BookReview review = 2;
+}
+
+// RejectBookRequest is the request for RejectBook.
+message RejectBookRequest {
+  string book_id = 1 [(buf.validate.field).string.min_len = 1];
+  string reason = 2 [(buf.validate.field).string.min_len = 1, (buf.validate.field).string.max_len = 2000];
+}
+
+// RejectBookResponse is the response for RejectBook.
+message RejectBookResponse {
+  Book book = 1;
+  BookReview review = 2;
+}
+
+// RecallReviewRequest is the request for RecallReview.
+message RecallReviewRequest {
+  string book_id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+// RecallReviewResponse is the response for RecallReview.
+message RecallReviewResponse {
+  Book book = 1;
+  BookReview review = 2;
+}
+
+// ListBookReviewsRequest is the request for ListBookReviews.
+message ListBookReviewsRequest {
+  string book_id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+// ListBookReviewsResponse is the response for ListBookReviews.
+message ListBookReviewsResponse {
+  repeated BookReview reviews = 1;
+}
+
+// ListPendingBooksRequest is the request for ListPendingBooks.
+message ListPendingBooksRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+// ListPendingBooksResponse is the response for ListPendingBooks.
+message ListPendingBooksResponse {
+  repeated Book books = 1;
+  string next_page_token = 2;
+}

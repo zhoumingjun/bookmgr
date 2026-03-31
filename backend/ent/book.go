@@ -69,8 +69,9 @@ type Book struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the BookQuery when eager-loading is set.
-	Edges        BookEdges `json:"edges"`
-	selectValues sql.SelectValues
+	Edges            BookEdges `json:"edges"`
+	book_review_book *uuid.UUID
+	selectValues     sql.SelectValues
 }
 
 // BookEdges holds the relations/edges for other nodes in the graph.
@@ -81,9 +82,11 @@ type BookEdges struct {
 	BookDimensions []*BookDimension `json:"book_dimensions,omitempty"`
 	// Files holds the value of the files edge.
 	Files []*BookFile `json:"files,omitempty"`
+	// Reviews holds the value of the reviews edge.
+	Reviews []*BookReview `json:"reviews,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // UploaderOrErr returns the Uploader value or an error if the edge
@@ -115,6 +118,15 @@ func (e BookEdges) FilesOrErr() ([]*BookFile, error) {
 	return nil, &NotLoadedError{edge: "files"}
 }
 
+// ReviewsOrErr returns the Reviews value or an error if the edge
+// was not loaded in eager-loading.
+func (e BookEdges) ReviewsOrErr() ([]*BookReview, error) {
+	if e.loadedTypes[3] {
+		return e.Reviews, nil
+	}
+	return nil, &NotLoadedError{edge: "reviews"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Book) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -130,6 +142,8 @@ func (*Book) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullTime)
 		case book.FieldID, book.FieldUploaderID:
 			values[i] = new(uuid.UUID)
+		case book.ForeignKeys[0]: // book_review_book
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -295,6 +309,13 @@ func (_m *Book) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.UpdatedAt = value.Time
 			}
+		case book.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field book_review_book", values[i])
+			} else if value.Valid {
+				_m.book_review_book = new(uuid.UUID)
+				*_m.book_review_book = *value.S.(*uuid.UUID)
+			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -321,6 +342,11 @@ func (_m *Book) QueryBookDimensions() *BookDimensionQuery {
 // QueryFiles queries the "files" edge of the Book entity.
 func (_m *Book) QueryFiles() *BookFileQuery {
 	return NewBookClient(_m.config).QueryFiles(_m)
+}
+
+// QueryReviews queries the "reviews" edge of the Book entity.
+func (_m *Book) QueryReviews() *BookReviewQuery {
+	return NewBookClient(_m.config).QueryReviews(_m)
 }
 
 // Update returns a builder for updating this Book.

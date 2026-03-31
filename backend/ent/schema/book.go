@@ -107,5 +107,6 @@ func (Book) Edges() []ent.Edge {
 			Unique(),
 		edge.To("book_dimensions", BookDimension.Type),
 		edge.From("files", BookFile.Type).Ref("book"),
+		edge.To("reviews", BookReview.Type),
 	}
 }

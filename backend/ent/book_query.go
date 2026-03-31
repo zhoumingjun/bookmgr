@@ -16,6 +16,7 @@ import (
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookdimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookreview"
 	"github.com/zhoumingjun/bookmgr/backend/ent/predicate"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
@@ -30,6 +31,8 @@ type BookQuery struct {
 	withUploader       *UserQuery
 	withBookDimensions *BookDimensionQuery
 	withFiles          *BookFileQuery
+	withReviews        *BookReviewQuery
+	withFKs            bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -125,6 +128,28 @@ func (_q *BookQuery) QueryFiles() *BookFileQuery {
 			sqlgraph.From(book.Table, book.FieldID, selector),
 			sqlgraph.To(bookfile.Table, bookfile.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, book.FilesTable, book.FilesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryReviews chains the current query on the "reviews" edge.
+func (_q *BookQuery) QueryReviews() *BookReviewQuery {
+	query := (&BookReviewClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(book.Table, book.FieldID, selector),
+			sqlgraph.To(bookreview.Table, bookreview.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, book.ReviewsTable, book.ReviewsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -327,6 +352,7 @@ func (_q *BookQuery) Clone() *BookQuery {
 		withUploader:       _q.withUploader.Clone(),
 		withBookDimensions: _q.withBookDimensions.Clone(),
 		withFiles:          _q.withFiles.Clone(),
+		withReviews:        _q.withReviews.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -363,6 +389,17 @@ func (_q *BookQuery) WithFiles(opts ...func(*BookFileQuery)) *BookQuery {
 		opt(query)
 	}
 	_q.withFiles = query
+	return _q
+}
+
+// WithReviews tells the query-builder to eager-load the nodes that are connected to
+// the "reviews" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *BookQuery) WithReviews(opts ...func(*BookReviewQuery)) *BookQuery {
+	query := (&BookReviewClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withReviews = query
 	return _q
 }
 
@@ -443,13 +480,18 @@ func (_q *BookQuery) prepareQuery(ctx context.Context) error {
 func (_q *BookQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Book, error) {
 	var (
 		nodes       = []*Book{}
+		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			_q.withUploader != nil,
 			_q.withBookDimensions != nil,
 			_q.withFiles != nil,
+			_q.withReviews != nil,
 		}
 	)
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, book.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Book).scanValues(nil, columns)
 	}
@@ -485,6 +527,13 @@ func (_q *BookQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Book, e
 		if err := _q.loadFiles(ctx, query, nodes,
 			func(n *Book) { n.Edges.Files = []*BookFile{} },
 			func(n *Book, e *BookFile) { n.Edges.Files = append(n.Edges.Files, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withReviews; query != nil {
+		if err := _q.loadReviews(ctx, query, nodes,
+			func(n *Book) { n.Edges.Reviews = []*BookReview{} },
+			func(n *Book, e *BookReview) { n.Edges.Reviews = append(n.Edges.Reviews, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -639,6 +688,37 @@ func (_q *BookQuery) loadFiles(ctx context.Context, query *BookFileQuery, nodes 
 		for kn := range nodes {
 			assign(kn, n)
 		}
+	}
+	return nil
+}
+func (_q *BookQuery) loadReviews(ctx context.Context, query *BookReviewQuery, nodes []*Book, init func(*Book), assign func(*Book, *BookReview)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Book)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.BookReview(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(book.ReviewsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.book_reviews
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "book_reviews" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "book_reviews" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

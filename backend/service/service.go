@@ -9,4 +9,5 @@ var Module = fx.Options(
 	fx.Provide(NewBookService),
 	fx.Provide(NewDimensionService),
 	fx.Provide(NewFileService),
+	fx.Provide(NewBookReviewService),
 )

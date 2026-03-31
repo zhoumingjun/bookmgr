@@ -1,0 +1,551 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "bookmgr/v1/review_service.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ReviewService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/books/{bookId}/reviews": {
+      "get": {
+        "summary": "ListBookReviews returns the review history for a book.",
+        "operationId": "ReviewService_ListBookReviews",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListBookReviewsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ReviewService"
+        ]
+      }
+    },
+    "/api/v1/books/{bookId}:approve": {
+      "post": {
+        "summary": "ApproveBook approves a pending book.",
+        "operationId": "ReviewService_ApproveBook",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ApproveBookResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ReviewServiceApproveBookBody"
+            }
+          }
+        ],
+        "tags": [
+          "ReviewService"
+        ]
+      }
+    },
+    "/api/v1/books/{bookId}:recall": {
+      "post": {
+        "summary": "RecallReview recalls a pending book back to draft.",
+        "operationId": "ReviewService_RecallReview",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RecallReviewResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ReviewServiceRecallReviewBody"
+            }
+          }
+        ],
+        "tags": [
+          "ReviewService"
+        ]
+      }
+    },
+    "/api/v1/books/{bookId}:reject": {
+      "post": {
+        "summary": "RejectBook rejects a pending book with a reason.",
+        "operationId": "ReviewService_RejectBook",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RejectBookResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ReviewServiceRejectBookBody"
+            }
+          }
+        ],
+        "tags": [
+          "ReviewService"
+        ]
+      }
+    },
+    "/api/v1/books/{bookId}:submit": {
+      "post": {
+        "summary": "SubmitForReview submits a draft book for review.",
+        "operationId": "ReviewService_SubmitForReview",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SubmitForReviewResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ReviewServiceSubmitForReviewBody"
+            }
+          }
+        ],
+        "tags": [
+          "ReviewService"
+        ]
+      }
+    },
+    "/api/v1/reviews/pending": {
+      "get": {
+        "summary": "ListPendingBooks returns all books awaiting review (admin only).",
+        "operationId": "ReviewService_ListPendingBooks",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListPendingBooksResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageToken",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ReviewService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "ReviewServiceApproveBookBody": {
+      "type": "object",
+      "description": "ApproveBookRequest is the request for ApproveBook."
+    },
+    "ReviewServiceRecallReviewBody": {
+      "type": "object",
+      "description": "RecallReviewRequest is the request for RecallReview."
+    },
+    "ReviewServiceRejectBookBody": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string"
+        }
+      },
+      "description": "RejectBookRequest is the request for RejectBook."
+    },
+    "ReviewServiceSubmitForReviewBody": {
+      "type": "object",
+      "description": "SubmitForReviewRequest is the request for SubmitForReview."
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1ApproveBookResponse": {
+      "type": "object",
+      "properties": {
+        "book": {
+          "$ref": "#/definitions/v1Book"
+        },
+        "review": {
+          "$ref": "#/definitions/v1BookReview"
+        }
+      },
+      "description": "ApproveBookResponse is the response for ApproveBook."
+    },
+    "v1Book": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the book."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the book."
+        },
+        "author": {
+          "type": "string",
+          "description": "The author of the book."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the book."
+        },
+        "pageCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of pages (for print edition)."
+        },
+        "durationMinutes": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Duration in minutes (for audio/animation editions)."
+        },
+        "coreGoal": {
+          "type": "string",
+          "description": "The core adaptation goal of the book."
+        },
+        "cognitiveLevel": {
+          "type": "string",
+          "description": "The cognitive adaptation level: light/moderate/severe (轻度/中度/重度)."
+        },
+        "resourceType": {
+          "type": "string",
+          "description": "Primary resource type: print/digital/audio/video."
+        },
+        "hasPrint": {
+          "type": "boolean",
+          "description": "Whether print edition is available."
+        },
+        "hasDigital": {
+          "type": "boolean",
+          "description": "Whether digital edition is available."
+        },
+        "hasAudio": {
+          "type": "boolean",
+          "description": "Whether audio edition is available."
+        },
+        "hasVideo": {
+          "type": "boolean",
+          "description": "Whether video/animation edition is available."
+        },
+        "teachingSuggestion": {
+          "type": "string",
+          "description": "Teaching usage suggestions."
+        },
+        "parentReadingGuide": {
+          "type": "string",
+          "description": "Parent-child co-reading guide."
+        },
+        "recommendedAgeMin": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Minimum recommended age in months."
+        },
+        "recommendedAgeMax": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Maximum recommended age in months."
+        },
+        "coverImageUrl": {
+          "type": "string",
+          "description": "URL to the book's cover image."
+        },
+        "status": {
+          "type": "string",
+          "description": "Status: draft/pending/approved/rejected."
+        },
+        "uploaderId": {
+          "type": "string",
+          "description": "The ID of the user who uploaded/created this book."
+        },
+        "viewCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "View count."
+        },
+        "dimensions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Dimension"
+          },
+          "description": "Associated dimensions (loaded with eager)."
+        },
+        "createTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the book was created."
+        },
+        "updateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the book was last updated."
+        }
+      },
+      "description": "Book represents a picturebook resource."
+    },
+    "v1BookReview": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "bookId": {
+          "type": "string"
+        },
+        "reviewerId": {
+          "type": "string"
+        },
+        "statusFrom": {
+          "type": "string"
+        },
+        "statusTo": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "BookReview represents a review action record."
+    },
+    "v1Dimension": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier."
+        },
+        "name": {
+          "type": "string",
+          "description": "Dimension name (e.g., \"身心准备\")."
+        },
+        "slug": {
+          "type": "string",
+          "description": "URL-safe slug (e.g., \"physical\")."
+        },
+        "parentId": {
+          "type": "string",
+          "description": "Parent dimension ID (null for top-level)."
+        },
+        "sortOrder": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Display order."
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Dimension"
+          },
+          "description": "Child subcategories."
+        }
+      },
+      "description": "Dimension represents a category dimension for picturebooks."
+    },
+    "v1ListBookReviewsResponse": {
+      "type": "object",
+      "properties": {
+        "reviews": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1BookReview"
+          }
+        }
+      },
+      "description": "ListBookReviewsResponse is the response for ListBookReviews."
+    },
+    "v1ListPendingBooksResponse": {
+      "type": "object",
+      "properties": {
+        "books": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Book"
+          }
+        },
+        "nextPageToken": {
+          "type": "string"
+        }
+      },
+      "description": "ListPendingBooksResponse is the response for ListPendingBooks."
+    },
+    "v1RecallReviewResponse": {
+      "type": "object",
+      "properties": {
+        "book": {
+          "$ref": "#/definitions/v1Book"
+        },
+        "review": {
+          "$ref": "#/definitions/v1BookReview"
+        }
+      },
+      "description": "RecallReviewResponse is the response for RecallReview."
+    },
+    "v1RejectBookResponse": {
+      "type": "object",
+      "properties": {
+        "book": {
+          "$ref": "#/definitions/v1Book"
+        },
+        "review": {
+          "$ref": "#/definitions/v1BookReview"
+        }
+      },
+      "description": "RejectBookResponse is the response for RejectBook."
+    },
+    "v1SubmitForReviewResponse": {
+      "type": "object",
+      "properties": {
+        "book": {
+          "$ref": "#/definitions/v1Book"
+        },
+        "review": {
+          "$ref": "#/definitions/v1BookReview"
+        }
+      },
+      "description": "SubmitForReviewResponse is the response for SubmitForReview."
+    }
+  }
+}

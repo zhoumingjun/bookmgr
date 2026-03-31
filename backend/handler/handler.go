@@ -12,4 +12,5 @@ var Module = fx.Options(
 	fx.Provide(NewUploadHandler),
 	fx.Provide(NewDimensionHandler),
 	fx.Provide(NewFileHandler),
+	fx.Provide(NewReviewHandler),
 )

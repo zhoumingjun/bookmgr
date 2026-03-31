@@ -9,6 +9,7 @@ import (
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookdimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookreview"
 	"github.com/zhoumingjun/bookmgr/backend/ent/dimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/schema"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
@@ -236,6 +237,46 @@ func init() {
 	bookfileDescID := bookfileFields[0].Descriptor()
 	// bookfile.DefaultID holds the default value on creation for the id field.
 	bookfile.DefaultID = bookfileDescID.Default.(func() uuid.UUID)
+	bookreviewFields := schema.BookReview{}.Fields()
+	_ = bookreviewFields
+	// bookreviewDescAction is the schema descriptor for action field.
+	bookreviewDescAction := bookreviewFields[3].Descriptor()
+	// bookreview.ActionValidator is a validator for the "action" field. It is called by the builders before save.
+	bookreview.ActionValidator = func() func(string) error {
+		validators := bookreviewDescAction.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(action string) error {
+			for _, fn := range fns {
+				if err := fn(action); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// bookreviewDescStatusFrom is the schema descriptor for status_from field.
+	bookreviewDescStatusFrom := bookreviewFields[4].Descriptor()
+	// bookreview.StatusFromValidator is a validator for the "status_from" field. It is called by the builders before save.
+	bookreview.StatusFromValidator = bookreviewDescStatusFrom.Validators[0].(func(string) error)
+	// bookreviewDescStatusTo is the schema descriptor for status_to field.
+	bookreviewDescStatusTo := bookreviewFields[5].Descriptor()
+	// bookreview.StatusToValidator is a validator for the "status_to" field. It is called by the builders before save.
+	bookreview.StatusToValidator = bookreviewDescStatusTo.Validators[0].(func(string) error)
+	// bookreviewDescReason is the schema descriptor for reason field.
+	bookreviewDescReason := bookreviewFields[6].Descriptor()
+	// bookreview.DefaultReason holds the default value on creation for the reason field.
+	bookreview.DefaultReason = bookreviewDescReason.Default.(string)
+	// bookreviewDescCreatedAt is the schema descriptor for created_at field.
+	bookreviewDescCreatedAt := bookreviewFields[7].Descriptor()
+	// bookreview.DefaultCreatedAt holds the default value on creation for the created_at field.
+	bookreview.DefaultCreatedAt = bookreviewDescCreatedAt.Default.(func() time.Time)
+	// bookreviewDescID is the schema descriptor for id field.
+	bookreviewDescID := bookreviewFields[0].Descriptor()
+	// bookreview.DefaultID holds the default value on creation for the id field.
+	bookreview.DefaultID = bookreviewDescID.Default.(func() uuid.UUID)
 	dimensionFields := schema.Dimension{}.Fields()
 	_ = dimensionFields
 	// dimensionDescName is the schema descriptor for name field.

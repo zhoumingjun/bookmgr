@@ -69,6 +69,8 @@ const (
 	EdgeBookDimensions = "book_dimensions"
 	// EdgeFiles holds the string denoting the files edge name in mutations.
 	EdgeFiles = "files"
+	// EdgeReviews holds the string denoting the reviews edge name in mutations.
+	EdgeReviews = "reviews"
 	// Table holds the table name of the book in the database.
 	Table = "books"
 	// UploaderTable is the table that holds the uploader relation/edge.
@@ -88,6 +90,13 @@ const (
 	// FilesInverseTable is the table name for the BookFile entity.
 	// It exists in this package in order to avoid circular dependency with the "bookfile" package.
 	FilesInverseTable = "book_files"
+	// ReviewsTable is the table that holds the reviews relation/edge.
+	ReviewsTable = "book_reviews"
+	// ReviewsInverseTable is the table name for the BookReview entity.
+	// It exists in this package in order to avoid circular dependency with the "bookreview" package.
+	ReviewsInverseTable = "book_reviews"
+	// ReviewsColumn is the table column denoting the reviews relation/edge.
+	ReviewsColumn = "book_reviews"
 )
 
 // Columns holds all SQL columns for book fields.
@@ -119,6 +128,12 @@ var Columns = []string{
 	FieldUpdatedAt,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "books"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"book_review_book",
+}
+
 var (
 	// BookDimensionsPrimaryKey and BookDimensionsColumn2 are the table columns denoting the
 	// primary key for the book_dimensions relation (M2M).
@@ -132,6 +147,11 @@ var (
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -359,6 +379,20 @@ func ByFiles(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newFilesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByReviewsCount orders the results by reviews count.
+func ByReviewsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newReviewsStep(), opts...)
+	}
+}
+
+// ByReviews orders the results by reviews terms.
+func ByReviews(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newReviewsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newUploaderStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -378,5 +412,12 @@ func newFilesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(FilesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, FilesTable, FilesPrimaryKey...),
+	)
+}
+func newReviewsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ReviewsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ReviewsTable, ReviewsColumn),
 	)
 }

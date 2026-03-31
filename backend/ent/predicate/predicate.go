@@ -15,6 +15,9 @@ type BookDimension func(*sql.Selector)
 // BookFile is the predicate function for bookfile builders.
 type BookFile func(*sql.Selector)
 
+// BookReview is the predicate function for bookreview builders.
+type BookReview func(*sql.Selector)
+
 // Dimension is the predicate function for dimension builders.
 type Dimension func(*sql.Selector)
 

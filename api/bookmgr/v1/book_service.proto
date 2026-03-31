@@ -271,3 +271,4 @@ message DownloadBookResponse {
   // The HTTP body containing the PDF file.
   google.api.HttpBody http_body = 1;
 }
+
