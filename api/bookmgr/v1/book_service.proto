@@ -7,6 +7,7 @@ import "google/api/annotations.proto";
 import "google/api/httpbody.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
+import "bookmgr/v1/common.proto";
 
 option go_package = "github.com/zhoumingjun/bookmgr/gen/api/bookmgr/v1;bookmgrv1";
 
@@ -26,7 +27,7 @@ service BookService {
     };
   }
 
-  // CreateBook creates a new book record. Admin only.
+  // CreateBook creates a new book record. Admin/super_admin only.
   rpc CreateBook(CreateBookRequest) returns (CreateBookResponse) {
     option (google.api.http) = {
       post: "/api/v1/books"
@@ -34,7 +35,7 @@ service BookService {
     };
   }
 
-  // UpdateBook updates an existing book's metadata. Admin only.
+  // UpdateBook updates an existing book's metadata. Admin/super_admin only.
   rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse) {
     option (google.api.http) = {
       patch: "/api/v1/books/{book.id}"
@@ -42,7 +43,7 @@ service BookService {
     };
   }
 
-  // DeleteBook removes a book and its file. Admin only.
+  // DeleteBook removes a book and its file. Admin/super_admin only.
   rpc DeleteBook(DeleteBookRequest) returns (DeleteBookResponse) {
     option (google.api.http) = {
       delete: "/api/v1/books/{id}"
@@ -57,7 +58,7 @@ service BookService {
   }
 }
 
-// Book represents a book resource.
+// Book represents a picturebook resource.
 message Book {
   // The unique identifier of the book.
   string id = 1;
@@ -68,20 +69,68 @@ message Book {
   // The author of the book.
   string author = 3;
 
-  // A description of the book.
+  // A brief description of the book.
   string description = 4;
 
-  // URL to the book's cover image.
-  string cover_url = 5;
+  // Number of pages (for print edition).
+  int32 page_count = 5;
 
-  // The ID of the user who uploaded this book.
-  string uploader_id = 6;
+  // Duration in minutes (for audio/animation editions).
+  int32 duration_minutes = 6;
+
+  // The core adaptation goal of the book.
+  string core_goal = 7;
+
+  // The cognitive adaptation level: light/moderate/severe (轻度/中度/重度).
+  string cognitive_level = 8;
+
+  // Primary resource type: print/digital/audio/video.
+  string resource_type = 9;
+
+  // Whether print edition is available.
+  bool has_print = 10;
+
+  // Whether digital edition is available.
+  bool has_digital = 11;
+
+  // Whether audio edition is available.
+  bool has_audio = 12;
+
+  // Whether video/animation edition is available.
+  bool has_video = 13;
+
+  // Teaching usage suggestions.
+  string teaching_suggestion = 14;
+
+  // Parent-child co-reading guide.
+  string parent_reading_guide = 15;
+
+  // Minimum recommended age in months.
+  int32 recommended_age_min = 16;
+
+  // Maximum recommended age in months.
+  int32 recommended_age_max = 17;
+
+  // URL to the book's cover image.
+  string cover_image_url = 18;
+
+  // Status: draft/pending/approved/rejected.
+  string status = 19;
+
+  // The ID of the user who uploaded/created this book.
+  string uploader_id = 20;
+
+  // View count.
+  int32 view_count = 21;
+
+  // Associated dimensions (loaded with eager).
+  repeated Dimension dimensions = 22;
 
   // When the book was created.
-  google.protobuf.Timestamp create_time = 7;
+  google.protobuf.Timestamp create_time = 23;
 
   // When the book was last updated.
-  google.protobuf.Timestamp update_time = 8;
+  google.protobuf.Timestamp update_time = 24;
 }
 
 // ListBooksRequest is the request for ListBooks.
@@ -94,6 +143,12 @@ message ListBooksRequest {
 
   // Token for the next page of results.
   string page_token = 2;
+
+  // Filter by dimension slug (optional).
+  string dimension_slug = 3;
+
+  // Filter by status (optional): draft/pending/approved/rejected.
+  string status = 4;
 }
 
 // ListBooksResponse is the response for ListBooks.
@@ -120,19 +175,59 @@ message GetBookResponse {
 // CreateBookRequest is the request for CreateBook.
 message CreateBookRequest {
   // The title of the book.
-  string title = 1 [(buf.validate.field).string = {
-    min_len: 1
-    max_len: 256
-  }];
+  string title = 1 [
+    (buf.validate.field).string = { min_len: 1, max_len: 200 }
+  ];
 
   // The author of the book.
-  string author = 2 [(buf.validate.field).string = {
-    min_len: 1
-    max_len: 256
-  }];
+  string author = 2 [
+    (buf.validate.field).string = { min_len: 1, max_len: 100 }
+  ];
 
-  // A description of the book.
+  // A brief description.
   string description = 3 [(buf.validate.field).string.max_len = 4096];
+
+  // Number of pages (for print edition).
+  int32 page_count = 4;
+
+  // Duration in minutes (for audio/animation editions).
+  int32 duration_minutes = 5;
+
+  // The core adaptation goal (required).
+  string core_goal = 6 [(buf.validate.field).string.min_len = 1];
+
+  // Cognitive level: light/moderate/severe.
+  string cognitive_level = 7 [(buf.validate.field).string.max_len = 50];
+
+  // Primary resource type.
+  string resource_type = 8 [(buf.validate.field).string.max_len = 50];
+
+  // Whether print edition is available.
+  bool has_print = 9;
+
+  // Whether digital edition is available.
+  bool has_digital = 10;
+
+  // Whether audio edition is available.
+  bool has_audio = 11;
+
+  // Whether video edition is available.
+  bool has_video = 12;
+
+  // Teaching usage suggestions.
+  string teaching_suggestion = 13 [(buf.validate.field).string.max_len = 4096];
+
+  // Parent-child co-reading guide.
+  string parent_reading_guide = 14 [(buf.validate.field).string.max_len = 4096];
+
+  // Minimum recommended age in months.
+  int32 recommended_age_min = 15;
+
+  // Maximum recommended age in months.
+  int32 recommended_age_max = 16;
+
+  // Dimension slugs to associate with (required, at least one).
+  repeated string dimension_slugs = 17;
 }
 
 // CreateBookResponse is the response for CreateBook.

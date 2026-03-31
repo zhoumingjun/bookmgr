@@ -71,6 +71,76 @@ func Description(v string) predicate.Book {
 	return predicate.Book(sql.FieldEQ(FieldDescription, v))
 }
 
+// PageCount applies equality check predicate on the "page_count" field. It's identical to PageCountEQ.
+func PageCount(v int) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldPageCount, v))
+}
+
+// DurationMinutes applies equality check predicate on the "duration_minutes" field. It's identical to DurationMinutesEQ.
+func DurationMinutes(v int) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldDurationMinutes, v))
+}
+
+// CoreGoal applies equality check predicate on the "core_goal" field. It's identical to CoreGoalEQ.
+func CoreGoal(v string) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldCoreGoal, v))
+}
+
+// CognitiveLevel applies equality check predicate on the "cognitive_level" field. It's identical to CognitiveLevelEQ.
+func CognitiveLevel(v string) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldCognitiveLevel, v))
+}
+
+// ResourceType applies equality check predicate on the "resource_type" field. It's identical to ResourceTypeEQ.
+func ResourceType(v string) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldResourceType, v))
+}
+
+// HasPrint applies equality check predicate on the "has_print" field. It's identical to HasPrintEQ.
+func HasPrint(v bool) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldHasPrint, v))
+}
+
+// HasDigital applies equality check predicate on the "has_digital" field. It's identical to HasDigitalEQ.
+func HasDigital(v bool) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldHasDigital, v))
+}
+
+// HasAudio applies equality check predicate on the "has_audio" field. It's identical to HasAudioEQ.
+func HasAudio(v bool) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldHasAudio, v))
+}
+
+// HasVideo applies equality check predicate on the "has_video" field. It's identical to HasVideoEQ.
+func HasVideo(v bool) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldHasVideo, v))
+}
+
+// TeachingSuggestion applies equality check predicate on the "teaching_suggestion" field. It's identical to TeachingSuggestionEQ.
+func TeachingSuggestion(v string) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldTeachingSuggestion, v))
+}
+
+// ParentReadingGuide applies equality check predicate on the "parent_reading_guide" field. It's identical to ParentReadingGuideEQ.
+func ParentReadingGuide(v string) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldParentReadingGuide, v))
+}
+
+// RecommendedAgeMin applies equality check predicate on the "recommended_age_min" field. It's identical to RecommendedAgeMinEQ.
+func RecommendedAgeMin(v int) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldRecommendedAgeMin, v))
+}
+
+// RecommendedAgeMax applies equality check predicate on the "recommended_age_max" field. It's identical to RecommendedAgeMaxEQ.
+func RecommendedAgeMax(v int) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldRecommendedAgeMax, v))
+}
+
+// CoverImageURL applies equality check predicate on the "cover_image_url" field. It's identical to CoverImageURLEQ.
+func CoverImageURL(v string) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldCoverImageURL, v))
+}
+
 // CoverURL applies equality check predicate on the "cover_url" field. It's identical to CoverURLEQ.
 func CoverURL(v string) predicate.Book {
 	return predicate.Book(sql.FieldEQ(FieldCoverURL, v))
@@ -81,9 +151,19 @@ func FilePath(v string) predicate.Book {
 	return predicate.Book(sql.FieldEQ(FieldFilePath, v))
 }
 
+// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
+func Status(v string) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldStatus, v))
+}
+
 // UploaderID applies equality check predicate on the "uploader_id" field. It's identical to UploaderIDEQ.
 func UploaderID(v uuid.UUID) predicate.Book {
 	return predicate.Book(sql.FieldEQ(FieldUploaderID, v))
+}
+
+// ViewCount applies equality check predicate on the "view_count" field. It's identical to ViewCountEQ.
+func ViewCount(v int) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldViewCount, v))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
@@ -301,6 +381,676 @@ func DescriptionContainsFold(v string) predicate.Book {
 	return predicate.Book(sql.FieldContainsFold(FieldDescription, v))
 }
 
+// PageCountEQ applies the EQ predicate on the "page_count" field.
+func PageCountEQ(v int) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldPageCount, v))
+}
+
+// PageCountNEQ applies the NEQ predicate on the "page_count" field.
+func PageCountNEQ(v int) predicate.Book {
+	return predicate.Book(sql.FieldNEQ(FieldPageCount, v))
+}
+
+// PageCountIn applies the In predicate on the "page_count" field.
+func PageCountIn(vs ...int) predicate.Book {
+	return predicate.Book(sql.FieldIn(FieldPageCount, vs...))
+}
+
+// PageCountNotIn applies the NotIn predicate on the "page_count" field.
+func PageCountNotIn(vs ...int) predicate.Book {
+	return predicate.Book(sql.FieldNotIn(FieldPageCount, vs...))
+}
+
+// PageCountGT applies the GT predicate on the "page_count" field.
+func PageCountGT(v int) predicate.Book {
+	return predicate.Book(sql.FieldGT(FieldPageCount, v))
+}
+
+// PageCountGTE applies the GTE predicate on the "page_count" field.
+func PageCountGTE(v int) predicate.Book {
+	return predicate.Book(sql.FieldGTE(FieldPageCount, v))
+}
+
+// PageCountLT applies the LT predicate on the "page_count" field.
+func PageCountLT(v int) predicate.Book {
+	return predicate.Book(sql.FieldLT(FieldPageCount, v))
+}
+
+// PageCountLTE applies the LTE predicate on the "page_count" field.
+func PageCountLTE(v int) predicate.Book {
+	return predicate.Book(sql.FieldLTE(FieldPageCount, v))
+}
+
+// PageCountIsNil applies the IsNil predicate on the "page_count" field.
+func PageCountIsNil() predicate.Book {
+	return predicate.Book(sql.FieldIsNull(FieldPageCount))
+}
+
+// PageCountNotNil applies the NotNil predicate on the "page_count" field.
+func PageCountNotNil() predicate.Book {
+	return predicate.Book(sql.FieldNotNull(FieldPageCount))
+}
+
+// DurationMinutesEQ applies the EQ predicate on the "duration_minutes" field.
+func DurationMinutesEQ(v int) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldDurationMinutes, v))
+}
+
+// DurationMinutesNEQ applies the NEQ predicate on the "duration_minutes" field.
+func DurationMinutesNEQ(v int) predicate.Book {
+	return predicate.Book(sql.FieldNEQ(FieldDurationMinutes, v))
+}
+
+// DurationMinutesIn applies the In predicate on the "duration_minutes" field.
+func DurationMinutesIn(vs ...int) predicate.Book {
+	return predicate.Book(sql.FieldIn(FieldDurationMinutes, vs...))
+}
+
+// DurationMinutesNotIn applies the NotIn predicate on the "duration_minutes" field.
+func DurationMinutesNotIn(vs ...int) predicate.Book {
+	return predicate.Book(sql.FieldNotIn(FieldDurationMinutes, vs...))
+}
+
+// DurationMinutesGT applies the GT predicate on the "duration_minutes" field.
+func DurationMinutesGT(v int) predicate.Book {
+	return predicate.Book(sql.FieldGT(FieldDurationMinutes, v))
+}
+
+// DurationMinutesGTE applies the GTE predicate on the "duration_minutes" field.
+func DurationMinutesGTE(v int) predicate.Book {
+	return predicate.Book(sql.FieldGTE(FieldDurationMinutes, v))
+}
+
+// DurationMinutesLT applies the LT predicate on the "duration_minutes" field.
+func DurationMinutesLT(v int) predicate.Book {
+	return predicate.Book(sql.FieldLT(FieldDurationMinutes, v))
+}
+
+// DurationMinutesLTE applies the LTE predicate on the "duration_minutes" field.
+func DurationMinutesLTE(v int) predicate.Book {
+	return predicate.Book(sql.FieldLTE(FieldDurationMinutes, v))
+}
+
+// DurationMinutesIsNil applies the IsNil predicate on the "duration_minutes" field.
+func DurationMinutesIsNil() predicate.Book {
+	return predicate.Book(sql.FieldIsNull(FieldDurationMinutes))
+}
+
+// DurationMinutesNotNil applies the NotNil predicate on the "duration_minutes" field.
+func DurationMinutesNotNil() predicate.Book {
+	return predicate.Book(sql.FieldNotNull(FieldDurationMinutes))
+}
+
+// CoreGoalEQ applies the EQ predicate on the "core_goal" field.
+func CoreGoalEQ(v string) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldCoreGoal, v))
+}
+
+// CoreGoalNEQ applies the NEQ predicate on the "core_goal" field.
+func CoreGoalNEQ(v string) predicate.Book {
+	return predicate.Book(sql.FieldNEQ(FieldCoreGoal, v))
+}
+
+// CoreGoalIn applies the In predicate on the "core_goal" field.
+func CoreGoalIn(vs ...string) predicate.Book {
+	return predicate.Book(sql.FieldIn(FieldCoreGoal, vs...))
+}
+
+// CoreGoalNotIn applies the NotIn predicate on the "core_goal" field.
+func CoreGoalNotIn(vs ...string) predicate.Book {
+	return predicate.Book(sql.FieldNotIn(FieldCoreGoal, vs...))
+}
+
+// CoreGoalGT applies the GT predicate on the "core_goal" field.
+func CoreGoalGT(v string) predicate.Book {
+	return predicate.Book(sql.FieldGT(FieldCoreGoal, v))
+}
+
+// CoreGoalGTE applies the GTE predicate on the "core_goal" field.
+func CoreGoalGTE(v string) predicate.Book {
+	return predicate.Book(sql.FieldGTE(FieldCoreGoal, v))
+}
+
+// CoreGoalLT applies the LT predicate on the "core_goal" field.
+func CoreGoalLT(v string) predicate.Book {
+	return predicate.Book(sql.FieldLT(FieldCoreGoal, v))
+}
+
+// CoreGoalLTE applies the LTE predicate on the "core_goal" field.
+func CoreGoalLTE(v string) predicate.Book {
+	return predicate.Book(sql.FieldLTE(FieldCoreGoal, v))
+}
+
+// CoreGoalContains applies the Contains predicate on the "core_goal" field.
+func CoreGoalContains(v string) predicate.Book {
+	return predicate.Book(sql.FieldContains(FieldCoreGoal, v))
+}
+
+// CoreGoalHasPrefix applies the HasPrefix predicate on the "core_goal" field.
+func CoreGoalHasPrefix(v string) predicate.Book {
+	return predicate.Book(sql.FieldHasPrefix(FieldCoreGoal, v))
+}
+
+// CoreGoalHasSuffix applies the HasSuffix predicate on the "core_goal" field.
+func CoreGoalHasSuffix(v string) predicate.Book {
+	return predicate.Book(sql.FieldHasSuffix(FieldCoreGoal, v))
+}
+
+// CoreGoalIsNil applies the IsNil predicate on the "core_goal" field.
+func CoreGoalIsNil() predicate.Book {
+	return predicate.Book(sql.FieldIsNull(FieldCoreGoal))
+}
+
+// CoreGoalNotNil applies the NotNil predicate on the "core_goal" field.
+func CoreGoalNotNil() predicate.Book {
+	return predicate.Book(sql.FieldNotNull(FieldCoreGoal))
+}
+
+// CoreGoalEqualFold applies the EqualFold predicate on the "core_goal" field.
+func CoreGoalEqualFold(v string) predicate.Book {
+	return predicate.Book(sql.FieldEqualFold(FieldCoreGoal, v))
+}
+
+// CoreGoalContainsFold applies the ContainsFold predicate on the "core_goal" field.
+func CoreGoalContainsFold(v string) predicate.Book {
+	return predicate.Book(sql.FieldContainsFold(FieldCoreGoal, v))
+}
+
+// CognitiveLevelEQ applies the EQ predicate on the "cognitive_level" field.
+func CognitiveLevelEQ(v string) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldCognitiveLevel, v))
+}
+
+// CognitiveLevelNEQ applies the NEQ predicate on the "cognitive_level" field.
+func CognitiveLevelNEQ(v string) predicate.Book {
+	return predicate.Book(sql.FieldNEQ(FieldCognitiveLevel, v))
+}
+
+// CognitiveLevelIn applies the In predicate on the "cognitive_level" field.
+func CognitiveLevelIn(vs ...string) predicate.Book {
+	return predicate.Book(sql.FieldIn(FieldCognitiveLevel, vs...))
+}
+
+// CognitiveLevelNotIn applies the NotIn predicate on the "cognitive_level" field.
+func CognitiveLevelNotIn(vs ...string) predicate.Book {
+	return predicate.Book(sql.FieldNotIn(FieldCognitiveLevel, vs...))
+}
+
+// CognitiveLevelGT applies the GT predicate on the "cognitive_level" field.
+func CognitiveLevelGT(v string) predicate.Book {
+	return predicate.Book(sql.FieldGT(FieldCognitiveLevel, v))
+}
+
+// CognitiveLevelGTE applies the GTE predicate on the "cognitive_level" field.
+func CognitiveLevelGTE(v string) predicate.Book {
+	return predicate.Book(sql.FieldGTE(FieldCognitiveLevel, v))
+}
+
+// CognitiveLevelLT applies the LT predicate on the "cognitive_level" field.
+func CognitiveLevelLT(v string) predicate.Book {
+	return predicate.Book(sql.FieldLT(FieldCognitiveLevel, v))
+}
+
+// CognitiveLevelLTE applies the LTE predicate on the "cognitive_level" field.
+func CognitiveLevelLTE(v string) predicate.Book {
+	return predicate.Book(sql.FieldLTE(FieldCognitiveLevel, v))
+}
+
+// CognitiveLevelContains applies the Contains predicate on the "cognitive_level" field.
+func CognitiveLevelContains(v string) predicate.Book {
+	return predicate.Book(sql.FieldContains(FieldCognitiveLevel, v))
+}
+
+// CognitiveLevelHasPrefix applies the HasPrefix predicate on the "cognitive_level" field.
+func CognitiveLevelHasPrefix(v string) predicate.Book {
+	return predicate.Book(sql.FieldHasPrefix(FieldCognitiveLevel, v))
+}
+
+// CognitiveLevelHasSuffix applies the HasSuffix predicate on the "cognitive_level" field.
+func CognitiveLevelHasSuffix(v string) predicate.Book {
+	return predicate.Book(sql.FieldHasSuffix(FieldCognitiveLevel, v))
+}
+
+// CognitiveLevelIsNil applies the IsNil predicate on the "cognitive_level" field.
+func CognitiveLevelIsNil() predicate.Book {
+	return predicate.Book(sql.FieldIsNull(FieldCognitiveLevel))
+}
+
+// CognitiveLevelNotNil applies the NotNil predicate on the "cognitive_level" field.
+func CognitiveLevelNotNil() predicate.Book {
+	return predicate.Book(sql.FieldNotNull(FieldCognitiveLevel))
+}
+
+// CognitiveLevelEqualFold applies the EqualFold predicate on the "cognitive_level" field.
+func CognitiveLevelEqualFold(v string) predicate.Book {
+	return predicate.Book(sql.FieldEqualFold(FieldCognitiveLevel, v))
+}
+
+// CognitiveLevelContainsFold applies the ContainsFold predicate on the "cognitive_level" field.
+func CognitiveLevelContainsFold(v string) predicate.Book {
+	return predicate.Book(sql.FieldContainsFold(FieldCognitiveLevel, v))
+}
+
+// ResourceTypeEQ applies the EQ predicate on the "resource_type" field.
+func ResourceTypeEQ(v string) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldResourceType, v))
+}
+
+// ResourceTypeNEQ applies the NEQ predicate on the "resource_type" field.
+func ResourceTypeNEQ(v string) predicate.Book {
+	return predicate.Book(sql.FieldNEQ(FieldResourceType, v))
+}
+
+// ResourceTypeIn applies the In predicate on the "resource_type" field.
+func ResourceTypeIn(vs ...string) predicate.Book {
+	return predicate.Book(sql.FieldIn(FieldResourceType, vs...))
+}
+
+// ResourceTypeNotIn applies the NotIn predicate on the "resource_type" field.
+func ResourceTypeNotIn(vs ...string) predicate.Book {
+	return predicate.Book(sql.FieldNotIn(FieldResourceType, vs...))
+}
+
+// ResourceTypeGT applies the GT predicate on the "resource_type" field.
+func ResourceTypeGT(v string) predicate.Book {
+	return predicate.Book(sql.FieldGT(FieldResourceType, v))
+}
+
+// ResourceTypeGTE applies the GTE predicate on the "resource_type" field.
+func ResourceTypeGTE(v string) predicate.Book {
+	return predicate.Book(sql.FieldGTE(FieldResourceType, v))
+}
+
+// ResourceTypeLT applies the LT predicate on the "resource_type" field.
+func ResourceTypeLT(v string) predicate.Book {
+	return predicate.Book(sql.FieldLT(FieldResourceType, v))
+}
+
+// ResourceTypeLTE applies the LTE predicate on the "resource_type" field.
+func ResourceTypeLTE(v string) predicate.Book {
+	return predicate.Book(sql.FieldLTE(FieldResourceType, v))
+}
+
+// ResourceTypeContains applies the Contains predicate on the "resource_type" field.
+func ResourceTypeContains(v string) predicate.Book {
+	return predicate.Book(sql.FieldContains(FieldResourceType, v))
+}
+
+// ResourceTypeHasPrefix applies the HasPrefix predicate on the "resource_type" field.
+func ResourceTypeHasPrefix(v string) predicate.Book {
+	return predicate.Book(sql.FieldHasPrefix(FieldResourceType, v))
+}
+
+// ResourceTypeHasSuffix applies the HasSuffix predicate on the "resource_type" field.
+func ResourceTypeHasSuffix(v string) predicate.Book {
+	return predicate.Book(sql.FieldHasSuffix(FieldResourceType, v))
+}
+
+// ResourceTypeIsNil applies the IsNil predicate on the "resource_type" field.
+func ResourceTypeIsNil() predicate.Book {
+	return predicate.Book(sql.FieldIsNull(FieldResourceType))
+}
+
+// ResourceTypeNotNil applies the NotNil predicate on the "resource_type" field.
+func ResourceTypeNotNil() predicate.Book {
+	return predicate.Book(sql.FieldNotNull(FieldResourceType))
+}
+
+// ResourceTypeEqualFold applies the EqualFold predicate on the "resource_type" field.
+func ResourceTypeEqualFold(v string) predicate.Book {
+	return predicate.Book(sql.FieldEqualFold(FieldResourceType, v))
+}
+
+// ResourceTypeContainsFold applies the ContainsFold predicate on the "resource_type" field.
+func ResourceTypeContainsFold(v string) predicate.Book {
+	return predicate.Book(sql.FieldContainsFold(FieldResourceType, v))
+}
+
+// HasPrintEQ applies the EQ predicate on the "has_print" field.
+func HasPrintEQ(v bool) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldHasPrint, v))
+}
+
+// HasPrintNEQ applies the NEQ predicate on the "has_print" field.
+func HasPrintNEQ(v bool) predicate.Book {
+	return predicate.Book(sql.FieldNEQ(FieldHasPrint, v))
+}
+
+// HasDigitalEQ applies the EQ predicate on the "has_digital" field.
+func HasDigitalEQ(v bool) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldHasDigital, v))
+}
+
+// HasDigitalNEQ applies the NEQ predicate on the "has_digital" field.
+func HasDigitalNEQ(v bool) predicate.Book {
+	return predicate.Book(sql.FieldNEQ(FieldHasDigital, v))
+}
+
+// HasAudioEQ applies the EQ predicate on the "has_audio" field.
+func HasAudioEQ(v bool) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldHasAudio, v))
+}
+
+// HasAudioNEQ applies the NEQ predicate on the "has_audio" field.
+func HasAudioNEQ(v bool) predicate.Book {
+	return predicate.Book(sql.FieldNEQ(FieldHasAudio, v))
+}
+
+// HasVideoEQ applies the EQ predicate on the "has_video" field.
+func HasVideoEQ(v bool) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldHasVideo, v))
+}
+
+// HasVideoNEQ applies the NEQ predicate on the "has_video" field.
+func HasVideoNEQ(v bool) predicate.Book {
+	return predicate.Book(sql.FieldNEQ(FieldHasVideo, v))
+}
+
+// TeachingSuggestionEQ applies the EQ predicate on the "teaching_suggestion" field.
+func TeachingSuggestionEQ(v string) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldTeachingSuggestion, v))
+}
+
+// TeachingSuggestionNEQ applies the NEQ predicate on the "teaching_suggestion" field.
+func TeachingSuggestionNEQ(v string) predicate.Book {
+	return predicate.Book(sql.FieldNEQ(FieldTeachingSuggestion, v))
+}
+
+// TeachingSuggestionIn applies the In predicate on the "teaching_suggestion" field.
+func TeachingSuggestionIn(vs ...string) predicate.Book {
+	return predicate.Book(sql.FieldIn(FieldTeachingSuggestion, vs...))
+}
+
+// TeachingSuggestionNotIn applies the NotIn predicate on the "teaching_suggestion" field.
+func TeachingSuggestionNotIn(vs ...string) predicate.Book {
+	return predicate.Book(sql.FieldNotIn(FieldTeachingSuggestion, vs...))
+}
+
+// TeachingSuggestionGT applies the GT predicate on the "teaching_suggestion" field.
+func TeachingSuggestionGT(v string) predicate.Book {
+	return predicate.Book(sql.FieldGT(FieldTeachingSuggestion, v))
+}
+
+// TeachingSuggestionGTE applies the GTE predicate on the "teaching_suggestion" field.
+func TeachingSuggestionGTE(v string) predicate.Book {
+	return predicate.Book(sql.FieldGTE(FieldTeachingSuggestion, v))
+}
+
+// TeachingSuggestionLT applies the LT predicate on the "teaching_suggestion" field.
+func TeachingSuggestionLT(v string) predicate.Book {
+	return predicate.Book(sql.FieldLT(FieldTeachingSuggestion, v))
+}
+
+// TeachingSuggestionLTE applies the LTE predicate on the "teaching_suggestion" field.
+func TeachingSuggestionLTE(v string) predicate.Book {
+	return predicate.Book(sql.FieldLTE(FieldTeachingSuggestion, v))
+}
+
+// TeachingSuggestionContains applies the Contains predicate on the "teaching_suggestion" field.
+func TeachingSuggestionContains(v string) predicate.Book {
+	return predicate.Book(sql.FieldContains(FieldTeachingSuggestion, v))
+}
+
+// TeachingSuggestionHasPrefix applies the HasPrefix predicate on the "teaching_suggestion" field.
+func TeachingSuggestionHasPrefix(v string) predicate.Book {
+	return predicate.Book(sql.FieldHasPrefix(FieldTeachingSuggestion, v))
+}
+
+// TeachingSuggestionHasSuffix applies the HasSuffix predicate on the "teaching_suggestion" field.
+func TeachingSuggestionHasSuffix(v string) predicate.Book {
+	return predicate.Book(sql.FieldHasSuffix(FieldTeachingSuggestion, v))
+}
+
+// TeachingSuggestionIsNil applies the IsNil predicate on the "teaching_suggestion" field.
+func TeachingSuggestionIsNil() predicate.Book {
+	return predicate.Book(sql.FieldIsNull(FieldTeachingSuggestion))
+}
+
+// TeachingSuggestionNotNil applies the NotNil predicate on the "teaching_suggestion" field.
+func TeachingSuggestionNotNil() predicate.Book {
+	return predicate.Book(sql.FieldNotNull(FieldTeachingSuggestion))
+}
+
+// TeachingSuggestionEqualFold applies the EqualFold predicate on the "teaching_suggestion" field.
+func TeachingSuggestionEqualFold(v string) predicate.Book {
+	return predicate.Book(sql.FieldEqualFold(FieldTeachingSuggestion, v))
+}
+
+// TeachingSuggestionContainsFold applies the ContainsFold predicate on the "teaching_suggestion" field.
+func TeachingSuggestionContainsFold(v string) predicate.Book {
+	return predicate.Book(sql.FieldContainsFold(FieldTeachingSuggestion, v))
+}
+
+// ParentReadingGuideEQ applies the EQ predicate on the "parent_reading_guide" field.
+func ParentReadingGuideEQ(v string) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldParentReadingGuide, v))
+}
+
+// ParentReadingGuideNEQ applies the NEQ predicate on the "parent_reading_guide" field.
+func ParentReadingGuideNEQ(v string) predicate.Book {
+	return predicate.Book(sql.FieldNEQ(FieldParentReadingGuide, v))
+}
+
+// ParentReadingGuideIn applies the In predicate on the "parent_reading_guide" field.
+func ParentReadingGuideIn(vs ...string) predicate.Book {
+	return predicate.Book(sql.FieldIn(FieldParentReadingGuide, vs...))
+}
+
+// ParentReadingGuideNotIn applies the NotIn predicate on the "parent_reading_guide" field.
+func ParentReadingGuideNotIn(vs ...string) predicate.Book {
+	return predicate.Book(sql.FieldNotIn(FieldParentReadingGuide, vs...))
+}
+
+// ParentReadingGuideGT applies the GT predicate on the "parent_reading_guide" field.
+func ParentReadingGuideGT(v string) predicate.Book {
+	return predicate.Book(sql.FieldGT(FieldParentReadingGuide, v))
+}
+
+// ParentReadingGuideGTE applies the GTE predicate on the "parent_reading_guide" field.
+func ParentReadingGuideGTE(v string) predicate.Book {
+	return predicate.Book(sql.FieldGTE(FieldParentReadingGuide, v))
+}
+
+// ParentReadingGuideLT applies the LT predicate on the "parent_reading_guide" field.
+func ParentReadingGuideLT(v string) predicate.Book {
+	return predicate.Book(sql.FieldLT(FieldParentReadingGuide, v))
+}
+
+// ParentReadingGuideLTE applies the LTE predicate on the "parent_reading_guide" field.
+func ParentReadingGuideLTE(v string) predicate.Book {
+	return predicate.Book(sql.FieldLTE(FieldParentReadingGuide, v))
+}
+
+// ParentReadingGuideContains applies the Contains predicate on the "parent_reading_guide" field.
+func ParentReadingGuideContains(v string) predicate.Book {
+	return predicate.Book(sql.FieldContains(FieldParentReadingGuide, v))
+}
+
+// ParentReadingGuideHasPrefix applies the HasPrefix predicate on the "parent_reading_guide" field.
+func ParentReadingGuideHasPrefix(v string) predicate.Book {
+	return predicate.Book(sql.FieldHasPrefix(FieldParentReadingGuide, v))
+}
+
+// ParentReadingGuideHasSuffix applies the HasSuffix predicate on the "parent_reading_guide" field.
+func ParentReadingGuideHasSuffix(v string) predicate.Book {
+	return predicate.Book(sql.FieldHasSuffix(FieldParentReadingGuide, v))
+}
+
+// ParentReadingGuideIsNil applies the IsNil predicate on the "parent_reading_guide" field.
+func ParentReadingGuideIsNil() predicate.Book {
+	return predicate.Book(sql.FieldIsNull(FieldParentReadingGuide))
+}
+
+// ParentReadingGuideNotNil applies the NotNil predicate on the "parent_reading_guide" field.
+func ParentReadingGuideNotNil() predicate.Book {
+	return predicate.Book(sql.FieldNotNull(FieldParentReadingGuide))
+}
+
+// ParentReadingGuideEqualFold applies the EqualFold predicate on the "parent_reading_guide" field.
+func ParentReadingGuideEqualFold(v string) predicate.Book {
+	return predicate.Book(sql.FieldEqualFold(FieldParentReadingGuide, v))
+}
+
+// ParentReadingGuideContainsFold applies the ContainsFold predicate on the "parent_reading_guide" field.
+func ParentReadingGuideContainsFold(v string) predicate.Book {
+	return predicate.Book(sql.FieldContainsFold(FieldParentReadingGuide, v))
+}
+
+// RecommendedAgeMinEQ applies the EQ predicate on the "recommended_age_min" field.
+func RecommendedAgeMinEQ(v int) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldRecommendedAgeMin, v))
+}
+
+// RecommendedAgeMinNEQ applies the NEQ predicate on the "recommended_age_min" field.
+func RecommendedAgeMinNEQ(v int) predicate.Book {
+	return predicate.Book(sql.FieldNEQ(FieldRecommendedAgeMin, v))
+}
+
+// RecommendedAgeMinIn applies the In predicate on the "recommended_age_min" field.
+func RecommendedAgeMinIn(vs ...int) predicate.Book {
+	return predicate.Book(sql.FieldIn(FieldRecommendedAgeMin, vs...))
+}
+
+// RecommendedAgeMinNotIn applies the NotIn predicate on the "recommended_age_min" field.
+func RecommendedAgeMinNotIn(vs ...int) predicate.Book {
+	return predicate.Book(sql.FieldNotIn(FieldRecommendedAgeMin, vs...))
+}
+
+// RecommendedAgeMinGT applies the GT predicate on the "recommended_age_min" field.
+func RecommendedAgeMinGT(v int) predicate.Book {
+	return predicate.Book(sql.FieldGT(FieldRecommendedAgeMin, v))
+}
+
+// RecommendedAgeMinGTE applies the GTE predicate on the "recommended_age_min" field.
+func RecommendedAgeMinGTE(v int) predicate.Book {
+	return predicate.Book(sql.FieldGTE(FieldRecommendedAgeMin, v))
+}
+
+// RecommendedAgeMinLT applies the LT predicate on the "recommended_age_min" field.
+func RecommendedAgeMinLT(v int) predicate.Book {
+	return predicate.Book(sql.FieldLT(FieldRecommendedAgeMin, v))
+}
+
+// RecommendedAgeMinLTE applies the LTE predicate on the "recommended_age_min" field.
+func RecommendedAgeMinLTE(v int) predicate.Book {
+	return predicate.Book(sql.FieldLTE(FieldRecommendedAgeMin, v))
+}
+
+// RecommendedAgeMaxEQ applies the EQ predicate on the "recommended_age_max" field.
+func RecommendedAgeMaxEQ(v int) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldRecommendedAgeMax, v))
+}
+
+// RecommendedAgeMaxNEQ applies the NEQ predicate on the "recommended_age_max" field.
+func RecommendedAgeMaxNEQ(v int) predicate.Book {
+	return predicate.Book(sql.FieldNEQ(FieldRecommendedAgeMax, v))
+}
+
+// RecommendedAgeMaxIn applies the In predicate on the "recommended_age_max" field.
+func RecommendedAgeMaxIn(vs ...int) predicate.Book {
+	return predicate.Book(sql.FieldIn(FieldRecommendedAgeMax, vs...))
+}
+
+// RecommendedAgeMaxNotIn applies the NotIn predicate on the "recommended_age_max" field.
+func RecommendedAgeMaxNotIn(vs ...int) predicate.Book {
+	return predicate.Book(sql.FieldNotIn(FieldRecommendedAgeMax, vs...))
+}
+
+// RecommendedAgeMaxGT applies the GT predicate on the "recommended_age_max" field.
+func RecommendedAgeMaxGT(v int) predicate.Book {
+	return predicate.Book(sql.FieldGT(FieldRecommendedAgeMax, v))
+}
+
+// RecommendedAgeMaxGTE applies the GTE predicate on the "recommended_age_max" field.
+func RecommendedAgeMaxGTE(v int) predicate.Book {
+	return predicate.Book(sql.FieldGTE(FieldRecommendedAgeMax, v))
+}
+
+// RecommendedAgeMaxLT applies the LT predicate on the "recommended_age_max" field.
+func RecommendedAgeMaxLT(v int) predicate.Book {
+	return predicate.Book(sql.FieldLT(FieldRecommendedAgeMax, v))
+}
+
+// RecommendedAgeMaxLTE applies the LTE predicate on the "recommended_age_max" field.
+func RecommendedAgeMaxLTE(v int) predicate.Book {
+	return predicate.Book(sql.FieldLTE(FieldRecommendedAgeMax, v))
+}
+
+// CoverImageURLEQ applies the EQ predicate on the "cover_image_url" field.
+func CoverImageURLEQ(v string) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldCoverImageURL, v))
+}
+
+// CoverImageURLNEQ applies the NEQ predicate on the "cover_image_url" field.
+func CoverImageURLNEQ(v string) predicate.Book {
+	return predicate.Book(sql.FieldNEQ(FieldCoverImageURL, v))
+}
+
+// CoverImageURLIn applies the In predicate on the "cover_image_url" field.
+func CoverImageURLIn(vs ...string) predicate.Book {
+	return predicate.Book(sql.FieldIn(FieldCoverImageURL, vs...))
+}
+
+// CoverImageURLNotIn applies the NotIn predicate on the "cover_image_url" field.
+func CoverImageURLNotIn(vs ...string) predicate.Book {
+	return predicate.Book(sql.FieldNotIn(FieldCoverImageURL, vs...))
+}
+
+// CoverImageURLGT applies the GT predicate on the "cover_image_url" field.
+func CoverImageURLGT(v string) predicate.Book {
+	return predicate.Book(sql.FieldGT(FieldCoverImageURL, v))
+}
+
+// CoverImageURLGTE applies the GTE predicate on the "cover_image_url" field.
+func CoverImageURLGTE(v string) predicate.Book {
+	return predicate.Book(sql.FieldGTE(FieldCoverImageURL, v))
+}
+
+// CoverImageURLLT applies the LT predicate on the "cover_image_url" field.
+func CoverImageURLLT(v string) predicate.Book {
+	return predicate.Book(sql.FieldLT(FieldCoverImageURL, v))
+}
+
+// CoverImageURLLTE applies the LTE predicate on the "cover_image_url" field.
+func CoverImageURLLTE(v string) predicate.Book {
+	return predicate.Book(sql.FieldLTE(FieldCoverImageURL, v))
+}
+
+// CoverImageURLContains applies the Contains predicate on the "cover_image_url" field.
+func CoverImageURLContains(v string) predicate.Book {
+	return predicate.Book(sql.FieldContains(FieldCoverImageURL, v))
+}
+
+// CoverImageURLHasPrefix applies the HasPrefix predicate on the "cover_image_url" field.
+func CoverImageURLHasPrefix(v string) predicate.Book {
+	return predicate.Book(sql.FieldHasPrefix(FieldCoverImageURL, v))
+}
+
+// CoverImageURLHasSuffix applies the HasSuffix predicate on the "cover_image_url" field.
+func CoverImageURLHasSuffix(v string) predicate.Book {
+	return predicate.Book(sql.FieldHasSuffix(FieldCoverImageURL, v))
+}
+
+// CoverImageURLIsNil applies the IsNil predicate on the "cover_image_url" field.
+func CoverImageURLIsNil() predicate.Book {
+	return predicate.Book(sql.FieldIsNull(FieldCoverImageURL))
+}
+
+// CoverImageURLNotNil applies the NotNil predicate on the "cover_image_url" field.
+func CoverImageURLNotNil() predicate.Book {
+	return predicate.Book(sql.FieldNotNull(FieldCoverImageURL))
+}
+
+// CoverImageURLEqualFold applies the EqualFold predicate on the "cover_image_url" field.
+func CoverImageURLEqualFold(v string) predicate.Book {
+	return predicate.Book(sql.FieldEqualFold(FieldCoverImageURL, v))
+}
+
+// CoverImageURLContainsFold applies the ContainsFold predicate on the "cover_image_url" field.
+func CoverImageURLContainsFold(v string) predicate.Book {
+	return predicate.Book(sql.FieldContainsFold(FieldCoverImageURL, v))
+}
+
 // CoverURLEQ applies the EQ predicate on the "cover_url" field.
 func CoverURLEQ(v string) predicate.Book {
 	return predicate.Book(sql.FieldEQ(FieldCoverURL, v))
@@ -451,6 +1201,71 @@ func FilePathContainsFold(v string) predicate.Book {
 	return predicate.Book(sql.FieldContainsFold(FieldFilePath, v))
 }
 
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v string) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldStatus, v))
+}
+
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v string) predicate.Book {
+	return predicate.Book(sql.FieldNEQ(FieldStatus, v))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...string) predicate.Book {
+	return predicate.Book(sql.FieldIn(FieldStatus, vs...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...string) predicate.Book {
+	return predicate.Book(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// StatusGT applies the GT predicate on the "status" field.
+func StatusGT(v string) predicate.Book {
+	return predicate.Book(sql.FieldGT(FieldStatus, v))
+}
+
+// StatusGTE applies the GTE predicate on the "status" field.
+func StatusGTE(v string) predicate.Book {
+	return predicate.Book(sql.FieldGTE(FieldStatus, v))
+}
+
+// StatusLT applies the LT predicate on the "status" field.
+func StatusLT(v string) predicate.Book {
+	return predicate.Book(sql.FieldLT(FieldStatus, v))
+}
+
+// StatusLTE applies the LTE predicate on the "status" field.
+func StatusLTE(v string) predicate.Book {
+	return predicate.Book(sql.FieldLTE(FieldStatus, v))
+}
+
+// StatusContains applies the Contains predicate on the "status" field.
+func StatusContains(v string) predicate.Book {
+	return predicate.Book(sql.FieldContains(FieldStatus, v))
+}
+
+// StatusHasPrefix applies the HasPrefix predicate on the "status" field.
+func StatusHasPrefix(v string) predicate.Book {
+	return predicate.Book(sql.FieldHasPrefix(FieldStatus, v))
+}
+
+// StatusHasSuffix applies the HasSuffix predicate on the "status" field.
+func StatusHasSuffix(v string) predicate.Book {
+	return predicate.Book(sql.FieldHasSuffix(FieldStatus, v))
+}
+
+// StatusEqualFold applies the EqualFold predicate on the "status" field.
+func StatusEqualFold(v string) predicate.Book {
+	return predicate.Book(sql.FieldEqualFold(FieldStatus, v))
+}
+
+// StatusContainsFold applies the ContainsFold predicate on the "status" field.
+func StatusContainsFold(v string) predicate.Book {
+	return predicate.Book(sql.FieldContainsFold(FieldStatus, v))
+}
+
 // UploaderIDEQ applies the EQ predicate on the "uploader_id" field.
 func UploaderIDEQ(v uuid.UUID) predicate.Book {
 	return predicate.Book(sql.FieldEQ(FieldUploaderID, v))
@@ -469,6 +1284,46 @@ func UploaderIDIn(vs ...uuid.UUID) predicate.Book {
 // UploaderIDNotIn applies the NotIn predicate on the "uploader_id" field.
 func UploaderIDNotIn(vs ...uuid.UUID) predicate.Book {
 	return predicate.Book(sql.FieldNotIn(FieldUploaderID, vs...))
+}
+
+// ViewCountEQ applies the EQ predicate on the "view_count" field.
+func ViewCountEQ(v int) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldViewCount, v))
+}
+
+// ViewCountNEQ applies the NEQ predicate on the "view_count" field.
+func ViewCountNEQ(v int) predicate.Book {
+	return predicate.Book(sql.FieldNEQ(FieldViewCount, v))
+}
+
+// ViewCountIn applies the In predicate on the "view_count" field.
+func ViewCountIn(vs ...int) predicate.Book {
+	return predicate.Book(sql.FieldIn(FieldViewCount, vs...))
+}
+
+// ViewCountNotIn applies the NotIn predicate on the "view_count" field.
+func ViewCountNotIn(vs ...int) predicate.Book {
+	return predicate.Book(sql.FieldNotIn(FieldViewCount, vs...))
+}
+
+// ViewCountGT applies the GT predicate on the "view_count" field.
+func ViewCountGT(v int) predicate.Book {
+	return predicate.Book(sql.FieldGT(FieldViewCount, v))
+}
+
+// ViewCountGTE applies the GTE predicate on the "view_count" field.
+func ViewCountGTE(v int) predicate.Book {
+	return predicate.Book(sql.FieldGTE(FieldViewCount, v))
+}
+
+// ViewCountLT applies the LT predicate on the "view_count" field.
+func ViewCountLT(v int) predicate.Book {
+	return predicate.Book(sql.FieldLT(FieldViewCount, v))
+}
+
+// ViewCountLTE applies the LTE predicate on the "view_count" field.
+func ViewCountLTE(v int) predicate.Book {
+	return predicate.Book(sql.FieldLTE(FieldViewCount, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

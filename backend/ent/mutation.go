@@ -43,8 +43,29 @@ type BookMutation struct {
 	title                  *string
 	author                 *string
 	description            *string
+	page_count             *int
+	addpage_count          *int
+	duration_minutes       *int
+	addduration_minutes    *int
+	core_goal              *string
+	cognitive_level        *string
+	resource_type          *string
+	has_print              *bool
+	has_digital            *bool
+	has_audio              *bool
+	has_video              *bool
+	teaching_suggestion    *string
+	parent_reading_guide   *string
+	recommended_age_min    *int
+	addrecommended_age_min *int
+	recommended_age_max    *int
+	addrecommended_age_max *int
+	cover_image_url        *string
 	cover_url              *string
 	file_path              *string
+	status                 *string
+	view_count             *int
+	addview_count          *int
 	created_at             *time.Time
 	updated_at             *time.Time
 	clearedFields          map[string]struct{}
@@ -283,6 +304,696 @@ func (m *BookMutation) ResetDescription() {
 	delete(m.clearedFields, book.FieldDescription)
 }
 
+// SetPageCount sets the "page_count" field.
+func (m *BookMutation) SetPageCount(i int) {
+	m.page_count = &i
+	m.addpage_count = nil
+}
+
+// PageCount returns the value of the "page_count" field in the mutation.
+func (m *BookMutation) PageCount() (r int, exists bool) {
+	v := m.page_count
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPageCount returns the old "page_count" field's value of the Book entity.
+// If the Book object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookMutation) OldPageCount(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPageCount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPageCount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPageCount: %w", err)
+	}
+	return oldValue.PageCount, nil
+}
+
+// AddPageCount adds i to the "page_count" field.
+func (m *BookMutation) AddPageCount(i int) {
+	if m.addpage_count != nil {
+		*m.addpage_count += i
+	} else {
+		m.addpage_count = &i
+	}
+}
+
+// AddedPageCount returns the value that was added to the "page_count" field in this mutation.
+func (m *BookMutation) AddedPageCount() (r int, exists bool) {
+	v := m.addpage_count
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearPageCount clears the value of the "page_count" field.
+func (m *BookMutation) ClearPageCount() {
+	m.page_count = nil
+	m.addpage_count = nil
+	m.clearedFields[book.FieldPageCount] = struct{}{}
+}
+
+// PageCountCleared returns if the "page_count" field was cleared in this mutation.
+func (m *BookMutation) PageCountCleared() bool {
+	_, ok := m.clearedFields[book.FieldPageCount]
+	return ok
+}
+
+// ResetPageCount resets all changes to the "page_count" field.
+func (m *BookMutation) ResetPageCount() {
+	m.page_count = nil
+	m.addpage_count = nil
+	delete(m.clearedFields, book.FieldPageCount)
+}
+
+// SetDurationMinutes sets the "duration_minutes" field.
+func (m *BookMutation) SetDurationMinutes(i int) {
+	m.duration_minutes = &i
+	m.addduration_minutes = nil
+}
+
+// DurationMinutes returns the value of the "duration_minutes" field in the mutation.
+func (m *BookMutation) DurationMinutes() (r int, exists bool) {
+	v := m.duration_minutes
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDurationMinutes returns the old "duration_minutes" field's value of the Book entity.
+// If the Book object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookMutation) OldDurationMinutes(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDurationMinutes is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDurationMinutes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDurationMinutes: %w", err)
+	}
+	return oldValue.DurationMinutes, nil
+}
+
+// AddDurationMinutes adds i to the "duration_minutes" field.
+func (m *BookMutation) AddDurationMinutes(i int) {
+	if m.addduration_minutes != nil {
+		*m.addduration_minutes += i
+	} else {
+		m.addduration_minutes = &i
+	}
+}
+
+// AddedDurationMinutes returns the value that was added to the "duration_minutes" field in this mutation.
+func (m *BookMutation) AddedDurationMinutes() (r int, exists bool) {
+	v := m.addduration_minutes
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearDurationMinutes clears the value of the "duration_minutes" field.
+func (m *BookMutation) ClearDurationMinutes() {
+	m.duration_minutes = nil
+	m.addduration_minutes = nil
+	m.clearedFields[book.FieldDurationMinutes] = struct{}{}
+}
+
+// DurationMinutesCleared returns if the "duration_minutes" field was cleared in this mutation.
+func (m *BookMutation) DurationMinutesCleared() bool {
+	_, ok := m.clearedFields[book.FieldDurationMinutes]
+	return ok
+}
+
+// ResetDurationMinutes resets all changes to the "duration_minutes" field.
+func (m *BookMutation) ResetDurationMinutes() {
+	m.duration_minutes = nil
+	m.addduration_minutes = nil
+	delete(m.clearedFields, book.FieldDurationMinutes)
+}
+
+// SetCoreGoal sets the "core_goal" field.
+func (m *BookMutation) SetCoreGoal(s string) {
+	m.core_goal = &s
+}
+
+// CoreGoal returns the value of the "core_goal" field in the mutation.
+func (m *BookMutation) CoreGoal() (r string, exists bool) {
+	v := m.core_goal
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCoreGoal returns the old "core_goal" field's value of the Book entity.
+// If the Book object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookMutation) OldCoreGoal(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCoreGoal is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCoreGoal requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCoreGoal: %w", err)
+	}
+	return oldValue.CoreGoal, nil
+}
+
+// ClearCoreGoal clears the value of the "core_goal" field.
+func (m *BookMutation) ClearCoreGoal() {
+	m.core_goal = nil
+	m.clearedFields[book.FieldCoreGoal] = struct{}{}
+}
+
+// CoreGoalCleared returns if the "core_goal" field was cleared in this mutation.
+func (m *BookMutation) CoreGoalCleared() bool {
+	_, ok := m.clearedFields[book.FieldCoreGoal]
+	return ok
+}
+
+// ResetCoreGoal resets all changes to the "core_goal" field.
+func (m *BookMutation) ResetCoreGoal() {
+	m.core_goal = nil
+	delete(m.clearedFields, book.FieldCoreGoal)
+}
+
+// SetCognitiveLevel sets the "cognitive_level" field.
+func (m *BookMutation) SetCognitiveLevel(s string) {
+	m.cognitive_level = &s
+}
+
+// CognitiveLevel returns the value of the "cognitive_level" field in the mutation.
+func (m *BookMutation) CognitiveLevel() (r string, exists bool) {
+	v := m.cognitive_level
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCognitiveLevel returns the old "cognitive_level" field's value of the Book entity.
+// If the Book object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookMutation) OldCognitiveLevel(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCognitiveLevel is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCognitiveLevel requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCognitiveLevel: %w", err)
+	}
+	return oldValue.CognitiveLevel, nil
+}
+
+// ClearCognitiveLevel clears the value of the "cognitive_level" field.
+func (m *BookMutation) ClearCognitiveLevel() {
+	m.cognitive_level = nil
+	m.clearedFields[book.FieldCognitiveLevel] = struct{}{}
+}
+
+// CognitiveLevelCleared returns if the "cognitive_level" field was cleared in this mutation.
+func (m *BookMutation) CognitiveLevelCleared() bool {
+	_, ok := m.clearedFields[book.FieldCognitiveLevel]
+	return ok
+}
+
+// ResetCognitiveLevel resets all changes to the "cognitive_level" field.
+func (m *BookMutation) ResetCognitiveLevel() {
+	m.cognitive_level = nil
+	delete(m.clearedFields, book.FieldCognitiveLevel)
+}
+
+// SetResourceType sets the "resource_type" field.
+func (m *BookMutation) SetResourceType(s string) {
+	m.resource_type = &s
+}
+
+// ResourceType returns the value of the "resource_type" field in the mutation.
+func (m *BookMutation) ResourceType() (r string, exists bool) {
+	v := m.resource_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldResourceType returns the old "resource_type" field's value of the Book entity.
+// If the Book object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookMutation) OldResourceType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldResourceType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldResourceType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldResourceType: %w", err)
+	}
+	return oldValue.ResourceType, nil
+}
+
+// ClearResourceType clears the value of the "resource_type" field.
+func (m *BookMutation) ClearResourceType() {
+	m.resource_type = nil
+	m.clearedFields[book.FieldResourceType] = struct{}{}
+}
+
+// ResourceTypeCleared returns if the "resource_type" field was cleared in this mutation.
+func (m *BookMutation) ResourceTypeCleared() bool {
+	_, ok := m.clearedFields[book.FieldResourceType]
+	return ok
+}
+
+// ResetResourceType resets all changes to the "resource_type" field.
+func (m *BookMutation) ResetResourceType() {
+	m.resource_type = nil
+	delete(m.clearedFields, book.FieldResourceType)
+}
+
+// SetHasPrint sets the "has_print" field.
+func (m *BookMutation) SetHasPrint(b bool) {
+	m.has_print = &b
+}
+
+// HasPrint returns the value of the "has_print" field in the mutation.
+func (m *BookMutation) HasPrint() (r bool, exists bool) {
+	v := m.has_print
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHasPrint returns the old "has_print" field's value of the Book entity.
+// If the Book object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookMutation) OldHasPrint(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHasPrint is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHasPrint requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHasPrint: %w", err)
+	}
+	return oldValue.HasPrint, nil
+}
+
+// ResetHasPrint resets all changes to the "has_print" field.
+func (m *BookMutation) ResetHasPrint() {
+	m.has_print = nil
+}
+
+// SetHasDigital sets the "has_digital" field.
+func (m *BookMutation) SetHasDigital(b bool) {
+	m.has_digital = &b
+}
+
+// HasDigital returns the value of the "has_digital" field in the mutation.
+func (m *BookMutation) HasDigital() (r bool, exists bool) {
+	v := m.has_digital
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHasDigital returns the old "has_digital" field's value of the Book entity.
+// If the Book object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookMutation) OldHasDigital(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHasDigital is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHasDigital requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHasDigital: %w", err)
+	}
+	return oldValue.HasDigital, nil
+}
+
+// ResetHasDigital resets all changes to the "has_digital" field.
+func (m *BookMutation) ResetHasDigital() {
+	m.has_digital = nil
+}
+
+// SetHasAudio sets the "has_audio" field.
+func (m *BookMutation) SetHasAudio(b bool) {
+	m.has_audio = &b
+}
+
+// HasAudio returns the value of the "has_audio" field in the mutation.
+func (m *BookMutation) HasAudio() (r bool, exists bool) {
+	v := m.has_audio
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHasAudio returns the old "has_audio" field's value of the Book entity.
+// If the Book object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookMutation) OldHasAudio(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHasAudio is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHasAudio requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHasAudio: %w", err)
+	}
+	return oldValue.HasAudio, nil
+}
+
+// ResetHasAudio resets all changes to the "has_audio" field.
+func (m *BookMutation) ResetHasAudio() {
+	m.has_audio = nil
+}
+
+// SetHasVideo sets the "has_video" field.
+func (m *BookMutation) SetHasVideo(b bool) {
+	m.has_video = &b
+}
+
+// HasVideo returns the value of the "has_video" field in the mutation.
+func (m *BookMutation) HasVideo() (r bool, exists bool) {
+	v := m.has_video
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHasVideo returns the old "has_video" field's value of the Book entity.
+// If the Book object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookMutation) OldHasVideo(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHasVideo is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHasVideo requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHasVideo: %w", err)
+	}
+	return oldValue.HasVideo, nil
+}
+
+// ResetHasVideo resets all changes to the "has_video" field.
+func (m *BookMutation) ResetHasVideo() {
+	m.has_video = nil
+}
+
+// SetTeachingSuggestion sets the "teaching_suggestion" field.
+func (m *BookMutation) SetTeachingSuggestion(s string) {
+	m.teaching_suggestion = &s
+}
+
+// TeachingSuggestion returns the value of the "teaching_suggestion" field in the mutation.
+func (m *BookMutation) TeachingSuggestion() (r string, exists bool) {
+	v := m.teaching_suggestion
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTeachingSuggestion returns the old "teaching_suggestion" field's value of the Book entity.
+// If the Book object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookMutation) OldTeachingSuggestion(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTeachingSuggestion is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTeachingSuggestion requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTeachingSuggestion: %w", err)
+	}
+	return oldValue.TeachingSuggestion, nil
+}
+
+// ClearTeachingSuggestion clears the value of the "teaching_suggestion" field.
+func (m *BookMutation) ClearTeachingSuggestion() {
+	m.teaching_suggestion = nil
+	m.clearedFields[book.FieldTeachingSuggestion] = struct{}{}
+}
+
+// TeachingSuggestionCleared returns if the "teaching_suggestion" field was cleared in this mutation.
+func (m *BookMutation) TeachingSuggestionCleared() bool {
+	_, ok := m.clearedFields[book.FieldTeachingSuggestion]
+	return ok
+}
+
+// ResetTeachingSuggestion resets all changes to the "teaching_suggestion" field.
+func (m *BookMutation) ResetTeachingSuggestion() {
+	m.teaching_suggestion = nil
+	delete(m.clearedFields, book.FieldTeachingSuggestion)
+}
+
+// SetParentReadingGuide sets the "parent_reading_guide" field.
+func (m *BookMutation) SetParentReadingGuide(s string) {
+	m.parent_reading_guide = &s
+}
+
+// ParentReadingGuide returns the value of the "parent_reading_guide" field in the mutation.
+func (m *BookMutation) ParentReadingGuide() (r string, exists bool) {
+	v := m.parent_reading_guide
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldParentReadingGuide returns the old "parent_reading_guide" field's value of the Book entity.
+// If the Book object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookMutation) OldParentReadingGuide(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldParentReadingGuide is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldParentReadingGuide requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldParentReadingGuide: %w", err)
+	}
+	return oldValue.ParentReadingGuide, nil
+}
+
+// ClearParentReadingGuide clears the value of the "parent_reading_guide" field.
+func (m *BookMutation) ClearParentReadingGuide() {
+	m.parent_reading_guide = nil
+	m.clearedFields[book.FieldParentReadingGuide] = struct{}{}
+}
+
+// ParentReadingGuideCleared returns if the "parent_reading_guide" field was cleared in this mutation.
+func (m *BookMutation) ParentReadingGuideCleared() bool {
+	_, ok := m.clearedFields[book.FieldParentReadingGuide]
+	return ok
+}
+
+// ResetParentReadingGuide resets all changes to the "parent_reading_guide" field.
+func (m *BookMutation) ResetParentReadingGuide() {
+	m.parent_reading_guide = nil
+	delete(m.clearedFields, book.FieldParentReadingGuide)
+}
+
+// SetRecommendedAgeMin sets the "recommended_age_min" field.
+func (m *BookMutation) SetRecommendedAgeMin(i int) {
+	m.recommended_age_min = &i
+	m.addrecommended_age_min = nil
+}
+
+// RecommendedAgeMin returns the value of the "recommended_age_min" field in the mutation.
+func (m *BookMutation) RecommendedAgeMin() (r int, exists bool) {
+	v := m.recommended_age_min
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRecommendedAgeMin returns the old "recommended_age_min" field's value of the Book entity.
+// If the Book object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookMutation) OldRecommendedAgeMin(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRecommendedAgeMin is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRecommendedAgeMin requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRecommendedAgeMin: %w", err)
+	}
+	return oldValue.RecommendedAgeMin, nil
+}
+
+// AddRecommendedAgeMin adds i to the "recommended_age_min" field.
+func (m *BookMutation) AddRecommendedAgeMin(i int) {
+	if m.addrecommended_age_min != nil {
+		*m.addrecommended_age_min += i
+	} else {
+		m.addrecommended_age_min = &i
+	}
+}
+
+// AddedRecommendedAgeMin returns the value that was added to the "recommended_age_min" field in this mutation.
+func (m *BookMutation) AddedRecommendedAgeMin() (r int, exists bool) {
+	v := m.addrecommended_age_min
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetRecommendedAgeMin resets all changes to the "recommended_age_min" field.
+func (m *BookMutation) ResetRecommendedAgeMin() {
+	m.recommended_age_min = nil
+	m.addrecommended_age_min = nil
+}
+
+// SetRecommendedAgeMax sets the "recommended_age_max" field.
+func (m *BookMutation) SetRecommendedAgeMax(i int) {
+	m.recommended_age_max = &i
+	m.addrecommended_age_max = nil
+}
+
+// RecommendedAgeMax returns the value of the "recommended_age_max" field in the mutation.
+func (m *BookMutation) RecommendedAgeMax() (r int, exists bool) {
+	v := m.recommended_age_max
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRecommendedAgeMax returns the old "recommended_age_max" field's value of the Book entity.
+// If the Book object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookMutation) OldRecommendedAgeMax(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRecommendedAgeMax is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRecommendedAgeMax requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRecommendedAgeMax: %w", err)
+	}
+	return oldValue.RecommendedAgeMax, nil
+}
+
+// AddRecommendedAgeMax adds i to the "recommended_age_max" field.
+func (m *BookMutation) AddRecommendedAgeMax(i int) {
+	if m.addrecommended_age_max != nil {
+		*m.addrecommended_age_max += i
+	} else {
+		m.addrecommended_age_max = &i
+	}
+}
+
+// AddedRecommendedAgeMax returns the value that was added to the "recommended_age_max" field in this mutation.
+func (m *BookMutation) AddedRecommendedAgeMax() (r int, exists bool) {
+	v := m.addrecommended_age_max
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetRecommendedAgeMax resets all changes to the "recommended_age_max" field.
+func (m *BookMutation) ResetRecommendedAgeMax() {
+	m.recommended_age_max = nil
+	m.addrecommended_age_max = nil
+}
+
+// SetCoverImageURL sets the "cover_image_url" field.
+func (m *BookMutation) SetCoverImageURL(s string) {
+	m.cover_image_url = &s
+}
+
+// CoverImageURL returns the value of the "cover_image_url" field in the mutation.
+func (m *BookMutation) CoverImageURL() (r string, exists bool) {
+	v := m.cover_image_url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCoverImageURL returns the old "cover_image_url" field's value of the Book entity.
+// If the Book object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookMutation) OldCoverImageURL(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCoverImageURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCoverImageURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCoverImageURL: %w", err)
+	}
+	return oldValue.CoverImageURL, nil
+}
+
+// ClearCoverImageURL clears the value of the "cover_image_url" field.
+func (m *BookMutation) ClearCoverImageURL() {
+	m.cover_image_url = nil
+	m.clearedFields[book.FieldCoverImageURL] = struct{}{}
+}
+
+// CoverImageURLCleared returns if the "cover_image_url" field was cleared in this mutation.
+func (m *BookMutation) CoverImageURLCleared() bool {
+	_, ok := m.clearedFields[book.FieldCoverImageURL]
+	return ok
+}
+
+// ResetCoverImageURL resets all changes to the "cover_image_url" field.
+func (m *BookMutation) ResetCoverImageURL() {
+	m.cover_image_url = nil
+	delete(m.clearedFields, book.FieldCoverImageURL)
+}
+
 // SetCoverURL sets the "cover_url" field.
 func (m *BookMutation) SetCoverURL(s string) {
 	m.cover_url = &s
@@ -381,6 +1092,42 @@ func (m *BookMutation) ResetFilePath() {
 	delete(m.clearedFields, book.FieldFilePath)
 }
 
+// SetStatus sets the "status" field.
+func (m *BookMutation) SetStatus(s string) {
+	m.status = &s
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *BookMutation) Status() (r string, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Book entity.
+// If the Book object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookMutation) OldStatus(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *BookMutation) ResetStatus() {
+	m.status = nil
+}
+
 // SetUploaderID sets the "uploader_id" field.
 func (m *BookMutation) SetUploaderID(u uuid.UUID) {
 	m.uploader = &u
@@ -415,6 +1162,62 @@ func (m *BookMutation) OldUploaderID(ctx context.Context) (v uuid.UUID, err erro
 // ResetUploaderID resets all changes to the "uploader_id" field.
 func (m *BookMutation) ResetUploaderID() {
 	m.uploader = nil
+}
+
+// SetViewCount sets the "view_count" field.
+func (m *BookMutation) SetViewCount(i int) {
+	m.view_count = &i
+	m.addview_count = nil
+}
+
+// ViewCount returns the value of the "view_count" field in the mutation.
+func (m *BookMutation) ViewCount() (r int, exists bool) {
+	v := m.view_count
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldViewCount returns the old "view_count" field's value of the Book entity.
+// If the Book object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookMutation) OldViewCount(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldViewCount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldViewCount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldViewCount: %w", err)
+	}
+	return oldValue.ViewCount, nil
+}
+
+// AddViewCount adds i to the "view_count" field.
+func (m *BookMutation) AddViewCount(i int) {
+	if m.addview_count != nil {
+		*m.addview_count += i
+	} else {
+		m.addview_count = &i
+	}
+}
+
+// AddedViewCount returns the value that was added to the "view_count" field in this mutation.
+func (m *BookMutation) AddedViewCount() (r int, exists bool) {
+	v := m.addview_count
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetViewCount resets all changes to the "view_count" field.
+func (m *BookMutation) ResetViewCount() {
+	m.view_count = nil
+	m.addview_count = nil
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -604,7 +1407,7 @@ func (m *BookMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *BookMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 24)
 	if m.title != nil {
 		fields = append(fields, book.FieldTitle)
 	}
@@ -614,14 +1417,62 @@ func (m *BookMutation) Fields() []string {
 	if m.description != nil {
 		fields = append(fields, book.FieldDescription)
 	}
+	if m.page_count != nil {
+		fields = append(fields, book.FieldPageCount)
+	}
+	if m.duration_minutes != nil {
+		fields = append(fields, book.FieldDurationMinutes)
+	}
+	if m.core_goal != nil {
+		fields = append(fields, book.FieldCoreGoal)
+	}
+	if m.cognitive_level != nil {
+		fields = append(fields, book.FieldCognitiveLevel)
+	}
+	if m.resource_type != nil {
+		fields = append(fields, book.FieldResourceType)
+	}
+	if m.has_print != nil {
+		fields = append(fields, book.FieldHasPrint)
+	}
+	if m.has_digital != nil {
+		fields = append(fields, book.FieldHasDigital)
+	}
+	if m.has_audio != nil {
+		fields = append(fields, book.FieldHasAudio)
+	}
+	if m.has_video != nil {
+		fields = append(fields, book.FieldHasVideo)
+	}
+	if m.teaching_suggestion != nil {
+		fields = append(fields, book.FieldTeachingSuggestion)
+	}
+	if m.parent_reading_guide != nil {
+		fields = append(fields, book.FieldParentReadingGuide)
+	}
+	if m.recommended_age_min != nil {
+		fields = append(fields, book.FieldRecommendedAgeMin)
+	}
+	if m.recommended_age_max != nil {
+		fields = append(fields, book.FieldRecommendedAgeMax)
+	}
+	if m.cover_image_url != nil {
+		fields = append(fields, book.FieldCoverImageURL)
+	}
 	if m.cover_url != nil {
 		fields = append(fields, book.FieldCoverURL)
 	}
 	if m.file_path != nil {
 		fields = append(fields, book.FieldFilePath)
 	}
+	if m.status != nil {
+		fields = append(fields, book.FieldStatus)
+	}
 	if m.uploader != nil {
 		fields = append(fields, book.FieldUploaderID)
+	}
+	if m.view_count != nil {
+		fields = append(fields, book.FieldViewCount)
 	}
 	if m.created_at != nil {
 		fields = append(fields, book.FieldCreatedAt)
@@ -643,12 +1494,44 @@ func (m *BookMutation) Field(name string) (ent.Value, bool) {
 		return m.Author()
 	case book.FieldDescription:
 		return m.Description()
+	case book.FieldPageCount:
+		return m.PageCount()
+	case book.FieldDurationMinutes:
+		return m.DurationMinutes()
+	case book.FieldCoreGoal:
+		return m.CoreGoal()
+	case book.FieldCognitiveLevel:
+		return m.CognitiveLevel()
+	case book.FieldResourceType:
+		return m.ResourceType()
+	case book.FieldHasPrint:
+		return m.HasPrint()
+	case book.FieldHasDigital:
+		return m.HasDigital()
+	case book.FieldHasAudio:
+		return m.HasAudio()
+	case book.FieldHasVideo:
+		return m.HasVideo()
+	case book.FieldTeachingSuggestion:
+		return m.TeachingSuggestion()
+	case book.FieldParentReadingGuide:
+		return m.ParentReadingGuide()
+	case book.FieldRecommendedAgeMin:
+		return m.RecommendedAgeMin()
+	case book.FieldRecommendedAgeMax:
+		return m.RecommendedAgeMax()
+	case book.FieldCoverImageURL:
+		return m.CoverImageURL()
 	case book.FieldCoverURL:
 		return m.CoverURL()
 	case book.FieldFilePath:
 		return m.FilePath()
+	case book.FieldStatus:
+		return m.Status()
 	case book.FieldUploaderID:
 		return m.UploaderID()
+	case book.FieldViewCount:
+		return m.ViewCount()
 	case book.FieldCreatedAt:
 		return m.CreatedAt()
 	case book.FieldUpdatedAt:
@@ -668,12 +1551,44 @@ func (m *BookMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldAuthor(ctx)
 	case book.FieldDescription:
 		return m.OldDescription(ctx)
+	case book.FieldPageCount:
+		return m.OldPageCount(ctx)
+	case book.FieldDurationMinutes:
+		return m.OldDurationMinutes(ctx)
+	case book.FieldCoreGoal:
+		return m.OldCoreGoal(ctx)
+	case book.FieldCognitiveLevel:
+		return m.OldCognitiveLevel(ctx)
+	case book.FieldResourceType:
+		return m.OldResourceType(ctx)
+	case book.FieldHasPrint:
+		return m.OldHasPrint(ctx)
+	case book.FieldHasDigital:
+		return m.OldHasDigital(ctx)
+	case book.FieldHasAudio:
+		return m.OldHasAudio(ctx)
+	case book.FieldHasVideo:
+		return m.OldHasVideo(ctx)
+	case book.FieldTeachingSuggestion:
+		return m.OldTeachingSuggestion(ctx)
+	case book.FieldParentReadingGuide:
+		return m.OldParentReadingGuide(ctx)
+	case book.FieldRecommendedAgeMin:
+		return m.OldRecommendedAgeMin(ctx)
+	case book.FieldRecommendedAgeMax:
+		return m.OldRecommendedAgeMax(ctx)
+	case book.FieldCoverImageURL:
+		return m.OldCoverImageURL(ctx)
 	case book.FieldCoverURL:
 		return m.OldCoverURL(ctx)
 	case book.FieldFilePath:
 		return m.OldFilePath(ctx)
+	case book.FieldStatus:
+		return m.OldStatus(ctx)
 	case book.FieldUploaderID:
 		return m.OldUploaderID(ctx)
+	case book.FieldViewCount:
+		return m.OldViewCount(ctx)
 	case book.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case book.FieldUpdatedAt:
@@ -708,6 +1623,104 @@ func (m *BookMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDescription(v)
 		return nil
+	case book.FieldPageCount:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPageCount(v)
+		return nil
+	case book.FieldDurationMinutes:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDurationMinutes(v)
+		return nil
+	case book.FieldCoreGoal:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCoreGoal(v)
+		return nil
+	case book.FieldCognitiveLevel:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCognitiveLevel(v)
+		return nil
+	case book.FieldResourceType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetResourceType(v)
+		return nil
+	case book.FieldHasPrint:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHasPrint(v)
+		return nil
+	case book.FieldHasDigital:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHasDigital(v)
+		return nil
+	case book.FieldHasAudio:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHasAudio(v)
+		return nil
+	case book.FieldHasVideo:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHasVideo(v)
+		return nil
+	case book.FieldTeachingSuggestion:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTeachingSuggestion(v)
+		return nil
+	case book.FieldParentReadingGuide:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetParentReadingGuide(v)
+		return nil
+	case book.FieldRecommendedAgeMin:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRecommendedAgeMin(v)
+		return nil
+	case book.FieldRecommendedAgeMax:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRecommendedAgeMax(v)
+		return nil
+	case book.FieldCoverImageURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCoverImageURL(v)
+		return nil
 	case book.FieldCoverURL:
 		v, ok := value.(string)
 		if !ok {
@@ -722,12 +1735,26 @@ func (m *BookMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetFilePath(v)
 		return nil
+	case book.FieldStatus:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
 	case book.FieldUploaderID:
 		v, ok := value.(uuid.UUID)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUploaderID(v)
+		return nil
+	case book.FieldViewCount:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetViewCount(v)
 		return nil
 	case book.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -750,13 +1777,41 @@ func (m *BookMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *BookMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addpage_count != nil {
+		fields = append(fields, book.FieldPageCount)
+	}
+	if m.addduration_minutes != nil {
+		fields = append(fields, book.FieldDurationMinutes)
+	}
+	if m.addrecommended_age_min != nil {
+		fields = append(fields, book.FieldRecommendedAgeMin)
+	}
+	if m.addrecommended_age_max != nil {
+		fields = append(fields, book.FieldRecommendedAgeMax)
+	}
+	if m.addview_count != nil {
+		fields = append(fields, book.FieldViewCount)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *BookMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case book.FieldPageCount:
+		return m.AddedPageCount()
+	case book.FieldDurationMinutes:
+		return m.AddedDurationMinutes()
+	case book.FieldRecommendedAgeMin:
+		return m.AddedRecommendedAgeMin()
+	case book.FieldRecommendedAgeMax:
+		return m.AddedRecommendedAgeMax()
+	case book.FieldViewCount:
+		return m.AddedViewCount()
+	}
 	return nil, false
 }
 
@@ -765,6 +1820,41 @@ func (m *BookMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *BookMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case book.FieldPageCount:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPageCount(v)
+		return nil
+	case book.FieldDurationMinutes:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDurationMinutes(v)
+		return nil
+	case book.FieldRecommendedAgeMin:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRecommendedAgeMin(v)
+		return nil
+	case book.FieldRecommendedAgeMax:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRecommendedAgeMax(v)
+		return nil
+	case book.FieldViewCount:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddViewCount(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Book numeric field %s", name)
 }
@@ -775,6 +1865,30 @@ func (m *BookMutation) ClearedFields() []string {
 	var fields []string
 	if m.FieldCleared(book.FieldDescription) {
 		fields = append(fields, book.FieldDescription)
+	}
+	if m.FieldCleared(book.FieldPageCount) {
+		fields = append(fields, book.FieldPageCount)
+	}
+	if m.FieldCleared(book.FieldDurationMinutes) {
+		fields = append(fields, book.FieldDurationMinutes)
+	}
+	if m.FieldCleared(book.FieldCoreGoal) {
+		fields = append(fields, book.FieldCoreGoal)
+	}
+	if m.FieldCleared(book.FieldCognitiveLevel) {
+		fields = append(fields, book.FieldCognitiveLevel)
+	}
+	if m.FieldCleared(book.FieldResourceType) {
+		fields = append(fields, book.FieldResourceType)
+	}
+	if m.FieldCleared(book.FieldTeachingSuggestion) {
+		fields = append(fields, book.FieldTeachingSuggestion)
+	}
+	if m.FieldCleared(book.FieldParentReadingGuide) {
+		fields = append(fields, book.FieldParentReadingGuide)
+	}
+	if m.FieldCleared(book.FieldCoverImageURL) {
+		fields = append(fields, book.FieldCoverImageURL)
 	}
 	if m.FieldCleared(book.FieldCoverURL) {
 		fields = append(fields, book.FieldCoverURL)
@@ -799,6 +1913,30 @@ func (m *BookMutation) ClearField(name string) error {
 	case book.FieldDescription:
 		m.ClearDescription()
 		return nil
+	case book.FieldPageCount:
+		m.ClearPageCount()
+		return nil
+	case book.FieldDurationMinutes:
+		m.ClearDurationMinutes()
+		return nil
+	case book.FieldCoreGoal:
+		m.ClearCoreGoal()
+		return nil
+	case book.FieldCognitiveLevel:
+		m.ClearCognitiveLevel()
+		return nil
+	case book.FieldResourceType:
+		m.ClearResourceType()
+		return nil
+	case book.FieldTeachingSuggestion:
+		m.ClearTeachingSuggestion()
+		return nil
+	case book.FieldParentReadingGuide:
+		m.ClearParentReadingGuide()
+		return nil
+	case book.FieldCoverImageURL:
+		m.ClearCoverImageURL()
+		return nil
 	case book.FieldCoverURL:
 		m.ClearCoverURL()
 		return nil
@@ -822,14 +1960,62 @@ func (m *BookMutation) ResetField(name string) error {
 	case book.FieldDescription:
 		m.ResetDescription()
 		return nil
+	case book.FieldPageCount:
+		m.ResetPageCount()
+		return nil
+	case book.FieldDurationMinutes:
+		m.ResetDurationMinutes()
+		return nil
+	case book.FieldCoreGoal:
+		m.ResetCoreGoal()
+		return nil
+	case book.FieldCognitiveLevel:
+		m.ResetCognitiveLevel()
+		return nil
+	case book.FieldResourceType:
+		m.ResetResourceType()
+		return nil
+	case book.FieldHasPrint:
+		m.ResetHasPrint()
+		return nil
+	case book.FieldHasDigital:
+		m.ResetHasDigital()
+		return nil
+	case book.FieldHasAudio:
+		m.ResetHasAudio()
+		return nil
+	case book.FieldHasVideo:
+		m.ResetHasVideo()
+		return nil
+	case book.FieldTeachingSuggestion:
+		m.ResetTeachingSuggestion()
+		return nil
+	case book.FieldParentReadingGuide:
+		m.ResetParentReadingGuide()
+		return nil
+	case book.FieldRecommendedAgeMin:
+		m.ResetRecommendedAgeMin()
+		return nil
+	case book.FieldRecommendedAgeMax:
+		m.ResetRecommendedAgeMax()
+		return nil
+	case book.FieldCoverImageURL:
+		m.ResetCoverImageURL()
+		return nil
 	case book.FieldCoverURL:
 		m.ResetCoverURL()
 		return nil
 	case book.FieldFilePath:
 		m.ResetFilePath()
 		return nil
+	case book.FieldStatus:
+		m.ResetStatus()
+		return nil
 	case book.FieldUploaderID:
 		m.ResetUploaderID()
+		return nil
+	case book.FieldViewCount:
+		m.ResetViewCount()
 		return nil
 	case book.FieldCreatedAt:
 		m.ResetCreatedAt()

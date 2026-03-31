@@ -37,11 +37,11 @@ type BookServiceClient interface {
 	ListBooks(ctx context.Context, in *ListBooksRequest, opts ...grpc.CallOption) (*ListBooksResponse, error)
 	// GetBook returns a single book by ID.
 	GetBook(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookResponse, error)
-	// CreateBook creates a new book record. Admin only.
+	// CreateBook creates a new book record. Admin/super_admin only.
 	CreateBook(ctx context.Context, in *CreateBookRequest, opts ...grpc.CallOption) (*CreateBookResponse, error)
-	// UpdateBook updates an existing book's metadata. Admin only.
+	// UpdateBook updates an existing book's metadata. Admin/super_admin only.
 	UpdateBook(ctx context.Context, in *UpdateBookRequest, opts ...grpc.CallOption) (*UpdateBookResponse, error)
-	// DeleteBook removes a book and its file. Admin only.
+	// DeleteBook removes a book and its file. Admin/super_admin only.
 	DeleteBook(ctx context.Context, in *DeleteBookRequest, opts ...grpc.CallOption) (*DeleteBookResponse, error)
 	// DownloadBook returns the book's PDF file as binary content.
 	DownloadBook(ctx context.Context, in *DownloadBookRequest, opts ...grpc.CallOption) (*DownloadBookResponse, error)
@@ -125,11 +125,11 @@ type BookServiceServer interface {
 	ListBooks(context.Context, *ListBooksRequest) (*ListBooksResponse, error)
 	// GetBook returns a single book by ID.
 	GetBook(context.Context, *GetBookRequest) (*GetBookResponse, error)
-	// CreateBook creates a new book record. Admin only.
+	// CreateBook creates a new book record. Admin/super_admin only.
 	CreateBook(context.Context, *CreateBookRequest) (*CreateBookResponse, error)
-	// UpdateBook updates an existing book's metadata. Admin only.
+	// UpdateBook updates an existing book's metadata. Admin/super_admin only.
 	UpdateBook(context.Context, *UpdateBookRequest) (*UpdateBookResponse, error)
-	// DeleteBook removes a book and its file. Admin only.
+	// DeleteBook removes a book and its file. Admin/super_admin only.
 	DeleteBook(context.Context, *DeleteBookRequest) (*DeleteBookResponse, error)
 	// DownloadBook returns the book's PDF file as binary content.
 	DownloadBook(context.Context, *DownloadBookRequest) (*DownloadBookResponse, error)

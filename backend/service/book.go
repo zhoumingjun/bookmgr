@@ -25,14 +25,15 @@ func NewBookService(repo *repository.BookRepository, storage storage.Storage) *B
 	return &BookService{repo: repo, storage: storage}
 }
 
-// BookListResult holds paginated book results.
-type BookListResult struct {
+// ListBooksResult holds paginated book results.
+type ListBooksResult struct {
 	Books         []*ent.Book
 	NextPageToken string
+	Total         int
 }
 
 // List returns a paginated list of books.
-func (s *BookService) List(ctx context.Context, pageSize int, pageToken string) (*BookListResult, error) {
+func (s *BookService) List(ctx context.Context, pageSize int, pageToken string) (*ListBooksResult, error) {
 	if pageSize <= 0 {
 		pageSize = 20
 	}
@@ -53,7 +54,7 @@ func (s *BookService) List(ctx context.Context, pageSize int, pageToken string) 
 	}
 
 	page := (offset / pageSize) + 1
-	result, err := s.repo.List(ctx, page, pageSize)
+	result, err := s.repo.List(ctx, repository.ListBooksParams{Page: page, PerPage: pageSize})
 	if err != nil {
 		return nil, fmt.Errorf("listing books: %w", err)
 	}
@@ -64,9 +65,37 @@ func (s *BookService) List(ctx context.Context, pageSize int, pageToken string) 
 		nextToken = base64.StdEncoding.EncodeToString([]byte(strconv.Itoa(nextOffset)))
 	}
 
-	return &BookListResult{
+	return &ListBooksResult{
 		Books:         result.Books,
 		NextPageToken: nextToken,
+		Total:         result.Total,
+	}, nil
+}
+
+// ListFull returns a paginated list with full filter support.
+func (s *BookService) ListFull(ctx context.Context, params repository.ListBooksParams) (*ListBooksResult, error) {
+	if params.PerPage <= 0 {
+		params.PerPage = 20
+	}
+	if params.PerPage > 100 {
+		params.PerPage = 100
+	}
+
+	result, err := s.repo.List(ctx, params)
+	if err != nil {
+		return nil, fmt.Errorf("listing books: %w", err)
+	}
+
+	nextOffset := (result.Page - 1) * result.PerPage + result.PerPage
+	var nextToken string
+	if nextOffset < result.Total {
+		nextToken = base64.StdEncoding.EncodeToString([]byte(strconv.Itoa(nextOffset)))
+	}
+
+	return &ListBooksResult{
+		Books:         result.Books,
+		NextPageToken: nextToken,
+		Total:         result.Total,
 	}, nil
 }
 
@@ -75,35 +104,67 @@ func (s *BookService) Get(ctx context.Context, id uuid.UUID) (*ent.Book, error) 
 	return s.repo.GetByID(ctx, id)
 }
 
-// Create creates a new book record.
+// GetFull returns a single book with dimensions loaded.
+func (s *BookService) GetFull(ctx context.Context, id uuid.UUID) (*ent.Book, error) {
+	return s.repo.GetByIDWithDimensions(ctx, id)
+}
+
+// Create creates a new book record (basic fields only).
 func (s *BookService) Create(ctx context.Context, title, author, description string, uploaderID uuid.UUID) (*ent.Book, error) {
-	return s.repo.Create(ctx, title, author, description, uploaderID)
+	return s.repo.Create(ctx, repository.CreateBookParams{
+		Title:      title,
+		Author:     author,
+		Description: description,
+		UploaderID: uploaderID,
+	})
+}
+
+// CreateFull creates a new book record with all fields.
+func (s *BookService) CreateFull(ctx context.Context, params repository.CreateBookParams) (*ent.Book, error) {
+	return s.repo.Create(ctx, params)
 }
 
 // BookUpdateFields specifies which book fields to update.
 type BookUpdateFields struct {
-	Title       *string
-	Author      *string
-	Description *string
-	CoverURL    *string
+	Title               *string
+	Author              *string
+	Description         *string
+	PageCount           *int
+	DurationMinutes     *int
+	CoreGoal            *string
+	CognitiveLevel      *string
+	ResourceType        *string
+	HasPrint            *bool
+	HasDigital          *bool
+	HasAudio            *bool
+	HasVideo            *bool
+	TeachingSuggestion  *string
+	ParentReadingGuide  *string
+	RecommendedAgeMin   *int
+	RecommendedAgeMax   *int
+	DimensionSlugs      []string
 }
 
 // Update modifies book fields.
 func (s *BookService) Update(ctx context.Context, id uuid.UUID, fields BookUpdateFields) (*ent.Book, error) {
-	return s.repo.Update(ctx, id, func(update *ent.BookUpdateOne) *ent.BookUpdateOne {
-		if fields.Title != nil {
-			update = update.SetTitle(*fields.Title)
-		}
-		if fields.Author != nil {
-			update = update.SetAuthor(*fields.Author)
-		}
-		if fields.Description != nil {
-			update = update.SetDescription(*fields.Description)
-		}
-		if fields.CoverURL != nil {
-			update = update.SetCoverURL(*fields.CoverURL)
-		}
-		return update
+	return s.repo.Update(ctx, id, repository.UpdateBookParams{
+		Title:               fields.Title,
+		Author:              fields.Author,
+		Description:         fields.Description,
+		PageCount:           fields.PageCount,
+		DurationMinutes:     fields.DurationMinutes,
+		CoreGoal:            fields.CoreGoal,
+		CognitiveLevel:      fields.CognitiveLevel,
+		ResourceType:        fields.ResourceType,
+		HasPrint:            fields.HasPrint,
+		HasDigital:          fields.HasDigital,
+		HasAudio:            fields.HasAudio,
+		HasVideo:            fields.HasVideo,
+		TeachingSuggestion:  fields.TeachingSuggestion,
+		ParentReadingGuide:  fields.ParentReadingGuide,
+		RecommendedAgeMin:   fields.RecommendedAgeMin,
+		RecommendedAgeMax:   fields.RecommendedAgeMax,
+		DimensionSlugs:      fields.DimensionSlugs,
 	})
 }
 
@@ -125,9 +186,7 @@ func (s *BookService) SaveFile(ctx context.Context, id uuid.UUID, r io.Reader) (
 	if err := s.storage.Save(ctx, filename, r); err != nil {
 		return nil, fmt.Errorf("saving file: %w", err)
 	}
-	return s.repo.Update(ctx, id, func(update *ent.BookUpdateOne) *ent.BookUpdateOne {
-		return update.SetFilePath(filename)
-	})
+	return s.repo.Update(ctx, id, repository.UpdateBookParams{})
 }
 
 // OpenFile opens the book's file for reading.

@@ -49,6 +49,20 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "dimensionSlug",
+            "description": "Filter by dimension slug (optional).",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "description": "Filter by status (optional): draft/pending/approved/rejected.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -56,7 +70,7 @@
         ]
       },
       "post": {
-        "summary": "CreateBook creates a new book record. Admin only.",
+        "summary": "CreateBook creates a new book record. Admin/super_admin only.",
         "operationId": "BookService_CreateBook",
         "responses": {
           "200": {
@@ -90,7 +104,7 @@
     },
     "/api/v1/books/{book.id}": {
       "patch": {
-        "summary": "UpdateBook updates an existing book's metadata. Admin only.",
+        "summary": "UpdateBook updates an existing book's metadata. Admin/super_admin only.",
         "operationId": "BookService_UpdateBook",
         "responses": {
           "200": {
@@ -160,7 +174,7 @@
         ]
       },
       "delete": {
-        "summary": "DeleteBook removes a book and its file. Admin only.",
+        "summary": "DeleteBook removes a book and its file. Admin/super_admin only.",
         "operationId": "BookService_DeleteBook",
         "responses": {
           "200": {
@@ -240,15 +254,88 @@
             },
             "description": {
               "type": "string",
-              "description": "A description of the book."
+              "description": "A brief description of the book."
             },
-            "coverUrl": {
+            "pageCount": {
+              "type": "integer",
+              "format": "int32",
+              "description": "Number of pages (for print edition)."
+            },
+            "durationMinutes": {
+              "type": "integer",
+              "format": "int32",
+              "description": "Duration in minutes (for audio/animation editions)."
+            },
+            "coreGoal": {
+              "type": "string",
+              "description": "The core adaptation goal of the book."
+            },
+            "cognitiveLevel": {
+              "type": "string",
+              "description": "The cognitive adaptation level: light/moderate/severe (轻度/中度/重度)."
+            },
+            "resourceType": {
+              "type": "string",
+              "description": "Primary resource type: print/digital/audio/video."
+            },
+            "hasPrint": {
+              "type": "boolean",
+              "description": "Whether print edition is available."
+            },
+            "hasDigital": {
+              "type": "boolean",
+              "description": "Whether digital edition is available."
+            },
+            "hasAudio": {
+              "type": "boolean",
+              "description": "Whether audio edition is available."
+            },
+            "hasVideo": {
+              "type": "boolean",
+              "description": "Whether video/animation edition is available."
+            },
+            "teachingSuggestion": {
+              "type": "string",
+              "description": "Teaching usage suggestions."
+            },
+            "parentReadingGuide": {
+              "type": "string",
+              "description": "Parent-child co-reading guide."
+            },
+            "recommendedAgeMin": {
+              "type": "integer",
+              "format": "int32",
+              "description": "Minimum recommended age in months."
+            },
+            "recommendedAgeMax": {
+              "type": "integer",
+              "format": "int32",
+              "description": "Maximum recommended age in months."
+            },
+            "coverImageUrl": {
               "type": "string",
               "description": "URL to the book's cover image."
             },
+            "status": {
+              "type": "string",
+              "description": "Status: draft/pending/approved/rejected."
+            },
             "uploaderId": {
               "type": "string",
-              "description": "The ID of the user who uploaded this book."
+              "description": "The ID of the user who uploaded/created this book."
+            },
+            "viewCount": {
+              "type": "integer",
+              "format": "int32",
+              "description": "View count."
+            },
+            "dimensions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1Dimension"
+              },
+              "description": "Associated dimensions (loaded with eager)."
             },
             "createTime": {
               "type": "string",
@@ -341,15 +428,88 @@
         },
         "description": {
           "type": "string",
-          "description": "A description of the book."
+          "description": "A brief description of the book."
         },
-        "coverUrl": {
+        "pageCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of pages (for print edition)."
+        },
+        "durationMinutes": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Duration in minutes (for audio/animation editions)."
+        },
+        "coreGoal": {
+          "type": "string",
+          "description": "The core adaptation goal of the book."
+        },
+        "cognitiveLevel": {
+          "type": "string",
+          "description": "The cognitive adaptation level: light/moderate/severe (轻度/中度/重度)."
+        },
+        "resourceType": {
+          "type": "string",
+          "description": "Primary resource type: print/digital/audio/video."
+        },
+        "hasPrint": {
+          "type": "boolean",
+          "description": "Whether print edition is available."
+        },
+        "hasDigital": {
+          "type": "boolean",
+          "description": "Whether digital edition is available."
+        },
+        "hasAudio": {
+          "type": "boolean",
+          "description": "Whether audio edition is available."
+        },
+        "hasVideo": {
+          "type": "boolean",
+          "description": "Whether video/animation edition is available."
+        },
+        "teachingSuggestion": {
+          "type": "string",
+          "description": "Teaching usage suggestions."
+        },
+        "parentReadingGuide": {
+          "type": "string",
+          "description": "Parent-child co-reading guide."
+        },
+        "recommendedAgeMin": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Minimum recommended age in months."
+        },
+        "recommendedAgeMax": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Maximum recommended age in months."
+        },
+        "coverImageUrl": {
           "type": "string",
           "description": "URL to the book's cover image."
         },
+        "status": {
+          "type": "string",
+          "description": "Status: draft/pending/approved/rejected."
+        },
         "uploaderId": {
           "type": "string",
-          "description": "The ID of the user who uploaded this book."
+          "description": "The ID of the user who uploaded/created this book."
+        },
+        "viewCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "View count."
+        },
+        "dimensions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Dimension"
+          },
+          "description": "Associated dimensions (loaded with eager)."
         },
         "createTime": {
           "type": "string",
@@ -362,7 +522,7 @@
           "description": "When the book was last updated."
         }
       },
-      "description": "Book represents a book resource."
+      "description": "Book represents a picturebook resource."
     },
     "v1CreateBookRequest": {
       "type": "object",
@@ -377,7 +537,70 @@
         },
         "description": {
           "type": "string",
-          "description": "A description of the book."
+          "description": "A brief description."
+        },
+        "pageCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of pages (for print edition)."
+        },
+        "durationMinutes": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Duration in minutes (for audio/animation editions)."
+        },
+        "coreGoal": {
+          "type": "string",
+          "description": "The core adaptation goal (required)."
+        },
+        "cognitiveLevel": {
+          "type": "string",
+          "description": "Cognitive level: light/moderate/severe."
+        },
+        "resourceType": {
+          "type": "string",
+          "description": "Primary resource type."
+        },
+        "hasPrint": {
+          "type": "boolean",
+          "description": "Whether print edition is available."
+        },
+        "hasDigital": {
+          "type": "boolean",
+          "description": "Whether digital edition is available."
+        },
+        "hasAudio": {
+          "type": "boolean",
+          "description": "Whether audio edition is available."
+        },
+        "hasVideo": {
+          "type": "boolean",
+          "description": "Whether video edition is available."
+        },
+        "teachingSuggestion": {
+          "type": "string",
+          "description": "Teaching usage suggestions."
+        },
+        "parentReadingGuide": {
+          "type": "string",
+          "description": "Parent-child co-reading guide."
+        },
+        "recommendedAgeMin": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Minimum recommended age in months."
+        },
+        "recommendedAgeMax": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Maximum recommended age in months."
+        },
+        "dimensionSlugs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Dimension slugs to associate with (required, at least one)."
         }
       },
       "description": "CreateBookRequest is the request for CreateBook."
@@ -395,6 +618,41 @@
     "v1DeleteBookResponse": {
       "type": "object",
       "description": "DeleteBookResponse is the response for DeleteBook."
+    },
+    "v1Dimension": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier."
+        },
+        "name": {
+          "type": "string",
+          "description": "Dimension name (e.g., \"身心准备\")."
+        },
+        "slug": {
+          "type": "string",
+          "description": "URL-safe slug (e.g., \"physical\")."
+        },
+        "parentId": {
+          "type": "string",
+          "description": "Parent dimension ID (null for top-level)."
+        },
+        "sortOrder": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Display order."
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Dimension"
+          },
+          "description": "Child subcategories."
+        }
+      },
+      "description": "Dimension represents a category dimension for picturebooks."
     },
     "v1DownloadBookResponse": {
       "type": "object",

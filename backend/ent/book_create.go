@@ -49,6 +49,202 @@ func (_c *BookCreate) SetNillableDescription(v *string) *BookCreate {
 	return _c
 }
 
+// SetPageCount sets the "page_count" field.
+func (_c *BookCreate) SetPageCount(v int) *BookCreate {
+	_c.mutation.SetPageCount(v)
+	return _c
+}
+
+// SetNillablePageCount sets the "page_count" field if the given value is not nil.
+func (_c *BookCreate) SetNillablePageCount(v *int) *BookCreate {
+	if v != nil {
+		_c.SetPageCount(*v)
+	}
+	return _c
+}
+
+// SetDurationMinutes sets the "duration_minutes" field.
+func (_c *BookCreate) SetDurationMinutes(v int) *BookCreate {
+	_c.mutation.SetDurationMinutes(v)
+	return _c
+}
+
+// SetNillableDurationMinutes sets the "duration_minutes" field if the given value is not nil.
+func (_c *BookCreate) SetNillableDurationMinutes(v *int) *BookCreate {
+	if v != nil {
+		_c.SetDurationMinutes(*v)
+	}
+	return _c
+}
+
+// SetCoreGoal sets the "core_goal" field.
+func (_c *BookCreate) SetCoreGoal(v string) *BookCreate {
+	_c.mutation.SetCoreGoal(v)
+	return _c
+}
+
+// SetNillableCoreGoal sets the "core_goal" field if the given value is not nil.
+func (_c *BookCreate) SetNillableCoreGoal(v *string) *BookCreate {
+	if v != nil {
+		_c.SetCoreGoal(*v)
+	}
+	return _c
+}
+
+// SetCognitiveLevel sets the "cognitive_level" field.
+func (_c *BookCreate) SetCognitiveLevel(v string) *BookCreate {
+	_c.mutation.SetCognitiveLevel(v)
+	return _c
+}
+
+// SetNillableCognitiveLevel sets the "cognitive_level" field if the given value is not nil.
+func (_c *BookCreate) SetNillableCognitiveLevel(v *string) *BookCreate {
+	if v != nil {
+		_c.SetCognitiveLevel(*v)
+	}
+	return _c
+}
+
+// SetResourceType sets the "resource_type" field.
+func (_c *BookCreate) SetResourceType(v string) *BookCreate {
+	_c.mutation.SetResourceType(v)
+	return _c
+}
+
+// SetNillableResourceType sets the "resource_type" field if the given value is not nil.
+func (_c *BookCreate) SetNillableResourceType(v *string) *BookCreate {
+	if v != nil {
+		_c.SetResourceType(*v)
+	}
+	return _c
+}
+
+// SetHasPrint sets the "has_print" field.
+func (_c *BookCreate) SetHasPrint(v bool) *BookCreate {
+	_c.mutation.SetHasPrint(v)
+	return _c
+}
+
+// SetNillableHasPrint sets the "has_print" field if the given value is not nil.
+func (_c *BookCreate) SetNillableHasPrint(v *bool) *BookCreate {
+	if v != nil {
+		_c.SetHasPrint(*v)
+	}
+	return _c
+}
+
+// SetHasDigital sets the "has_digital" field.
+func (_c *BookCreate) SetHasDigital(v bool) *BookCreate {
+	_c.mutation.SetHasDigital(v)
+	return _c
+}
+
+// SetNillableHasDigital sets the "has_digital" field if the given value is not nil.
+func (_c *BookCreate) SetNillableHasDigital(v *bool) *BookCreate {
+	if v != nil {
+		_c.SetHasDigital(*v)
+	}
+	return _c
+}
+
+// SetHasAudio sets the "has_audio" field.
+func (_c *BookCreate) SetHasAudio(v bool) *BookCreate {
+	_c.mutation.SetHasAudio(v)
+	return _c
+}
+
+// SetNillableHasAudio sets the "has_audio" field if the given value is not nil.
+func (_c *BookCreate) SetNillableHasAudio(v *bool) *BookCreate {
+	if v != nil {
+		_c.SetHasAudio(*v)
+	}
+	return _c
+}
+
+// SetHasVideo sets the "has_video" field.
+func (_c *BookCreate) SetHasVideo(v bool) *BookCreate {
+	_c.mutation.SetHasVideo(v)
+	return _c
+}
+
+// SetNillableHasVideo sets the "has_video" field if the given value is not nil.
+func (_c *BookCreate) SetNillableHasVideo(v *bool) *BookCreate {
+	if v != nil {
+		_c.SetHasVideo(*v)
+	}
+	return _c
+}
+
+// SetTeachingSuggestion sets the "teaching_suggestion" field.
+func (_c *BookCreate) SetTeachingSuggestion(v string) *BookCreate {
+	_c.mutation.SetTeachingSuggestion(v)
+	return _c
+}
+
+// SetNillableTeachingSuggestion sets the "teaching_suggestion" field if the given value is not nil.
+func (_c *BookCreate) SetNillableTeachingSuggestion(v *string) *BookCreate {
+	if v != nil {
+		_c.SetTeachingSuggestion(*v)
+	}
+	return _c
+}
+
+// SetParentReadingGuide sets the "parent_reading_guide" field.
+func (_c *BookCreate) SetParentReadingGuide(v string) *BookCreate {
+	_c.mutation.SetParentReadingGuide(v)
+	return _c
+}
+
+// SetNillableParentReadingGuide sets the "parent_reading_guide" field if the given value is not nil.
+func (_c *BookCreate) SetNillableParentReadingGuide(v *string) *BookCreate {
+	if v != nil {
+		_c.SetParentReadingGuide(*v)
+	}
+	return _c
+}
+
+// SetRecommendedAgeMin sets the "recommended_age_min" field.
+func (_c *BookCreate) SetRecommendedAgeMin(v int) *BookCreate {
+	_c.mutation.SetRecommendedAgeMin(v)
+	return _c
+}
+
+// SetNillableRecommendedAgeMin sets the "recommended_age_min" field if the given value is not nil.
+func (_c *BookCreate) SetNillableRecommendedAgeMin(v *int) *BookCreate {
+	if v != nil {
+		_c.SetRecommendedAgeMin(*v)
+	}
+	return _c
+}
+
+// SetRecommendedAgeMax sets the "recommended_age_max" field.
+func (_c *BookCreate) SetRecommendedAgeMax(v int) *BookCreate {
+	_c.mutation.SetRecommendedAgeMax(v)
+	return _c
+}
+
+// SetNillableRecommendedAgeMax sets the "recommended_age_max" field if the given value is not nil.
+func (_c *BookCreate) SetNillableRecommendedAgeMax(v *int) *BookCreate {
+	if v != nil {
+		_c.SetRecommendedAgeMax(*v)
+	}
+	return _c
+}
+
+// SetCoverImageURL sets the "cover_image_url" field.
+func (_c *BookCreate) SetCoverImageURL(v string) *BookCreate {
+	_c.mutation.SetCoverImageURL(v)
+	return _c
+}
+
+// SetNillableCoverImageURL sets the "cover_image_url" field if the given value is not nil.
+func (_c *BookCreate) SetNillableCoverImageURL(v *string) *BookCreate {
+	if v != nil {
+		_c.SetCoverImageURL(*v)
+	}
+	return _c
+}
+
 // SetCoverURL sets the "cover_url" field.
 func (_c *BookCreate) SetCoverURL(v string) *BookCreate {
 	_c.mutation.SetCoverURL(v)
@@ -77,9 +273,37 @@ func (_c *BookCreate) SetNillableFilePath(v *string) *BookCreate {
 	return _c
 }
 
+// SetStatus sets the "status" field.
+func (_c *BookCreate) SetStatus(v string) *BookCreate {
+	_c.mutation.SetStatus(v)
+	return _c
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (_c *BookCreate) SetNillableStatus(v *string) *BookCreate {
+	if v != nil {
+		_c.SetStatus(*v)
+	}
+	return _c
+}
+
 // SetUploaderID sets the "uploader_id" field.
 func (_c *BookCreate) SetUploaderID(v uuid.UUID) *BookCreate {
 	_c.mutation.SetUploaderID(v)
+	return _c
+}
+
+// SetViewCount sets the "view_count" field.
+func (_c *BookCreate) SetViewCount(v int) *BookCreate {
+	_c.mutation.SetViewCount(v)
+	return _c
+}
+
+// SetNillableViewCount sets the "view_count" field if the given value is not nil.
+func (_c *BookCreate) SetNillableViewCount(v *int) *BookCreate {
+	if v != nil {
+		_c.SetViewCount(*v)
+	}
 	return _c
 }
 
@@ -184,6 +408,54 @@ func (_c *BookCreate) defaults() {
 		v := book.DefaultDescription
 		_c.mutation.SetDescription(v)
 	}
+	if _, ok := _c.mutation.CoreGoal(); !ok {
+		v := book.DefaultCoreGoal
+		_c.mutation.SetCoreGoal(v)
+	}
+	if _, ok := _c.mutation.CognitiveLevel(); !ok {
+		v := book.DefaultCognitiveLevel
+		_c.mutation.SetCognitiveLevel(v)
+	}
+	if _, ok := _c.mutation.ResourceType(); !ok {
+		v := book.DefaultResourceType
+		_c.mutation.SetResourceType(v)
+	}
+	if _, ok := _c.mutation.HasPrint(); !ok {
+		v := book.DefaultHasPrint
+		_c.mutation.SetHasPrint(v)
+	}
+	if _, ok := _c.mutation.HasDigital(); !ok {
+		v := book.DefaultHasDigital
+		_c.mutation.SetHasDigital(v)
+	}
+	if _, ok := _c.mutation.HasAudio(); !ok {
+		v := book.DefaultHasAudio
+		_c.mutation.SetHasAudio(v)
+	}
+	if _, ok := _c.mutation.HasVideo(); !ok {
+		v := book.DefaultHasVideo
+		_c.mutation.SetHasVideo(v)
+	}
+	if _, ok := _c.mutation.TeachingSuggestion(); !ok {
+		v := book.DefaultTeachingSuggestion
+		_c.mutation.SetTeachingSuggestion(v)
+	}
+	if _, ok := _c.mutation.ParentReadingGuide(); !ok {
+		v := book.DefaultParentReadingGuide
+		_c.mutation.SetParentReadingGuide(v)
+	}
+	if _, ok := _c.mutation.RecommendedAgeMin(); !ok {
+		v := book.DefaultRecommendedAgeMin
+		_c.mutation.SetRecommendedAgeMin(v)
+	}
+	if _, ok := _c.mutation.RecommendedAgeMax(); !ok {
+		v := book.DefaultRecommendedAgeMax
+		_c.mutation.SetRecommendedAgeMax(v)
+	}
+	if _, ok := _c.mutation.CoverImageURL(); !ok {
+		v := book.DefaultCoverImageURL
+		_c.mutation.SetCoverImageURL(v)
+	}
 	if _, ok := _c.mutation.CoverURL(); !ok {
 		v := book.DefaultCoverURL
 		_c.mutation.SetCoverURL(v)
@@ -191,6 +463,14 @@ func (_c *BookCreate) defaults() {
 	if _, ok := _c.mutation.FilePath(); !ok {
 		v := book.DefaultFilePath
 		_c.mutation.SetFilePath(v)
+	}
+	if _, ok := _c.mutation.Status(); !ok {
+		v := book.DefaultStatus
+		_c.mutation.SetStatus(v)
+	}
+	if _, ok := _c.mutation.ViewCount(); !ok {
+		v := book.DefaultViewCount
+		_c.mutation.SetViewCount(v)
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := book.DefaultCreatedAt()
@@ -224,8 +504,57 @@ func (_c *BookCreate) check() error {
 			return &ValidationError{Name: "author", err: fmt.Errorf(`ent: validator failed for field "Book.author": %w`, err)}
 		}
 	}
+	if v, ok := _c.mutation.CognitiveLevel(); ok {
+		if err := book.CognitiveLevelValidator(v); err != nil {
+			return &ValidationError{Name: "cognitive_level", err: fmt.Errorf(`ent: validator failed for field "Book.cognitive_level": %w`, err)}
+		}
+	}
+	if v, ok := _c.mutation.ResourceType(); ok {
+		if err := book.ResourceTypeValidator(v); err != nil {
+			return &ValidationError{Name: "resource_type", err: fmt.Errorf(`ent: validator failed for field "Book.resource_type": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.HasPrint(); !ok {
+		return &ValidationError{Name: "has_print", err: errors.New(`ent: missing required field "Book.has_print"`)}
+	}
+	if _, ok := _c.mutation.HasDigital(); !ok {
+		return &ValidationError{Name: "has_digital", err: errors.New(`ent: missing required field "Book.has_digital"`)}
+	}
+	if _, ok := _c.mutation.HasAudio(); !ok {
+		return &ValidationError{Name: "has_audio", err: errors.New(`ent: missing required field "Book.has_audio"`)}
+	}
+	if _, ok := _c.mutation.HasVideo(); !ok {
+		return &ValidationError{Name: "has_video", err: errors.New(`ent: missing required field "Book.has_video"`)}
+	}
+	if _, ok := _c.mutation.RecommendedAgeMin(); !ok {
+		return &ValidationError{Name: "recommended_age_min", err: errors.New(`ent: missing required field "Book.recommended_age_min"`)}
+	}
+	if _, ok := _c.mutation.RecommendedAgeMax(); !ok {
+		return &ValidationError{Name: "recommended_age_max", err: errors.New(`ent: missing required field "Book.recommended_age_max"`)}
+	}
+	if v, ok := _c.mutation.CoverImageURL(); ok {
+		if err := book.CoverImageURLValidator(v); err != nil {
+			return &ValidationError{Name: "cover_image_url", err: fmt.Errorf(`ent: validator failed for field "Book.cover_image_url": %w`, err)}
+		}
+	}
+	if v, ok := _c.mutation.CoverURL(); ok {
+		if err := book.CoverURLValidator(v); err != nil {
+			return &ValidationError{Name: "cover_url", err: fmt.Errorf(`ent: validator failed for field "Book.cover_url": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Book.status"`)}
+	}
+	if v, ok := _c.mutation.Status(); ok {
+		if err := book.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Book.status": %w`, err)}
+		}
+	}
 	if _, ok := _c.mutation.UploaderID(); !ok {
 		return &ValidationError{Name: "uploader_id", err: errors.New(`ent: missing required field "Book.uploader_id"`)}
+	}
+	if _, ok := _c.mutation.ViewCount(); !ok {
+		return &ValidationError{Name: "view_count", err: errors.New(`ent: missing required field "Book.view_count"`)}
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Book.created_at"`)}
@@ -283,6 +612,62 @@ func (_c *BookCreate) createSpec() (*Book, *sqlgraph.CreateSpec) {
 		_spec.SetField(book.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
+	if value, ok := _c.mutation.PageCount(); ok {
+		_spec.SetField(book.FieldPageCount, field.TypeInt, value)
+		_node.PageCount = value
+	}
+	if value, ok := _c.mutation.DurationMinutes(); ok {
+		_spec.SetField(book.FieldDurationMinutes, field.TypeInt, value)
+		_node.DurationMinutes = value
+	}
+	if value, ok := _c.mutation.CoreGoal(); ok {
+		_spec.SetField(book.FieldCoreGoal, field.TypeString, value)
+		_node.CoreGoal = value
+	}
+	if value, ok := _c.mutation.CognitiveLevel(); ok {
+		_spec.SetField(book.FieldCognitiveLevel, field.TypeString, value)
+		_node.CognitiveLevel = value
+	}
+	if value, ok := _c.mutation.ResourceType(); ok {
+		_spec.SetField(book.FieldResourceType, field.TypeString, value)
+		_node.ResourceType = value
+	}
+	if value, ok := _c.mutation.HasPrint(); ok {
+		_spec.SetField(book.FieldHasPrint, field.TypeBool, value)
+		_node.HasPrint = value
+	}
+	if value, ok := _c.mutation.HasDigital(); ok {
+		_spec.SetField(book.FieldHasDigital, field.TypeBool, value)
+		_node.HasDigital = value
+	}
+	if value, ok := _c.mutation.HasAudio(); ok {
+		_spec.SetField(book.FieldHasAudio, field.TypeBool, value)
+		_node.HasAudio = value
+	}
+	if value, ok := _c.mutation.HasVideo(); ok {
+		_spec.SetField(book.FieldHasVideo, field.TypeBool, value)
+		_node.HasVideo = value
+	}
+	if value, ok := _c.mutation.TeachingSuggestion(); ok {
+		_spec.SetField(book.FieldTeachingSuggestion, field.TypeString, value)
+		_node.TeachingSuggestion = value
+	}
+	if value, ok := _c.mutation.ParentReadingGuide(); ok {
+		_spec.SetField(book.FieldParentReadingGuide, field.TypeString, value)
+		_node.ParentReadingGuide = value
+	}
+	if value, ok := _c.mutation.RecommendedAgeMin(); ok {
+		_spec.SetField(book.FieldRecommendedAgeMin, field.TypeInt, value)
+		_node.RecommendedAgeMin = value
+	}
+	if value, ok := _c.mutation.RecommendedAgeMax(); ok {
+		_spec.SetField(book.FieldRecommendedAgeMax, field.TypeInt, value)
+		_node.RecommendedAgeMax = value
+	}
+	if value, ok := _c.mutation.CoverImageURL(); ok {
+		_spec.SetField(book.FieldCoverImageURL, field.TypeString, value)
+		_node.CoverImageURL = value
+	}
 	if value, ok := _c.mutation.CoverURL(); ok {
 		_spec.SetField(book.FieldCoverURL, field.TypeString, value)
 		_node.CoverURL = value
@@ -290,6 +675,14 @@ func (_c *BookCreate) createSpec() (*Book, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.FilePath(); ok {
 		_spec.SetField(book.FieldFilePath, field.TypeString, value)
 		_node.FilePath = value
+	}
+	if value, ok := _c.mutation.Status(); ok {
+		_spec.SetField(book.FieldStatus, field.TypeString, value)
+		_node.Status = value
+	}
+	if value, ok := _c.mutation.ViewCount(); ok {
+		_spec.SetField(book.FieldViewCount, field.TypeInt, value)
+		_node.ViewCount = value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(book.FieldCreatedAt, field.TypeTime, value)

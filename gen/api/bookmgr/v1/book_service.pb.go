@@ -26,7 +26,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Book represents a book resource.
+// Book represents a picturebook resource.
 type Book struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The unique identifier of the book.
@@ -35,16 +35,48 @@ type Book struct {
 	Title string `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
 	// The author of the book.
 	Author string `protobuf:"bytes,3,opt,name=author,proto3" json:"author,omitempty"`
-	// A description of the book.
+	// A brief description of the book.
 	Description string `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	// Number of pages (for print edition).
+	PageCount int32 `protobuf:"varint,5,opt,name=page_count,json=pageCount,proto3" json:"page_count,omitempty"`
+	// Duration in minutes (for audio/animation editions).
+	DurationMinutes int32 `protobuf:"varint,6,opt,name=duration_minutes,json=durationMinutes,proto3" json:"duration_minutes,omitempty"`
+	// The core adaptation goal of the book.
+	CoreGoal string `protobuf:"bytes,7,opt,name=core_goal,json=coreGoal,proto3" json:"core_goal,omitempty"`
+	// The cognitive adaptation level: light/moderate/severe (轻度/中度/重度).
+	CognitiveLevel string `protobuf:"bytes,8,opt,name=cognitive_level,json=cognitiveLevel,proto3" json:"cognitive_level,omitempty"`
+	// Primary resource type: print/digital/audio/video.
+	ResourceType string `protobuf:"bytes,9,opt,name=resource_type,json=resourceType,proto3" json:"resource_type,omitempty"`
+	// Whether print edition is available.
+	HasPrint bool `protobuf:"varint,10,opt,name=has_print,json=hasPrint,proto3" json:"has_print,omitempty"`
+	// Whether digital edition is available.
+	HasDigital bool `protobuf:"varint,11,opt,name=has_digital,json=hasDigital,proto3" json:"has_digital,omitempty"`
+	// Whether audio edition is available.
+	HasAudio bool `protobuf:"varint,12,opt,name=has_audio,json=hasAudio,proto3" json:"has_audio,omitempty"`
+	// Whether video/animation edition is available.
+	HasVideo bool `protobuf:"varint,13,opt,name=has_video,json=hasVideo,proto3" json:"has_video,omitempty"`
+	// Teaching usage suggestions.
+	TeachingSuggestion string `protobuf:"bytes,14,opt,name=teaching_suggestion,json=teachingSuggestion,proto3" json:"teaching_suggestion,omitempty"`
+	// Parent-child co-reading guide.
+	ParentReadingGuide string `protobuf:"bytes,15,opt,name=parent_reading_guide,json=parentReadingGuide,proto3" json:"parent_reading_guide,omitempty"`
+	// Minimum recommended age in months.
+	RecommendedAgeMin int32 `protobuf:"varint,16,opt,name=recommended_age_min,json=recommendedAgeMin,proto3" json:"recommended_age_min,omitempty"`
+	// Maximum recommended age in months.
+	RecommendedAgeMax int32 `protobuf:"varint,17,opt,name=recommended_age_max,json=recommendedAgeMax,proto3" json:"recommended_age_max,omitempty"`
 	// URL to the book's cover image.
-	CoverUrl string `protobuf:"bytes,5,opt,name=cover_url,json=coverUrl,proto3" json:"cover_url,omitempty"`
-	// The ID of the user who uploaded this book.
-	UploaderId string `protobuf:"bytes,6,opt,name=uploader_id,json=uploaderId,proto3" json:"uploader_id,omitempty"`
+	CoverImageUrl string `protobuf:"bytes,18,opt,name=cover_image_url,json=coverImageUrl,proto3" json:"cover_image_url,omitempty"`
+	// Status: draft/pending/approved/rejected.
+	Status string `protobuf:"bytes,19,opt,name=status,proto3" json:"status,omitempty"`
+	// The ID of the user who uploaded/created this book.
+	UploaderId string `protobuf:"bytes,20,opt,name=uploader_id,json=uploaderId,proto3" json:"uploader_id,omitempty"`
+	// View count.
+	ViewCount int32 `protobuf:"varint,21,opt,name=view_count,json=viewCount,proto3" json:"view_count,omitempty"`
+	// Associated dimensions (loaded with eager).
+	Dimensions []*Dimension `protobuf:"bytes,22,rep,name=dimensions,proto3" json:"dimensions,omitempty"`
 	// When the book was created.
-	CreateTime *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
+	CreateTime *timestamppb.Timestamp `protobuf:"bytes,23,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
 	// When the book was last updated.
-	UpdateTime    *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`
+	UpdateTime    *timestamppb.Timestamp `protobuf:"bytes,24,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -107,9 +139,107 @@ func (x *Book) GetDescription() string {
 	return ""
 }
 
-func (x *Book) GetCoverUrl() string {
+func (x *Book) GetPageCount() int32 {
 	if x != nil {
-		return x.CoverUrl
+		return x.PageCount
+	}
+	return 0
+}
+
+func (x *Book) GetDurationMinutes() int32 {
+	if x != nil {
+		return x.DurationMinutes
+	}
+	return 0
+}
+
+func (x *Book) GetCoreGoal() string {
+	if x != nil {
+		return x.CoreGoal
+	}
+	return ""
+}
+
+func (x *Book) GetCognitiveLevel() string {
+	if x != nil {
+		return x.CognitiveLevel
+	}
+	return ""
+}
+
+func (x *Book) GetResourceType() string {
+	if x != nil {
+		return x.ResourceType
+	}
+	return ""
+}
+
+func (x *Book) GetHasPrint() bool {
+	if x != nil {
+		return x.HasPrint
+	}
+	return false
+}
+
+func (x *Book) GetHasDigital() bool {
+	if x != nil {
+		return x.HasDigital
+	}
+	return false
+}
+
+func (x *Book) GetHasAudio() bool {
+	if x != nil {
+		return x.HasAudio
+	}
+	return false
+}
+
+func (x *Book) GetHasVideo() bool {
+	if x != nil {
+		return x.HasVideo
+	}
+	return false
+}
+
+func (x *Book) GetTeachingSuggestion() string {
+	if x != nil {
+		return x.TeachingSuggestion
+	}
+	return ""
+}
+
+func (x *Book) GetParentReadingGuide() string {
+	if x != nil {
+		return x.ParentReadingGuide
+	}
+	return ""
+}
+
+func (x *Book) GetRecommendedAgeMin() int32 {
+	if x != nil {
+		return x.RecommendedAgeMin
+	}
+	return 0
+}
+
+func (x *Book) GetRecommendedAgeMax() int32 {
+	if x != nil {
+		return x.RecommendedAgeMax
+	}
+	return 0
+}
+
+func (x *Book) GetCoverImageUrl() string {
+	if x != nil {
+		return x.CoverImageUrl
+	}
+	return ""
+}
+
+func (x *Book) GetStatus() string {
+	if x != nil {
+		return x.Status
 	}
 	return ""
 }
@@ -119,6 +249,20 @@ func (x *Book) GetUploaderId() string {
 		return x.UploaderId
 	}
 	return ""
+}
+
+func (x *Book) GetViewCount() int32 {
+	if x != nil {
+		return x.ViewCount
+	}
+	return 0
+}
+
+func (x *Book) GetDimensions() []*Dimension {
+	if x != nil {
+		return x.Dimensions
+	}
+	return nil
 }
 
 func (x *Book) GetCreateTime() *timestamppb.Timestamp {
@@ -141,7 +285,11 @@ type ListBooksRequest struct {
 	// Maximum number of books to return. Default 20.
 	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// Token for the next page of results.
-	PageToken     string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	// Filter by dimension slug (optional).
+	DimensionSlug string `protobuf:"bytes,3,opt,name=dimension_slug,json=dimensionSlug,proto3" json:"dimension_slug,omitempty"`
+	// Filter by status (optional): draft/pending/approved/rejected.
+	Status        string `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -186,6 +334,20 @@ func (x *ListBooksRequest) GetPageSize() int32 {
 func (x *ListBooksRequest) GetPageToken() string {
 	if x != nil {
 		return x.PageToken
+	}
+	return ""
+}
+
+func (x *ListBooksRequest) GetDimensionSlug() string {
+	if x != nil {
+		return x.DimensionSlug
+	}
+	return ""
+}
+
+func (x *ListBooksRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
 	}
 	return ""
 }
@@ -344,10 +506,38 @@ type CreateBookRequest struct {
 	Title string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
 	// The author of the book.
 	Author string `protobuf:"bytes,2,opt,name=author,proto3" json:"author,omitempty"`
-	// A description of the book.
-	Description   string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	// A brief description.
+	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	// Number of pages (for print edition).
+	PageCount int32 `protobuf:"varint,4,opt,name=page_count,json=pageCount,proto3" json:"page_count,omitempty"`
+	// Duration in minutes (for audio/animation editions).
+	DurationMinutes int32 `protobuf:"varint,5,opt,name=duration_minutes,json=durationMinutes,proto3" json:"duration_minutes,omitempty"`
+	// The core adaptation goal (required).
+	CoreGoal string `protobuf:"bytes,6,opt,name=core_goal,json=coreGoal,proto3" json:"core_goal,omitempty"`
+	// Cognitive level: light/moderate/severe.
+	CognitiveLevel string `protobuf:"bytes,7,opt,name=cognitive_level,json=cognitiveLevel,proto3" json:"cognitive_level,omitempty"`
+	// Primary resource type.
+	ResourceType string `protobuf:"bytes,8,opt,name=resource_type,json=resourceType,proto3" json:"resource_type,omitempty"`
+	// Whether print edition is available.
+	HasPrint bool `protobuf:"varint,9,opt,name=has_print,json=hasPrint,proto3" json:"has_print,omitempty"`
+	// Whether digital edition is available.
+	HasDigital bool `protobuf:"varint,10,opt,name=has_digital,json=hasDigital,proto3" json:"has_digital,omitempty"`
+	// Whether audio edition is available.
+	HasAudio bool `protobuf:"varint,11,opt,name=has_audio,json=hasAudio,proto3" json:"has_audio,omitempty"`
+	// Whether video edition is available.
+	HasVideo bool `protobuf:"varint,12,opt,name=has_video,json=hasVideo,proto3" json:"has_video,omitempty"`
+	// Teaching usage suggestions.
+	TeachingSuggestion string `protobuf:"bytes,13,opt,name=teaching_suggestion,json=teachingSuggestion,proto3" json:"teaching_suggestion,omitempty"`
+	// Parent-child co-reading guide.
+	ParentReadingGuide string `protobuf:"bytes,14,opt,name=parent_reading_guide,json=parentReadingGuide,proto3" json:"parent_reading_guide,omitempty"`
+	// Minimum recommended age in months.
+	RecommendedAgeMin int32 `protobuf:"varint,15,opt,name=recommended_age_min,json=recommendedAgeMin,proto3" json:"recommended_age_min,omitempty"`
+	// Maximum recommended age in months.
+	RecommendedAgeMax int32 `protobuf:"varint,16,opt,name=recommended_age_max,json=recommendedAgeMax,proto3" json:"recommended_age_max,omitempty"`
+	// Dimension slugs to associate with (required, at least one).
+	DimensionSlugs []string `protobuf:"bytes,17,rep,name=dimension_slugs,json=dimensionSlugs,proto3" json:"dimension_slugs,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *CreateBookRequest) Reset() {
@@ -399,6 +589,104 @@ func (x *CreateBookRequest) GetDescription() string {
 		return x.Description
 	}
 	return ""
+}
+
+func (x *CreateBookRequest) GetPageCount() int32 {
+	if x != nil {
+		return x.PageCount
+	}
+	return 0
+}
+
+func (x *CreateBookRequest) GetDurationMinutes() int32 {
+	if x != nil {
+		return x.DurationMinutes
+	}
+	return 0
+}
+
+func (x *CreateBookRequest) GetCoreGoal() string {
+	if x != nil {
+		return x.CoreGoal
+	}
+	return ""
+}
+
+func (x *CreateBookRequest) GetCognitiveLevel() string {
+	if x != nil {
+		return x.CognitiveLevel
+	}
+	return ""
+}
+
+func (x *CreateBookRequest) GetResourceType() string {
+	if x != nil {
+		return x.ResourceType
+	}
+	return ""
+}
+
+func (x *CreateBookRequest) GetHasPrint() bool {
+	if x != nil {
+		return x.HasPrint
+	}
+	return false
+}
+
+func (x *CreateBookRequest) GetHasDigital() bool {
+	if x != nil {
+		return x.HasDigital
+	}
+	return false
+}
+
+func (x *CreateBookRequest) GetHasAudio() bool {
+	if x != nil {
+		return x.HasAudio
+	}
+	return false
+}
+
+func (x *CreateBookRequest) GetHasVideo() bool {
+	if x != nil {
+		return x.HasVideo
+	}
+	return false
+}
+
+func (x *CreateBookRequest) GetTeachingSuggestion() string {
+	if x != nil {
+		return x.TeachingSuggestion
+	}
+	return ""
+}
+
+func (x *CreateBookRequest) GetParentReadingGuide() string {
+	if x != nil {
+		return x.ParentReadingGuide
+	}
+	return ""
+}
+
+func (x *CreateBookRequest) GetRecommendedAgeMin() int32 {
+	if x != nil {
+		return x.RecommendedAgeMin
+	}
+	return 0
+}
+
+func (x *CreateBookRequest) GetRecommendedAgeMax() int32 {
+	if x != nil {
+		return x.RecommendedAgeMax
+	}
+	return 0
+}
+
+func (x *CreateBookRequest) GetDimensionSlugs() []string {
+	if x != nil {
+		return x.DimensionSlugs
+	}
+	return nil
 }
 
 // CreateBookResponse is the response for CreateBook.
@@ -728,36 +1016,76 @@ var File_bookmgr_v1_book_service_proto protoreflect.FileDescriptor
 const file_bookmgr_v1_book_service_proto_rawDesc = "" +
 	"\n" +
 	"\x1dbookmgr/v1/book_service.proto\x12\n" +
-	"bookmgr.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x19google/api/httpbody.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9e\x02\n" +
+	"bookmgr.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x19google/api/httpbody.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17bookmgr/v1/common.proto\"\x87\a\n" +
 	"\x04Book\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x16\n" +
 	"\x06author\x18\x03 \x01(\tR\x06author\x12 \n" +
-	"\vdescription\x18\x04 \x01(\tR\vdescription\x12\x1b\n" +
-	"\tcover_url\x18\x05 \x01(\tR\bcoverUrl\x12\x1f\n" +
-	"\vuploader_id\x18\x06 \x01(\tR\n" +
-	"uploaderId\x12;\n" +
-	"\vcreate_time\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription\x12\x1d\n" +
+	"\n" +
+	"page_count\x18\x05 \x01(\x05R\tpageCount\x12)\n" +
+	"\x10duration_minutes\x18\x06 \x01(\x05R\x0fdurationMinutes\x12\x1b\n" +
+	"\tcore_goal\x18\a \x01(\tR\bcoreGoal\x12'\n" +
+	"\x0fcognitive_level\x18\b \x01(\tR\x0ecognitiveLevel\x12#\n" +
+	"\rresource_type\x18\t \x01(\tR\fresourceType\x12\x1b\n" +
+	"\thas_print\x18\n" +
+	" \x01(\bR\bhasPrint\x12\x1f\n" +
+	"\vhas_digital\x18\v \x01(\bR\n" +
+	"hasDigital\x12\x1b\n" +
+	"\thas_audio\x18\f \x01(\bR\bhasAudio\x12\x1b\n" +
+	"\thas_video\x18\r \x01(\bR\bhasVideo\x12/\n" +
+	"\x13teaching_suggestion\x18\x0e \x01(\tR\x12teachingSuggestion\x120\n" +
+	"\x14parent_reading_guide\x18\x0f \x01(\tR\x12parentReadingGuide\x12.\n" +
+	"\x13recommended_age_min\x18\x10 \x01(\x05R\x11recommendedAgeMin\x12.\n" +
+	"\x13recommended_age_max\x18\x11 \x01(\x05R\x11recommendedAgeMax\x12&\n" +
+	"\x0fcover_image_url\x18\x12 \x01(\tR\rcoverImageUrl\x12\x16\n" +
+	"\x06status\x18\x13 \x01(\tR\x06status\x12\x1f\n" +
+	"\vuploader_id\x18\x14 \x01(\tR\n" +
+	"uploaderId\x12\x1d\n" +
+	"\n" +
+	"view_count\x18\x15 \x01(\x05R\tviewCount\x125\n" +
+	"\n" +
+	"dimensions\x18\x16 \x03(\v2\x15.bookmgr.v1.DimensionR\n" +
+	"dimensions\x12;\n" +
+	"\vcreate_time\x18\x17 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"createTime\x12;\n" +
-	"\vupdate_time\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\n" +
-	"updateTime\"Y\n" +
+	"\vupdate_time\x18\x18 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"updateTime\"\x98\x01\n" +
 	"\x10ListBooksRequest\x12&\n" +
 	"\tpage_size\x18\x01 \x01(\x05B\t\xbaH\x06\x1a\x04\x18d(\x00R\bpageSize\x12\x1d\n" +
 	"\n" +
-	"page_token\x18\x02 \x01(\tR\tpageToken\"c\n" +
+	"page_token\x18\x02 \x01(\tR\tpageToken\x12%\n" +
+	"\x0edimension_slug\x18\x03 \x01(\tR\rdimensionSlug\x12\x16\n" +
+	"\x06status\x18\x04 \x01(\tR\x06status\"c\n" +
 	"\x11ListBooksResponse\x12&\n" +
 	"\x05books\x18\x01 \x03(\v2\x10.bookmgr.v1.BookR\x05books\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\")\n" +
 	"\x0eGetBookRequest\x12\x17\n" +
 	"\x02id\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x02id\"7\n" +
 	"\x0fGetBookResponse\x12$\n" +
-	"\x04book\x18\x01 \x01(\v2\x10.bookmgr.v1.BookR\x04book\"\x85\x01\n" +
+	"\x04book\x18\x01 \x01(\v2\x10.bookmgr.v1.BookR\x04book\"\xcc\x05\n" +
 	"\x11CreateBookRequest\x12 \n" +
 	"\x05title\x18\x01 \x01(\tB\n" +
-	"\xbaH\ar\x05\x10\x01\x18\x80\x02R\x05title\x12\"\n" +
-	"\x06author\x18\x02 \x01(\tB\n" +
-	"\xbaH\ar\x05\x10\x01\x18\x80\x02R\x06author\x12*\n" +
-	"\vdescription\x18\x03 \x01(\tB\b\xbaH\x05r\x03\x18\x80 R\vdescription\":\n" +
+	"\xbaH\ar\x05\x10\x01\x18\xc8\x01R\x05title\x12!\n" +
+	"\x06author\x18\x02 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18dR\x06author\x12*\n" +
+	"\vdescription\x18\x03 \x01(\tB\b\xbaH\x05r\x03\x18\x80 R\vdescription\x12\x1d\n" +
+	"\n" +
+	"page_count\x18\x04 \x01(\x05R\tpageCount\x12)\n" +
+	"\x10duration_minutes\x18\x05 \x01(\x05R\x0fdurationMinutes\x12$\n" +
+	"\tcore_goal\x18\x06 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\bcoreGoal\x120\n" +
+	"\x0fcognitive_level\x18\a \x01(\tB\a\xbaH\x04r\x02\x182R\x0ecognitiveLevel\x12,\n" +
+	"\rresource_type\x18\b \x01(\tB\a\xbaH\x04r\x02\x182R\fresourceType\x12\x1b\n" +
+	"\thas_print\x18\t \x01(\bR\bhasPrint\x12\x1f\n" +
+	"\vhas_digital\x18\n" +
+	" \x01(\bR\n" +
+	"hasDigital\x12\x1b\n" +
+	"\thas_audio\x18\v \x01(\bR\bhasAudio\x12\x1b\n" +
+	"\thas_video\x18\f \x01(\bR\bhasVideo\x129\n" +
+	"\x13teaching_suggestion\x18\r \x01(\tB\b\xbaH\x05r\x03\x18\x80 R\x12teachingSuggestion\x12:\n" +
+	"\x14parent_reading_guide\x18\x0e \x01(\tB\b\xbaH\x05r\x03\x18\x80 R\x12parentReadingGuide\x12.\n" +
+	"\x13recommended_age_min\x18\x0f \x01(\x05R\x11recommendedAgeMin\x12.\n" +
+	"\x13recommended_age_max\x18\x10 \x01(\x05R\x11recommendedAgeMax\x12'\n" +
+	"\x0fdimension_slugs\x18\x11 \x03(\tR\x0edimensionSlugs\":\n" +
 	"\x12CreateBookResponse\x12$\n" +
 	"\x04book\x18\x01 \x01(\v2\x10.bookmgr.v1.BookR\x04book\"~\n" +
 	"\x11UpdateBookRequest\x12,\n" +
@@ -811,37 +1139,39 @@ var file_bookmgr_v1_book_service_proto_goTypes = []any{
 	(*DeleteBookResponse)(nil),    // 10: bookmgr.v1.DeleteBookResponse
 	(*DownloadBookRequest)(nil),   // 11: bookmgr.v1.DownloadBookRequest
 	(*DownloadBookResponse)(nil),  // 12: bookmgr.v1.DownloadBookResponse
-	(*timestamppb.Timestamp)(nil), // 13: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil), // 14: google.protobuf.FieldMask
-	(*httpbody.HttpBody)(nil),     // 15: google.api.HttpBody
+	(*Dimension)(nil),             // 13: bookmgr.v1.Dimension
+	(*timestamppb.Timestamp)(nil), // 14: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil), // 15: google.protobuf.FieldMask
+	(*httpbody.HttpBody)(nil),     // 16: google.api.HttpBody
 }
 var file_bookmgr_v1_book_service_proto_depIdxs = []int32{
-	13, // 0: bookmgr.v1.Book.create_time:type_name -> google.protobuf.Timestamp
-	13, // 1: bookmgr.v1.Book.update_time:type_name -> google.protobuf.Timestamp
-	0,  // 2: bookmgr.v1.ListBooksResponse.books:type_name -> bookmgr.v1.Book
-	0,  // 3: bookmgr.v1.GetBookResponse.book:type_name -> bookmgr.v1.Book
-	0,  // 4: bookmgr.v1.CreateBookResponse.book:type_name -> bookmgr.v1.Book
-	0,  // 5: bookmgr.v1.UpdateBookRequest.book:type_name -> bookmgr.v1.Book
-	14, // 6: bookmgr.v1.UpdateBookRequest.update_mask:type_name -> google.protobuf.FieldMask
-	0,  // 7: bookmgr.v1.UpdateBookResponse.book:type_name -> bookmgr.v1.Book
-	15, // 8: bookmgr.v1.DownloadBookResponse.http_body:type_name -> google.api.HttpBody
-	1,  // 9: bookmgr.v1.BookService.ListBooks:input_type -> bookmgr.v1.ListBooksRequest
-	3,  // 10: bookmgr.v1.BookService.GetBook:input_type -> bookmgr.v1.GetBookRequest
-	5,  // 11: bookmgr.v1.BookService.CreateBook:input_type -> bookmgr.v1.CreateBookRequest
-	7,  // 12: bookmgr.v1.BookService.UpdateBook:input_type -> bookmgr.v1.UpdateBookRequest
-	9,  // 13: bookmgr.v1.BookService.DeleteBook:input_type -> bookmgr.v1.DeleteBookRequest
-	11, // 14: bookmgr.v1.BookService.DownloadBook:input_type -> bookmgr.v1.DownloadBookRequest
-	2,  // 15: bookmgr.v1.BookService.ListBooks:output_type -> bookmgr.v1.ListBooksResponse
-	4,  // 16: bookmgr.v1.BookService.GetBook:output_type -> bookmgr.v1.GetBookResponse
-	6,  // 17: bookmgr.v1.BookService.CreateBook:output_type -> bookmgr.v1.CreateBookResponse
-	8,  // 18: bookmgr.v1.BookService.UpdateBook:output_type -> bookmgr.v1.UpdateBookResponse
-	10, // 19: bookmgr.v1.BookService.DeleteBook:output_type -> bookmgr.v1.DeleteBookResponse
-	12, // 20: bookmgr.v1.BookService.DownloadBook:output_type -> bookmgr.v1.DownloadBookResponse
-	15, // [15:21] is the sub-list for method output_type
-	9,  // [9:15] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	13, // 0: bookmgr.v1.Book.dimensions:type_name -> bookmgr.v1.Dimension
+	14, // 1: bookmgr.v1.Book.create_time:type_name -> google.protobuf.Timestamp
+	14, // 2: bookmgr.v1.Book.update_time:type_name -> google.protobuf.Timestamp
+	0,  // 3: bookmgr.v1.ListBooksResponse.books:type_name -> bookmgr.v1.Book
+	0,  // 4: bookmgr.v1.GetBookResponse.book:type_name -> bookmgr.v1.Book
+	0,  // 5: bookmgr.v1.CreateBookResponse.book:type_name -> bookmgr.v1.Book
+	0,  // 6: bookmgr.v1.UpdateBookRequest.book:type_name -> bookmgr.v1.Book
+	15, // 7: bookmgr.v1.UpdateBookRequest.update_mask:type_name -> google.protobuf.FieldMask
+	0,  // 8: bookmgr.v1.UpdateBookResponse.book:type_name -> bookmgr.v1.Book
+	16, // 9: bookmgr.v1.DownloadBookResponse.http_body:type_name -> google.api.HttpBody
+	1,  // 10: bookmgr.v1.BookService.ListBooks:input_type -> bookmgr.v1.ListBooksRequest
+	3,  // 11: bookmgr.v1.BookService.GetBook:input_type -> bookmgr.v1.GetBookRequest
+	5,  // 12: bookmgr.v1.BookService.CreateBook:input_type -> bookmgr.v1.CreateBookRequest
+	7,  // 13: bookmgr.v1.BookService.UpdateBook:input_type -> bookmgr.v1.UpdateBookRequest
+	9,  // 14: bookmgr.v1.BookService.DeleteBook:input_type -> bookmgr.v1.DeleteBookRequest
+	11, // 15: bookmgr.v1.BookService.DownloadBook:input_type -> bookmgr.v1.DownloadBookRequest
+	2,  // 16: bookmgr.v1.BookService.ListBooks:output_type -> bookmgr.v1.ListBooksResponse
+	4,  // 17: bookmgr.v1.BookService.GetBook:output_type -> bookmgr.v1.GetBookResponse
+	6,  // 18: bookmgr.v1.BookService.CreateBook:output_type -> bookmgr.v1.CreateBookResponse
+	8,  // 19: bookmgr.v1.BookService.UpdateBook:output_type -> bookmgr.v1.UpdateBookResponse
+	10, // 20: bookmgr.v1.BookService.DeleteBook:output_type -> bookmgr.v1.DeleteBookResponse
+	12, // 21: bookmgr.v1.BookService.DownloadBook:output_type -> bookmgr.v1.DownloadBookResponse
+	16, // [16:22] is the sub-list for method output_type
+	10, // [10:16] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_bookmgr_v1_book_service_proto_init() }
@@ -849,6 +1179,7 @@ func file_bookmgr_v1_book_service_proto_init() {
 	if File_bookmgr_v1_book_service_proto != nil {
 		return
 	}
+	file_bookmgr_v1_common_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

@@ -13,6 +13,7 @@ import (
 
 	"github.com/zhoumingjun/bookmgr/backend/ent"
 	"github.com/zhoumingjun/bookmgr/backend/middleware"
+	"github.com/zhoumingjun/bookmgr/backend/repository"
 	"github.com/zhoumingjun/bookmgr/backend/service"
 	bookmgrv1 "github.com/zhoumingjun/bookmgr/gen/api/bookmgr/v1"
 )
@@ -29,7 +30,16 @@ func NewBookHandler(bookService *service.BookService) *BookHandler {
 }
 
 func (h *BookHandler) ListBooks(ctx context.Context, req *bookmgrv1.ListBooksRequest) (*bookmgrv1.ListBooksResponse, error) {
-	result, err := h.bookService.List(ctx, int(req.GetPageSize()), req.GetPageToken())
+	params := repository.ListBooksParams{
+		Page:          1,
+		PerPage:       int(req.GetPageSize()),
+		DimensionSlug: req.GetDimensionSlug(),
+		Status:        req.GetStatus(),
+	}
+	if params.PerPage == 0 {
+		params.PerPage = 20
+	}
+	result, err := h.bookService.ListFull(ctx, params)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "listing books: %v", err)
 	}
@@ -39,9 +49,14 @@ func (h *BookHandler) ListBooks(ctx context.Context, req *bookmgrv1.ListBooksReq
 		books[i] = entBookToProto(b)
 	}
 
+	var nextToken string
+	if result.Total > params.PerPage {
+		nextToken = result.NextPageToken
+	}
+
 	return &bookmgrv1.ListBooksResponse{
 		Books:         books,
-		NextPageToken: result.NextPageToken,
+		NextPageToken: nextToken,
 	}, nil
 }
 
@@ -51,7 +66,7 @@ func (h *BookHandler) GetBook(ctx context.Context, req *bookmgrv1.GetBookRequest
 		return nil, status.Errorf(codes.InvalidArgument, "invalid book id")
 	}
 
-	b, err := h.bookService.Get(ctx, id)
+	b, err := h.bookService.GetFull(ctx, id)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			return nil, status.Errorf(codes.NotFound, "book not found")
@@ -68,7 +83,28 @@ func (h *BookHandler) CreateBook(ctx context.Context, req *bookmgrv1.CreateBookR
 		uploaderID, _ = uuid.Parse(claims.Subject)
 	}
 
-	b, err := h.bookService.Create(ctx, req.GetTitle(), req.GetAuthor(), req.GetDescription(), uploaderID)
+	params := repository.CreateBookParams{
+		Title:               req.GetTitle(),
+		Author:              req.GetAuthor(),
+		Description:         req.GetDescription(),
+		PageCount:           int(req.GetPageCount()),
+		DurationMinutes:     int(req.GetDurationMinutes()),
+		CoreGoal:            req.GetCoreGoal(),
+		CognitiveLevel:      req.GetCognitiveLevel(),
+		ResourceType:        req.GetResourceType(),
+		HasPrint:            req.GetHasPrint(),
+		HasDigital:          req.GetHasDigital(),
+		HasAudio:            req.GetHasAudio(),
+		HasVideo:            req.GetHasVideo(),
+		TeachingSuggestion:  req.GetTeachingSuggestion(),
+		ParentReadingGuide:  req.GetParentReadingGuide(),
+		RecommendedAgeMin:  int(req.GetRecommendedAgeMin()),
+		RecommendedAgeMax:   int(req.GetRecommendedAgeMax()),
+		UploaderID:          uploaderID,
+		DimensionSlugs:     req.GetDimensionSlugs(),
+	}
+
+	b, err := h.bookService.CreateFull(ctx, params)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "creating book: %v", err)
 	}
@@ -86,26 +122,69 @@ func (h *BookHandler) UpdateBook(ctx context.Context, req *bookmgrv1.UpdateBookR
 		return nil, status.Errorf(codes.InvalidArgument, "invalid book id")
 	}
 
-	fields := service.BookUpdateFields{}
+	pb := req.GetBook()
 	mask := req.GetUpdateMask()
 	if mask == nil || len(mask.GetPaths()) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "update_mask is required")
 	}
 
+	fields := service.BookUpdateFields{}
 	for _, path := range mask.GetPaths() {
 		switch path {
 		case "title":
-			v := req.GetBook().GetTitle()
+			v := pb.GetTitle()
 			fields.Title = &v
 		case "author":
-			v := req.GetBook().GetAuthor()
+			v := pb.GetAuthor()
 			fields.Author = &v
 		case "description":
-			v := req.GetBook().GetDescription()
+			v := pb.GetDescription()
 			fields.Description = &v
-		case "cover_url":
-			v := req.GetBook().GetCoverUrl()
-			fields.CoverURL = &v
+		case "page_count":
+			v := int(pb.GetPageCount())
+			fields.PageCount = &v
+		case "duration_minutes":
+			v := int(pb.GetDurationMinutes())
+			fields.DurationMinutes = &v
+		case "core_goal":
+			v := pb.GetCoreGoal()
+			fields.CoreGoal = &v
+		case "cognitive_level":
+			v := pb.GetCognitiveLevel()
+			fields.CognitiveLevel = &v
+		case "resource_type":
+			v := pb.GetResourceType()
+			fields.ResourceType = &v
+		case "has_print":
+			v := pb.GetHasPrint()
+			fields.HasPrint = &v
+		case "has_digital":
+			v := pb.GetHasDigital()
+			fields.HasDigital = &v
+		case "has_audio":
+			v := pb.GetHasAudio()
+			fields.HasAudio = &v
+		case "has_video":
+			v := pb.GetHasVideo()
+			fields.HasVideo = &v
+		case "teaching_suggestion":
+			v := pb.GetTeachingSuggestion()
+			fields.TeachingSuggestion = &v
+		case "parent_reading_guide":
+			v := pb.GetParentReadingGuide()
+			fields.ParentReadingGuide = &v
+		case "recommended_age_min":
+			v := int(pb.GetRecommendedAgeMin())
+			fields.RecommendedAgeMin = &v
+		case "recommended_age_max":
+			v := int(pb.GetRecommendedAgeMax())
+			fields.RecommendedAgeMax = &v
+		case "dimensions":
+			var slugs []string
+			for _, d := range pb.GetDimensions() {
+				slugs = append(slugs, d.GetSlug())
+			}
+			fields.DimensionSlugs = slugs
 		default:
 			return nil, status.Errorf(codes.InvalidArgument, "unsupported field: %s", path)
 		}
@@ -167,14 +246,50 @@ func (h *BookHandler) DownloadBook(ctx context.Context, req *bookmgrv1.DownloadB
 }
 
 func entBookToProto(b *ent.Book) *bookmgrv1.Book {
-	return &bookmgrv1.Book{
-		Id:          b.ID.String(),
-		Title:       b.Title,
-		Author:      b.Author,
-		Description: b.Description,
-		CoverUrl:    b.CoverURL,
-		UploaderId:  b.UploaderID.String(),
-		CreateTime:  timestamppb.New(b.CreatedAt),
-		UpdateTime:  timestamppb.New(b.UpdatedAt),
+	pb := &bookmgrv1.Book{
+		Id:                   b.ID.String(),
+		Title:                b.Title,
+		Author:               b.Author,
+		Description:          b.Description,
+		PageCount:            int32(b.PageCount),
+		DurationMinutes:      int32(b.DurationMinutes),
+		CoreGoal:             b.CoreGoal,
+		CognitiveLevel:       b.CognitiveLevel,
+		ResourceType:         b.ResourceType,
+		HasPrint:             b.HasPrint,
+		HasDigital:           b.HasDigital,
+		HasAudio:             b.HasAudio,
+		HasVideo:             b.HasVideo,
+		TeachingSuggestion:   b.TeachingSuggestion,
+		ParentReadingGuide:   b.ParentReadingGuide,
+		RecommendedAgeMin:    int32(b.RecommendedAgeMin),
+		RecommendedAgeMax:    int32(b.RecommendedAgeMax),
+		CoverImageUrl:        b.CoverImageURL,
+		Status:               b.Status,
+		UploaderId:           b.UploaderID.String(),
+		ViewCount:            int32(b.ViewCount),
+		CreateTime:           timestamppb.New(b.CreatedAt),
+		UpdateTime:           timestamppb.New(b.UpdatedAt),
+	}
+
+	// Map dimensions if loaded
+	if len(b.Edges.BookDimensions) > 0 {
+		pbDims := make([]*bookmgrv1.Dimension, 0, len(b.Edges.BookDimensions))
+		for _, bd := range b.Edges.BookDimensions {
+			if len(bd.Edges.Dimension) > 0 {
+				pbDims = append(pbDims, entDimensionToProto(bd.Edges.Dimension[0]))
+			}
+		}
+		pb.Dimensions = pbDims
+	}
+
+	return pb
+}
+
+func entDimensionToProto(d *ent.Dimension) *bookmgrv1.Dimension {
+	return &bookmgrv1.Dimension{
+		Id:   d.ID.String(),
+		Name: d.Name,
+		Slug: d.Slug,
 	}
 }

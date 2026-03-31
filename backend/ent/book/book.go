@@ -21,12 +21,44 @@ const (
 	FieldAuthor = "author"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// FieldPageCount holds the string denoting the page_count field in the database.
+	FieldPageCount = "page_count"
+	// FieldDurationMinutes holds the string denoting the duration_minutes field in the database.
+	FieldDurationMinutes = "duration_minutes"
+	// FieldCoreGoal holds the string denoting the core_goal field in the database.
+	FieldCoreGoal = "core_goal"
+	// FieldCognitiveLevel holds the string denoting the cognitive_level field in the database.
+	FieldCognitiveLevel = "cognitive_level"
+	// FieldResourceType holds the string denoting the resource_type field in the database.
+	FieldResourceType = "resource_type"
+	// FieldHasPrint holds the string denoting the has_print field in the database.
+	FieldHasPrint = "has_print"
+	// FieldHasDigital holds the string denoting the has_digital field in the database.
+	FieldHasDigital = "has_digital"
+	// FieldHasAudio holds the string denoting the has_audio field in the database.
+	FieldHasAudio = "has_audio"
+	// FieldHasVideo holds the string denoting the has_video field in the database.
+	FieldHasVideo = "has_video"
+	// FieldTeachingSuggestion holds the string denoting the teaching_suggestion field in the database.
+	FieldTeachingSuggestion = "teaching_suggestion"
+	// FieldParentReadingGuide holds the string denoting the parent_reading_guide field in the database.
+	FieldParentReadingGuide = "parent_reading_guide"
+	// FieldRecommendedAgeMin holds the string denoting the recommended_age_min field in the database.
+	FieldRecommendedAgeMin = "recommended_age_min"
+	// FieldRecommendedAgeMax holds the string denoting the recommended_age_max field in the database.
+	FieldRecommendedAgeMax = "recommended_age_max"
+	// FieldCoverImageURL holds the string denoting the cover_image_url field in the database.
+	FieldCoverImageURL = "cover_image_url"
 	// FieldCoverURL holds the string denoting the cover_url field in the database.
 	FieldCoverURL = "cover_url"
 	// FieldFilePath holds the string denoting the file_path field in the database.
 	FieldFilePath = "file_path"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
 	// FieldUploaderID holds the string denoting the uploader_id field in the database.
 	FieldUploaderID = "uploader_id"
+	// FieldViewCount holds the string denoting the view_count field in the database.
+	FieldViewCount = "view_count"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -57,9 +89,25 @@ var Columns = []string{
 	FieldTitle,
 	FieldAuthor,
 	FieldDescription,
+	FieldPageCount,
+	FieldDurationMinutes,
+	FieldCoreGoal,
+	FieldCognitiveLevel,
+	FieldResourceType,
+	FieldHasPrint,
+	FieldHasDigital,
+	FieldHasAudio,
+	FieldHasVideo,
+	FieldTeachingSuggestion,
+	FieldParentReadingGuide,
+	FieldRecommendedAgeMin,
+	FieldRecommendedAgeMax,
+	FieldCoverImageURL,
 	FieldCoverURL,
 	FieldFilePath,
+	FieldStatus,
 	FieldUploaderID,
+	FieldViewCount,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -87,10 +135,48 @@ var (
 	AuthorValidator func(string) error
 	// DefaultDescription holds the default value on creation for the "description" field.
 	DefaultDescription string
+	// DefaultCoreGoal holds the default value on creation for the "core_goal" field.
+	DefaultCoreGoal string
+	// DefaultCognitiveLevel holds the default value on creation for the "cognitive_level" field.
+	DefaultCognitiveLevel string
+	// CognitiveLevelValidator is a validator for the "cognitive_level" field. It is called by the builders before save.
+	CognitiveLevelValidator func(string) error
+	// DefaultResourceType holds the default value on creation for the "resource_type" field.
+	DefaultResourceType string
+	// ResourceTypeValidator is a validator for the "resource_type" field. It is called by the builders before save.
+	ResourceTypeValidator func(string) error
+	// DefaultHasPrint holds the default value on creation for the "has_print" field.
+	DefaultHasPrint bool
+	// DefaultHasDigital holds the default value on creation for the "has_digital" field.
+	DefaultHasDigital bool
+	// DefaultHasAudio holds the default value on creation for the "has_audio" field.
+	DefaultHasAudio bool
+	// DefaultHasVideo holds the default value on creation for the "has_video" field.
+	DefaultHasVideo bool
+	// DefaultTeachingSuggestion holds the default value on creation for the "teaching_suggestion" field.
+	DefaultTeachingSuggestion string
+	// DefaultParentReadingGuide holds the default value on creation for the "parent_reading_guide" field.
+	DefaultParentReadingGuide string
+	// DefaultRecommendedAgeMin holds the default value on creation for the "recommended_age_min" field.
+	DefaultRecommendedAgeMin int
+	// DefaultRecommendedAgeMax holds the default value on creation for the "recommended_age_max" field.
+	DefaultRecommendedAgeMax int
+	// DefaultCoverImageURL holds the default value on creation for the "cover_image_url" field.
+	DefaultCoverImageURL string
+	// CoverImageURLValidator is a validator for the "cover_image_url" field. It is called by the builders before save.
+	CoverImageURLValidator func(string) error
 	// DefaultCoverURL holds the default value on creation for the "cover_url" field.
 	DefaultCoverURL string
+	// CoverURLValidator is a validator for the "cover_url" field. It is called by the builders before save.
+	CoverURLValidator func(string) error
 	// DefaultFilePath holds the default value on creation for the "file_path" field.
 	DefaultFilePath string
+	// DefaultStatus holds the default value on creation for the "status" field.
+	DefaultStatus string
+	// StatusValidator is a validator for the "status" field. It is called by the builders before save.
+	StatusValidator func(string) error
+	// DefaultViewCount holds the default value on creation for the "view_count" field.
+	DefaultViewCount int
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -124,6 +210,76 @@ func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
 }
 
+// ByPageCount orders the results by the page_count field.
+func ByPageCount(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPageCount, opts...).ToFunc()
+}
+
+// ByDurationMinutes orders the results by the duration_minutes field.
+func ByDurationMinutes(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDurationMinutes, opts...).ToFunc()
+}
+
+// ByCoreGoal orders the results by the core_goal field.
+func ByCoreGoal(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCoreGoal, opts...).ToFunc()
+}
+
+// ByCognitiveLevel orders the results by the cognitive_level field.
+func ByCognitiveLevel(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCognitiveLevel, opts...).ToFunc()
+}
+
+// ByResourceType orders the results by the resource_type field.
+func ByResourceType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldResourceType, opts...).ToFunc()
+}
+
+// ByHasPrint orders the results by the has_print field.
+func ByHasPrint(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldHasPrint, opts...).ToFunc()
+}
+
+// ByHasDigital orders the results by the has_digital field.
+func ByHasDigital(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldHasDigital, opts...).ToFunc()
+}
+
+// ByHasAudio orders the results by the has_audio field.
+func ByHasAudio(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldHasAudio, opts...).ToFunc()
+}
+
+// ByHasVideo orders the results by the has_video field.
+func ByHasVideo(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldHasVideo, opts...).ToFunc()
+}
+
+// ByTeachingSuggestion orders the results by the teaching_suggestion field.
+func ByTeachingSuggestion(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTeachingSuggestion, opts...).ToFunc()
+}
+
+// ByParentReadingGuide orders the results by the parent_reading_guide field.
+func ByParentReadingGuide(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldParentReadingGuide, opts...).ToFunc()
+}
+
+// ByRecommendedAgeMin orders the results by the recommended_age_min field.
+func ByRecommendedAgeMin(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRecommendedAgeMin, opts...).ToFunc()
+}
+
+// ByRecommendedAgeMax orders the results by the recommended_age_max field.
+func ByRecommendedAgeMax(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRecommendedAgeMax, opts...).ToFunc()
+}
+
+// ByCoverImageURL orders the results by the cover_image_url field.
+func ByCoverImageURL(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCoverImageURL, opts...).ToFunc()
+}
+
 // ByCoverURL orders the results by the cover_url field.
 func ByCoverURL(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCoverURL, opts...).ToFunc()
@@ -134,9 +290,19 @@ func ByFilePath(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldFilePath, opts...).ToFunc()
 }
 
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
 // ByUploaderID orders the results by the uploader_id field.
 func ByUploaderID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUploaderID, opts...).ToFunc()
+}
+
+// ByViewCount orders the results by the view_count field.
+func ByViewCount(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldViewCount, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

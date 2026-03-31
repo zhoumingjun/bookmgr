@@ -79,6 +79,278 @@ func (_u *BookUpdate) ClearDescription() *BookUpdate {
 	return _u
 }
 
+// SetPageCount sets the "page_count" field.
+func (_u *BookUpdate) SetPageCount(v int) *BookUpdate {
+	_u.mutation.ResetPageCount()
+	_u.mutation.SetPageCount(v)
+	return _u
+}
+
+// SetNillablePageCount sets the "page_count" field if the given value is not nil.
+func (_u *BookUpdate) SetNillablePageCount(v *int) *BookUpdate {
+	if v != nil {
+		_u.SetPageCount(*v)
+	}
+	return _u
+}
+
+// AddPageCount adds value to the "page_count" field.
+func (_u *BookUpdate) AddPageCount(v int) *BookUpdate {
+	_u.mutation.AddPageCount(v)
+	return _u
+}
+
+// ClearPageCount clears the value of the "page_count" field.
+func (_u *BookUpdate) ClearPageCount() *BookUpdate {
+	_u.mutation.ClearPageCount()
+	return _u
+}
+
+// SetDurationMinutes sets the "duration_minutes" field.
+func (_u *BookUpdate) SetDurationMinutes(v int) *BookUpdate {
+	_u.mutation.ResetDurationMinutes()
+	_u.mutation.SetDurationMinutes(v)
+	return _u
+}
+
+// SetNillableDurationMinutes sets the "duration_minutes" field if the given value is not nil.
+func (_u *BookUpdate) SetNillableDurationMinutes(v *int) *BookUpdate {
+	if v != nil {
+		_u.SetDurationMinutes(*v)
+	}
+	return _u
+}
+
+// AddDurationMinutes adds value to the "duration_minutes" field.
+func (_u *BookUpdate) AddDurationMinutes(v int) *BookUpdate {
+	_u.mutation.AddDurationMinutes(v)
+	return _u
+}
+
+// ClearDurationMinutes clears the value of the "duration_minutes" field.
+func (_u *BookUpdate) ClearDurationMinutes() *BookUpdate {
+	_u.mutation.ClearDurationMinutes()
+	return _u
+}
+
+// SetCoreGoal sets the "core_goal" field.
+func (_u *BookUpdate) SetCoreGoal(v string) *BookUpdate {
+	_u.mutation.SetCoreGoal(v)
+	return _u
+}
+
+// SetNillableCoreGoal sets the "core_goal" field if the given value is not nil.
+func (_u *BookUpdate) SetNillableCoreGoal(v *string) *BookUpdate {
+	if v != nil {
+		_u.SetCoreGoal(*v)
+	}
+	return _u
+}
+
+// ClearCoreGoal clears the value of the "core_goal" field.
+func (_u *BookUpdate) ClearCoreGoal() *BookUpdate {
+	_u.mutation.ClearCoreGoal()
+	return _u
+}
+
+// SetCognitiveLevel sets the "cognitive_level" field.
+func (_u *BookUpdate) SetCognitiveLevel(v string) *BookUpdate {
+	_u.mutation.SetCognitiveLevel(v)
+	return _u
+}
+
+// SetNillableCognitiveLevel sets the "cognitive_level" field if the given value is not nil.
+func (_u *BookUpdate) SetNillableCognitiveLevel(v *string) *BookUpdate {
+	if v != nil {
+		_u.SetCognitiveLevel(*v)
+	}
+	return _u
+}
+
+// ClearCognitiveLevel clears the value of the "cognitive_level" field.
+func (_u *BookUpdate) ClearCognitiveLevel() *BookUpdate {
+	_u.mutation.ClearCognitiveLevel()
+	return _u
+}
+
+// SetResourceType sets the "resource_type" field.
+func (_u *BookUpdate) SetResourceType(v string) *BookUpdate {
+	_u.mutation.SetResourceType(v)
+	return _u
+}
+
+// SetNillableResourceType sets the "resource_type" field if the given value is not nil.
+func (_u *BookUpdate) SetNillableResourceType(v *string) *BookUpdate {
+	if v != nil {
+		_u.SetResourceType(*v)
+	}
+	return _u
+}
+
+// ClearResourceType clears the value of the "resource_type" field.
+func (_u *BookUpdate) ClearResourceType() *BookUpdate {
+	_u.mutation.ClearResourceType()
+	return _u
+}
+
+// SetHasPrint sets the "has_print" field.
+func (_u *BookUpdate) SetHasPrint(v bool) *BookUpdate {
+	_u.mutation.SetHasPrint(v)
+	return _u
+}
+
+// SetNillableHasPrint sets the "has_print" field if the given value is not nil.
+func (_u *BookUpdate) SetNillableHasPrint(v *bool) *BookUpdate {
+	if v != nil {
+		_u.SetHasPrint(*v)
+	}
+	return _u
+}
+
+// SetHasDigital sets the "has_digital" field.
+func (_u *BookUpdate) SetHasDigital(v bool) *BookUpdate {
+	_u.mutation.SetHasDigital(v)
+	return _u
+}
+
+// SetNillableHasDigital sets the "has_digital" field if the given value is not nil.
+func (_u *BookUpdate) SetNillableHasDigital(v *bool) *BookUpdate {
+	if v != nil {
+		_u.SetHasDigital(*v)
+	}
+	return _u
+}
+
+// SetHasAudio sets the "has_audio" field.
+func (_u *BookUpdate) SetHasAudio(v bool) *BookUpdate {
+	_u.mutation.SetHasAudio(v)
+	return _u
+}
+
+// SetNillableHasAudio sets the "has_audio" field if the given value is not nil.
+func (_u *BookUpdate) SetNillableHasAudio(v *bool) *BookUpdate {
+	if v != nil {
+		_u.SetHasAudio(*v)
+	}
+	return _u
+}
+
+// SetHasVideo sets the "has_video" field.
+func (_u *BookUpdate) SetHasVideo(v bool) *BookUpdate {
+	_u.mutation.SetHasVideo(v)
+	return _u
+}
+
+// SetNillableHasVideo sets the "has_video" field if the given value is not nil.
+func (_u *BookUpdate) SetNillableHasVideo(v *bool) *BookUpdate {
+	if v != nil {
+		_u.SetHasVideo(*v)
+	}
+	return _u
+}
+
+// SetTeachingSuggestion sets the "teaching_suggestion" field.
+func (_u *BookUpdate) SetTeachingSuggestion(v string) *BookUpdate {
+	_u.mutation.SetTeachingSuggestion(v)
+	return _u
+}
+
+// SetNillableTeachingSuggestion sets the "teaching_suggestion" field if the given value is not nil.
+func (_u *BookUpdate) SetNillableTeachingSuggestion(v *string) *BookUpdate {
+	if v != nil {
+		_u.SetTeachingSuggestion(*v)
+	}
+	return _u
+}
+
+// ClearTeachingSuggestion clears the value of the "teaching_suggestion" field.
+func (_u *BookUpdate) ClearTeachingSuggestion() *BookUpdate {
+	_u.mutation.ClearTeachingSuggestion()
+	return _u
+}
+
+// SetParentReadingGuide sets the "parent_reading_guide" field.
+func (_u *BookUpdate) SetParentReadingGuide(v string) *BookUpdate {
+	_u.mutation.SetParentReadingGuide(v)
+	return _u
+}
+
+// SetNillableParentReadingGuide sets the "parent_reading_guide" field if the given value is not nil.
+func (_u *BookUpdate) SetNillableParentReadingGuide(v *string) *BookUpdate {
+	if v != nil {
+		_u.SetParentReadingGuide(*v)
+	}
+	return _u
+}
+
+// ClearParentReadingGuide clears the value of the "parent_reading_guide" field.
+func (_u *BookUpdate) ClearParentReadingGuide() *BookUpdate {
+	_u.mutation.ClearParentReadingGuide()
+	return _u
+}
+
+// SetRecommendedAgeMin sets the "recommended_age_min" field.
+func (_u *BookUpdate) SetRecommendedAgeMin(v int) *BookUpdate {
+	_u.mutation.ResetRecommendedAgeMin()
+	_u.mutation.SetRecommendedAgeMin(v)
+	return _u
+}
+
+// SetNillableRecommendedAgeMin sets the "recommended_age_min" field if the given value is not nil.
+func (_u *BookUpdate) SetNillableRecommendedAgeMin(v *int) *BookUpdate {
+	if v != nil {
+		_u.SetRecommendedAgeMin(*v)
+	}
+	return _u
+}
+
+// AddRecommendedAgeMin adds value to the "recommended_age_min" field.
+func (_u *BookUpdate) AddRecommendedAgeMin(v int) *BookUpdate {
+	_u.mutation.AddRecommendedAgeMin(v)
+	return _u
+}
+
+// SetRecommendedAgeMax sets the "recommended_age_max" field.
+func (_u *BookUpdate) SetRecommendedAgeMax(v int) *BookUpdate {
+	_u.mutation.ResetRecommendedAgeMax()
+	_u.mutation.SetRecommendedAgeMax(v)
+	return _u
+}
+
+// SetNillableRecommendedAgeMax sets the "recommended_age_max" field if the given value is not nil.
+func (_u *BookUpdate) SetNillableRecommendedAgeMax(v *int) *BookUpdate {
+	if v != nil {
+		_u.SetRecommendedAgeMax(*v)
+	}
+	return _u
+}
+
+// AddRecommendedAgeMax adds value to the "recommended_age_max" field.
+func (_u *BookUpdate) AddRecommendedAgeMax(v int) *BookUpdate {
+	_u.mutation.AddRecommendedAgeMax(v)
+	return _u
+}
+
+// SetCoverImageURL sets the "cover_image_url" field.
+func (_u *BookUpdate) SetCoverImageURL(v string) *BookUpdate {
+	_u.mutation.SetCoverImageURL(v)
+	return _u
+}
+
+// SetNillableCoverImageURL sets the "cover_image_url" field if the given value is not nil.
+func (_u *BookUpdate) SetNillableCoverImageURL(v *string) *BookUpdate {
+	if v != nil {
+		_u.SetCoverImageURL(*v)
+	}
+	return _u
+}
+
+// ClearCoverImageURL clears the value of the "cover_image_url" field.
+func (_u *BookUpdate) ClearCoverImageURL() *BookUpdate {
+	_u.mutation.ClearCoverImageURL()
+	return _u
+}
+
 // SetCoverURL sets the "cover_url" field.
 func (_u *BookUpdate) SetCoverURL(v string) *BookUpdate {
 	_u.mutation.SetCoverURL(v)
@@ -119,6 +391,20 @@ func (_u *BookUpdate) ClearFilePath() *BookUpdate {
 	return _u
 }
 
+// SetStatus sets the "status" field.
+func (_u *BookUpdate) SetStatus(v string) *BookUpdate {
+	_u.mutation.SetStatus(v)
+	return _u
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (_u *BookUpdate) SetNillableStatus(v *string) *BookUpdate {
+	if v != nil {
+		_u.SetStatus(*v)
+	}
+	return _u
+}
+
 // SetUploaderID sets the "uploader_id" field.
 func (_u *BookUpdate) SetUploaderID(v uuid.UUID) *BookUpdate {
 	_u.mutation.SetUploaderID(v)
@@ -130,6 +416,27 @@ func (_u *BookUpdate) SetNillableUploaderID(v *uuid.UUID) *BookUpdate {
 	if v != nil {
 		_u.SetUploaderID(*v)
 	}
+	return _u
+}
+
+// SetViewCount sets the "view_count" field.
+func (_u *BookUpdate) SetViewCount(v int) *BookUpdate {
+	_u.mutation.ResetViewCount()
+	_u.mutation.SetViewCount(v)
+	return _u
+}
+
+// SetNillableViewCount sets the "view_count" field if the given value is not nil.
+func (_u *BookUpdate) SetNillableViewCount(v *int) *BookUpdate {
+	if v != nil {
+		_u.SetViewCount(*v)
+	}
+	return _u
+}
+
+// AddViewCount adds value to the "view_count" field.
+func (_u *BookUpdate) AddViewCount(v int) *BookUpdate {
+	_u.mutation.AddViewCount(v)
 	return _u
 }
 
@@ -239,6 +546,31 @@ func (_u *BookUpdate) check() error {
 			return &ValidationError{Name: "author", err: fmt.Errorf(`ent: validator failed for field "Book.author": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.CognitiveLevel(); ok {
+		if err := book.CognitiveLevelValidator(v); err != nil {
+			return &ValidationError{Name: "cognitive_level", err: fmt.Errorf(`ent: validator failed for field "Book.cognitive_level": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.ResourceType(); ok {
+		if err := book.ResourceTypeValidator(v); err != nil {
+			return &ValidationError{Name: "resource_type", err: fmt.Errorf(`ent: validator failed for field "Book.resource_type": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.CoverImageURL(); ok {
+		if err := book.CoverImageURLValidator(v); err != nil {
+			return &ValidationError{Name: "cover_image_url", err: fmt.Errorf(`ent: validator failed for field "Book.cover_image_url": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.CoverURL(); ok {
+		if err := book.CoverURLValidator(v); err != nil {
+			return &ValidationError{Name: "cover_url", err: fmt.Errorf(`ent: validator failed for field "Book.cover_url": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.Status(); ok {
+		if err := book.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Book.status": %w`, err)}
+		}
+	}
 	if _u.mutation.UploaderCleared() && len(_u.mutation.UploaderIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Book.uploader"`)
 	}
@@ -269,6 +601,84 @@ func (_u *BookUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(book.FieldDescription, field.TypeString)
 	}
+	if value, ok := _u.mutation.PageCount(); ok {
+		_spec.SetField(book.FieldPageCount, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedPageCount(); ok {
+		_spec.AddField(book.FieldPageCount, field.TypeInt, value)
+	}
+	if _u.mutation.PageCountCleared() {
+		_spec.ClearField(book.FieldPageCount, field.TypeInt)
+	}
+	if value, ok := _u.mutation.DurationMinutes(); ok {
+		_spec.SetField(book.FieldDurationMinutes, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedDurationMinutes(); ok {
+		_spec.AddField(book.FieldDurationMinutes, field.TypeInt, value)
+	}
+	if _u.mutation.DurationMinutesCleared() {
+		_spec.ClearField(book.FieldDurationMinutes, field.TypeInt)
+	}
+	if value, ok := _u.mutation.CoreGoal(); ok {
+		_spec.SetField(book.FieldCoreGoal, field.TypeString, value)
+	}
+	if _u.mutation.CoreGoalCleared() {
+		_spec.ClearField(book.FieldCoreGoal, field.TypeString)
+	}
+	if value, ok := _u.mutation.CognitiveLevel(); ok {
+		_spec.SetField(book.FieldCognitiveLevel, field.TypeString, value)
+	}
+	if _u.mutation.CognitiveLevelCleared() {
+		_spec.ClearField(book.FieldCognitiveLevel, field.TypeString)
+	}
+	if value, ok := _u.mutation.ResourceType(); ok {
+		_spec.SetField(book.FieldResourceType, field.TypeString, value)
+	}
+	if _u.mutation.ResourceTypeCleared() {
+		_spec.ClearField(book.FieldResourceType, field.TypeString)
+	}
+	if value, ok := _u.mutation.HasPrint(); ok {
+		_spec.SetField(book.FieldHasPrint, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.HasDigital(); ok {
+		_spec.SetField(book.FieldHasDigital, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.HasAudio(); ok {
+		_spec.SetField(book.FieldHasAudio, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.HasVideo(); ok {
+		_spec.SetField(book.FieldHasVideo, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.TeachingSuggestion(); ok {
+		_spec.SetField(book.FieldTeachingSuggestion, field.TypeString, value)
+	}
+	if _u.mutation.TeachingSuggestionCleared() {
+		_spec.ClearField(book.FieldTeachingSuggestion, field.TypeString)
+	}
+	if value, ok := _u.mutation.ParentReadingGuide(); ok {
+		_spec.SetField(book.FieldParentReadingGuide, field.TypeString, value)
+	}
+	if _u.mutation.ParentReadingGuideCleared() {
+		_spec.ClearField(book.FieldParentReadingGuide, field.TypeString)
+	}
+	if value, ok := _u.mutation.RecommendedAgeMin(); ok {
+		_spec.SetField(book.FieldRecommendedAgeMin, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedRecommendedAgeMin(); ok {
+		_spec.AddField(book.FieldRecommendedAgeMin, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.RecommendedAgeMax(); ok {
+		_spec.SetField(book.FieldRecommendedAgeMax, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedRecommendedAgeMax(); ok {
+		_spec.AddField(book.FieldRecommendedAgeMax, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.CoverImageURL(); ok {
+		_spec.SetField(book.FieldCoverImageURL, field.TypeString, value)
+	}
+	if _u.mutation.CoverImageURLCleared() {
+		_spec.ClearField(book.FieldCoverImageURL, field.TypeString)
+	}
 	if value, ok := _u.mutation.CoverURL(); ok {
 		_spec.SetField(book.FieldCoverURL, field.TypeString, value)
 	}
@@ -280,6 +690,15 @@ func (_u *BookUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.FilePathCleared() {
 		_spec.ClearField(book.FieldFilePath, field.TypeString)
+	}
+	if value, ok := _u.mutation.Status(); ok {
+		_spec.SetField(book.FieldStatus, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.ViewCount(); ok {
+		_spec.SetField(book.FieldViewCount, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedViewCount(); ok {
+		_spec.AddField(book.FieldViewCount, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(book.FieldUpdatedAt, field.TypeTime, value)
@@ -426,6 +845,278 @@ func (_u *BookUpdateOne) ClearDescription() *BookUpdateOne {
 	return _u
 }
 
+// SetPageCount sets the "page_count" field.
+func (_u *BookUpdateOne) SetPageCount(v int) *BookUpdateOne {
+	_u.mutation.ResetPageCount()
+	_u.mutation.SetPageCount(v)
+	return _u
+}
+
+// SetNillablePageCount sets the "page_count" field if the given value is not nil.
+func (_u *BookUpdateOne) SetNillablePageCount(v *int) *BookUpdateOne {
+	if v != nil {
+		_u.SetPageCount(*v)
+	}
+	return _u
+}
+
+// AddPageCount adds value to the "page_count" field.
+func (_u *BookUpdateOne) AddPageCount(v int) *BookUpdateOne {
+	_u.mutation.AddPageCount(v)
+	return _u
+}
+
+// ClearPageCount clears the value of the "page_count" field.
+func (_u *BookUpdateOne) ClearPageCount() *BookUpdateOne {
+	_u.mutation.ClearPageCount()
+	return _u
+}
+
+// SetDurationMinutes sets the "duration_minutes" field.
+func (_u *BookUpdateOne) SetDurationMinutes(v int) *BookUpdateOne {
+	_u.mutation.ResetDurationMinutes()
+	_u.mutation.SetDurationMinutes(v)
+	return _u
+}
+
+// SetNillableDurationMinutes sets the "duration_minutes" field if the given value is not nil.
+func (_u *BookUpdateOne) SetNillableDurationMinutes(v *int) *BookUpdateOne {
+	if v != nil {
+		_u.SetDurationMinutes(*v)
+	}
+	return _u
+}
+
+// AddDurationMinutes adds value to the "duration_minutes" field.
+func (_u *BookUpdateOne) AddDurationMinutes(v int) *BookUpdateOne {
+	_u.mutation.AddDurationMinutes(v)
+	return _u
+}
+
+// ClearDurationMinutes clears the value of the "duration_minutes" field.
+func (_u *BookUpdateOne) ClearDurationMinutes() *BookUpdateOne {
+	_u.mutation.ClearDurationMinutes()
+	return _u
+}
+
+// SetCoreGoal sets the "core_goal" field.
+func (_u *BookUpdateOne) SetCoreGoal(v string) *BookUpdateOne {
+	_u.mutation.SetCoreGoal(v)
+	return _u
+}
+
+// SetNillableCoreGoal sets the "core_goal" field if the given value is not nil.
+func (_u *BookUpdateOne) SetNillableCoreGoal(v *string) *BookUpdateOne {
+	if v != nil {
+		_u.SetCoreGoal(*v)
+	}
+	return _u
+}
+
+// ClearCoreGoal clears the value of the "core_goal" field.
+func (_u *BookUpdateOne) ClearCoreGoal() *BookUpdateOne {
+	_u.mutation.ClearCoreGoal()
+	return _u
+}
+
+// SetCognitiveLevel sets the "cognitive_level" field.
+func (_u *BookUpdateOne) SetCognitiveLevel(v string) *BookUpdateOne {
+	_u.mutation.SetCognitiveLevel(v)
+	return _u
+}
+
+// SetNillableCognitiveLevel sets the "cognitive_level" field if the given value is not nil.
+func (_u *BookUpdateOne) SetNillableCognitiveLevel(v *string) *BookUpdateOne {
+	if v != nil {
+		_u.SetCognitiveLevel(*v)
+	}
+	return _u
+}
+
+// ClearCognitiveLevel clears the value of the "cognitive_level" field.
+func (_u *BookUpdateOne) ClearCognitiveLevel() *BookUpdateOne {
+	_u.mutation.ClearCognitiveLevel()
+	return _u
+}
+
+// SetResourceType sets the "resource_type" field.
+func (_u *BookUpdateOne) SetResourceType(v string) *BookUpdateOne {
+	_u.mutation.SetResourceType(v)
+	return _u
+}
+
+// SetNillableResourceType sets the "resource_type" field if the given value is not nil.
+func (_u *BookUpdateOne) SetNillableResourceType(v *string) *BookUpdateOne {
+	if v != nil {
+		_u.SetResourceType(*v)
+	}
+	return _u
+}
+
+// ClearResourceType clears the value of the "resource_type" field.
+func (_u *BookUpdateOne) ClearResourceType() *BookUpdateOne {
+	_u.mutation.ClearResourceType()
+	return _u
+}
+
+// SetHasPrint sets the "has_print" field.
+func (_u *BookUpdateOne) SetHasPrint(v bool) *BookUpdateOne {
+	_u.mutation.SetHasPrint(v)
+	return _u
+}
+
+// SetNillableHasPrint sets the "has_print" field if the given value is not nil.
+func (_u *BookUpdateOne) SetNillableHasPrint(v *bool) *BookUpdateOne {
+	if v != nil {
+		_u.SetHasPrint(*v)
+	}
+	return _u
+}
+
+// SetHasDigital sets the "has_digital" field.
+func (_u *BookUpdateOne) SetHasDigital(v bool) *BookUpdateOne {
+	_u.mutation.SetHasDigital(v)
+	return _u
+}
+
+// SetNillableHasDigital sets the "has_digital" field if the given value is not nil.
+func (_u *BookUpdateOne) SetNillableHasDigital(v *bool) *BookUpdateOne {
+	if v != nil {
+		_u.SetHasDigital(*v)
+	}
+	return _u
+}
+
+// SetHasAudio sets the "has_audio" field.
+func (_u *BookUpdateOne) SetHasAudio(v bool) *BookUpdateOne {
+	_u.mutation.SetHasAudio(v)
+	return _u
+}
+
+// SetNillableHasAudio sets the "has_audio" field if the given value is not nil.
+func (_u *BookUpdateOne) SetNillableHasAudio(v *bool) *BookUpdateOne {
+	if v != nil {
+		_u.SetHasAudio(*v)
+	}
+	return _u
+}
+
+// SetHasVideo sets the "has_video" field.
+func (_u *BookUpdateOne) SetHasVideo(v bool) *BookUpdateOne {
+	_u.mutation.SetHasVideo(v)
+	return _u
+}
+
+// SetNillableHasVideo sets the "has_video" field if the given value is not nil.
+func (_u *BookUpdateOne) SetNillableHasVideo(v *bool) *BookUpdateOne {
+	if v != nil {
+		_u.SetHasVideo(*v)
+	}
+	return _u
+}
+
+// SetTeachingSuggestion sets the "teaching_suggestion" field.
+func (_u *BookUpdateOne) SetTeachingSuggestion(v string) *BookUpdateOne {
+	_u.mutation.SetTeachingSuggestion(v)
+	return _u
+}
+
+// SetNillableTeachingSuggestion sets the "teaching_suggestion" field if the given value is not nil.
+func (_u *BookUpdateOne) SetNillableTeachingSuggestion(v *string) *BookUpdateOne {
+	if v != nil {
+		_u.SetTeachingSuggestion(*v)
+	}
+	return _u
+}
+
+// ClearTeachingSuggestion clears the value of the "teaching_suggestion" field.
+func (_u *BookUpdateOne) ClearTeachingSuggestion() *BookUpdateOne {
+	_u.mutation.ClearTeachingSuggestion()
+	return _u
+}
+
+// SetParentReadingGuide sets the "parent_reading_guide" field.
+func (_u *BookUpdateOne) SetParentReadingGuide(v string) *BookUpdateOne {
+	_u.mutation.SetParentReadingGuide(v)
+	return _u
+}
+
+// SetNillableParentReadingGuide sets the "parent_reading_guide" field if the given value is not nil.
+func (_u *BookUpdateOne) SetNillableParentReadingGuide(v *string) *BookUpdateOne {
+	if v != nil {
+		_u.SetParentReadingGuide(*v)
+	}
+	return _u
+}
+
+// ClearParentReadingGuide clears the value of the "parent_reading_guide" field.
+func (_u *BookUpdateOne) ClearParentReadingGuide() *BookUpdateOne {
+	_u.mutation.ClearParentReadingGuide()
+	return _u
+}
+
+// SetRecommendedAgeMin sets the "recommended_age_min" field.
+func (_u *BookUpdateOne) SetRecommendedAgeMin(v int) *BookUpdateOne {
+	_u.mutation.ResetRecommendedAgeMin()
+	_u.mutation.SetRecommendedAgeMin(v)
+	return _u
+}
+
+// SetNillableRecommendedAgeMin sets the "recommended_age_min" field if the given value is not nil.
+func (_u *BookUpdateOne) SetNillableRecommendedAgeMin(v *int) *BookUpdateOne {
+	if v != nil {
+		_u.SetRecommendedAgeMin(*v)
+	}
+	return _u
+}
+
+// AddRecommendedAgeMin adds value to the "recommended_age_min" field.
+func (_u *BookUpdateOne) AddRecommendedAgeMin(v int) *BookUpdateOne {
+	_u.mutation.AddRecommendedAgeMin(v)
+	return _u
+}
+
+// SetRecommendedAgeMax sets the "recommended_age_max" field.
+func (_u *BookUpdateOne) SetRecommendedAgeMax(v int) *BookUpdateOne {
+	_u.mutation.ResetRecommendedAgeMax()
+	_u.mutation.SetRecommendedAgeMax(v)
+	return _u
+}
+
+// SetNillableRecommendedAgeMax sets the "recommended_age_max" field if the given value is not nil.
+func (_u *BookUpdateOne) SetNillableRecommendedAgeMax(v *int) *BookUpdateOne {
+	if v != nil {
+		_u.SetRecommendedAgeMax(*v)
+	}
+	return _u
+}
+
+// AddRecommendedAgeMax adds value to the "recommended_age_max" field.
+func (_u *BookUpdateOne) AddRecommendedAgeMax(v int) *BookUpdateOne {
+	_u.mutation.AddRecommendedAgeMax(v)
+	return _u
+}
+
+// SetCoverImageURL sets the "cover_image_url" field.
+func (_u *BookUpdateOne) SetCoverImageURL(v string) *BookUpdateOne {
+	_u.mutation.SetCoverImageURL(v)
+	return _u
+}
+
+// SetNillableCoverImageURL sets the "cover_image_url" field if the given value is not nil.
+func (_u *BookUpdateOne) SetNillableCoverImageURL(v *string) *BookUpdateOne {
+	if v != nil {
+		_u.SetCoverImageURL(*v)
+	}
+	return _u
+}
+
+// ClearCoverImageURL clears the value of the "cover_image_url" field.
+func (_u *BookUpdateOne) ClearCoverImageURL() *BookUpdateOne {
+	_u.mutation.ClearCoverImageURL()
+	return _u
+}
+
 // SetCoverURL sets the "cover_url" field.
 func (_u *BookUpdateOne) SetCoverURL(v string) *BookUpdateOne {
 	_u.mutation.SetCoverURL(v)
@@ -466,6 +1157,20 @@ func (_u *BookUpdateOne) ClearFilePath() *BookUpdateOne {
 	return _u
 }
 
+// SetStatus sets the "status" field.
+func (_u *BookUpdateOne) SetStatus(v string) *BookUpdateOne {
+	_u.mutation.SetStatus(v)
+	return _u
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (_u *BookUpdateOne) SetNillableStatus(v *string) *BookUpdateOne {
+	if v != nil {
+		_u.SetStatus(*v)
+	}
+	return _u
+}
+
 // SetUploaderID sets the "uploader_id" field.
 func (_u *BookUpdateOne) SetUploaderID(v uuid.UUID) *BookUpdateOne {
 	_u.mutation.SetUploaderID(v)
@@ -477,6 +1182,27 @@ func (_u *BookUpdateOne) SetNillableUploaderID(v *uuid.UUID) *BookUpdateOne {
 	if v != nil {
 		_u.SetUploaderID(*v)
 	}
+	return _u
+}
+
+// SetViewCount sets the "view_count" field.
+func (_u *BookUpdateOne) SetViewCount(v int) *BookUpdateOne {
+	_u.mutation.ResetViewCount()
+	_u.mutation.SetViewCount(v)
+	return _u
+}
+
+// SetNillableViewCount sets the "view_count" field if the given value is not nil.
+func (_u *BookUpdateOne) SetNillableViewCount(v *int) *BookUpdateOne {
+	if v != nil {
+		_u.SetViewCount(*v)
+	}
+	return _u
+}
+
+// AddViewCount adds value to the "view_count" field.
+func (_u *BookUpdateOne) AddViewCount(v int) *BookUpdateOne {
+	_u.mutation.AddViewCount(v)
 	return _u
 }
 
@@ -599,6 +1325,31 @@ func (_u *BookUpdateOne) check() error {
 			return &ValidationError{Name: "author", err: fmt.Errorf(`ent: validator failed for field "Book.author": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.CognitiveLevel(); ok {
+		if err := book.CognitiveLevelValidator(v); err != nil {
+			return &ValidationError{Name: "cognitive_level", err: fmt.Errorf(`ent: validator failed for field "Book.cognitive_level": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.ResourceType(); ok {
+		if err := book.ResourceTypeValidator(v); err != nil {
+			return &ValidationError{Name: "resource_type", err: fmt.Errorf(`ent: validator failed for field "Book.resource_type": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.CoverImageURL(); ok {
+		if err := book.CoverImageURLValidator(v); err != nil {
+			return &ValidationError{Name: "cover_image_url", err: fmt.Errorf(`ent: validator failed for field "Book.cover_image_url": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.CoverURL(); ok {
+		if err := book.CoverURLValidator(v); err != nil {
+			return &ValidationError{Name: "cover_url", err: fmt.Errorf(`ent: validator failed for field "Book.cover_url": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.Status(); ok {
+		if err := book.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Book.status": %w`, err)}
+		}
+	}
 	if _u.mutation.UploaderCleared() && len(_u.mutation.UploaderIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Book.uploader"`)
 	}
@@ -646,6 +1397,84 @@ func (_u *BookUpdateOne) sqlSave(ctx context.Context) (_node *Book, err error) {
 	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(book.FieldDescription, field.TypeString)
 	}
+	if value, ok := _u.mutation.PageCount(); ok {
+		_spec.SetField(book.FieldPageCount, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedPageCount(); ok {
+		_spec.AddField(book.FieldPageCount, field.TypeInt, value)
+	}
+	if _u.mutation.PageCountCleared() {
+		_spec.ClearField(book.FieldPageCount, field.TypeInt)
+	}
+	if value, ok := _u.mutation.DurationMinutes(); ok {
+		_spec.SetField(book.FieldDurationMinutes, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedDurationMinutes(); ok {
+		_spec.AddField(book.FieldDurationMinutes, field.TypeInt, value)
+	}
+	if _u.mutation.DurationMinutesCleared() {
+		_spec.ClearField(book.FieldDurationMinutes, field.TypeInt)
+	}
+	if value, ok := _u.mutation.CoreGoal(); ok {
+		_spec.SetField(book.FieldCoreGoal, field.TypeString, value)
+	}
+	if _u.mutation.CoreGoalCleared() {
+		_spec.ClearField(book.FieldCoreGoal, field.TypeString)
+	}
+	if value, ok := _u.mutation.CognitiveLevel(); ok {
+		_spec.SetField(book.FieldCognitiveLevel, field.TypeString, value)
+	}
+	if _u.mutation.CognitiveLevelCleared() {
+		_spec.ClearField(book.FieldCognitiveLevel, field.TypeString)
+	}
+	if value, ok := _u.mutation.ResourceType(); ok {
+		_spec.SetField(book.FieldResourceType, field.TypeString, value)
+	}
+	if _u.mutation.ResourceTypeCleared() {
+		_spec.ClearField(book.FieldResourceType, field.TypeString)
+	}
+	if value, ok := _u.mutation.HasPrint(); ok {
+		_spec.SetField(book.FieldHasPrint, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.HasDigital(); ok {
+		_spec.SetField(book.FieldHasDigital, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.HasAudio(); ok {
+		_spec.SetField(book.FieldHasAudio, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.HasVideo(); ok {
+		_spec.SetField(book.FieldHasVideo, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.TeachingSuggestion(); ok {
+		_spec.SetField(book.FieldTeachingSuggestion, field.TypeString, value)
+	}
+	if _u.mutation.TeachingSuggestionCleared() {
+		_spec.ClearField(book.FieldTeachingSuggestion, field.TypeString)
+	}
+	if value, ok := _u.mutation.ParentReadingGuide(); ok {
+		_spec.SetField(book.FieldParentReadingGuide, field.TypeString, value)
+	}
+	if _u.mutation.ParentReadingGuideCleared() {
+		_spec.ClearField(book.FieldParentReadingGuide, field.TypeString)
+	}
+	if value, ok := _u.mutation.RecommendedAgeMin(); ok {
+		_spec.SetField(book.FieldRecommendedAgeMin, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedRecommendedAgeMin(); ok {
+		_spec.AddField(book.FieldRecommendedAgeMin, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.RecommendedAgeMax(); ok {
+		_spec.SetField(book.FieldRecommendedAgeMax, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedRecommendedAgeMax(); ok {
+		_spec.AddField(book.FieldRecommendedAgeMax, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.CoverImageURL(); ok {
+		_spec.SetField(book.FieldCoverImageURL, field.TypeString, value)
+	}
+	if _u.mutation.CoverImageURLCleared() {
+		_spec.ClearField(book.FieldCoverImageURL, field.TypeString)
+	}
 	if value, ok := _u.mutation.CoverURL(); ok {
 		_spec.SetField(book.FieldCoverURL, field.TypeString, value)
 	}
@@ -657,6 +1486,15 @@ func (_u *BookUpdateOne) sqlSave(ctx context.Context) (_node *Book, err error) {
 	}
 	if _u.mutation.FilePathCleared() {
 		_spec.ClearField(book.FieldFilePath, field.TypeString)
+	}
+	if value, ok := _u.mutation.Status(); ok {
+		_spec.SetField(book.FieldStatus, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.ViewCount(); ok {
+		_spec.SetField(book.FieldViewCount, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedViewCount(); ok {
+		_spec.AddField(book.FieldViewCount, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(book.FieldUpdatedAt, field.TypeTime, value)

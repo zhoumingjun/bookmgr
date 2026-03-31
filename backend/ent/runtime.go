@@ -40,39 +40,91 @@ func init() {
 	// bookDescAuthor is the schema descriptor for author field.
 	bookDescAuthor := bookFields[2].Descriptor()
 	// book.AuthorValidator is a validator for the "author" field. It is called by the builders before save.
-	book.AuthorValidator = func() func(string) error {
-		validators := bookDescAuthor.Validators
-		fns := [...]func(string) error{
-			validators[0].(func(string) error),
-			validators[1].(func(string) error),
-		}
-		return func(author string) error {
-			for _, fn := range fns {
-				if err := fn(author); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-	}()
+	book.AuthorValidator = bookDescAuthor.Validators[0].(func(string) error)
 	// bookDescDescription is the schema descriptor for description field.
 	bookDescDescription := bookFields[3].Descriptor()
 	// book.DefaultDescription holds the default value on creation for the description field.
 	book.DefaultDescription = bookDescDescription.Default.(string)
+	// bookDescCoreGoal is the schema descriptor for core_goal field.
+	bookDescCoreGoal := bookFields[6].Descriptor()
+	// book.DefaultCoreGoal holds the default value on creation for the core_goal field.
+	book.DefaultCoreGoal = bookDescCoreGoal.Default.(string)
+	// bookDescCognitiveLevel is the schema descriptor for cognitive_level field.
+	bookDescCognitiveLevel := bookFields[7].Descriptor()
+	// book.DefaultCognitiveLevel holds the default value on creation for the cognitive_level field.
+	book.DefaultCognitiveLevel = bookDescCognitiveLevel.Default.(string)
+	// book.CognitiveLevelValidator is a validator for the "cognitive_level" field. It is called by the builders before save.
+	book.CognitiveLevelValidator = bookDescCognitiveLevel.Validators[0].(func(string) error)
+	// bookDescResourceType is the schema descriptor for resource_type field.
+	bookDescResourceType := bookFields[8].Descriptor()
+	// book.DefaultResourceType holds the default value on creation for the resource_type field.
+	book.DefaultResourceType = bookDescResourceType.Default.(string)
+	// book.ResourceTypeValidator is a validator for the "resource_type" field. It is called by the builders before save.
+	book.ResourceTypeValidator = bookDescResourceType.Validators[0].(func(string) error)
+	// bookDescHasPrint is the schema descriptor for has_print field.
+	bookDescHasPrint := bookFields[9].Descriptor()
+	// book.DefaultHasPrint holds the default value on creation for the has_print field.
+	book.DefaultHasPrint = bookDescHasPrint.Default.(bool)
+	// bookDescHasDigital is the schema descriptor for has_digital field.
+	bookDescHasDigital := bookFields[10].Descriptor()
+	// book.DefaultHasDigital holds the default value on creation for the has_digital field.
+	book.DefaultHasDigital = bookDescHasDigital.Default.(bool)
+	// bookDescHasAudio is the schema descriptor for has_audio field.
+	bookDescHasAudio := bookFields[11].Descriptor()
+	// book.DefaultHasAudio holds the default value on creation for the has_audio field.
+	book.DefaultHasAudio = bookDescHasAudio.Default.(bool)
+	// bookDescHasVideo is the schema descriptor for has_video field.
+	bookDescHasVideo := bookFields[12].Descriptor()
+	// book.DefaultHasVideo holds the default value on creation for the has_video field.
+	book.DefaultHasVideo = bookDescHasVideo.Default.(bool)
+	// bookDescTeachingSuggestion is the schema descriptor for teaching_suggestion field.
+	bookDescTeachingSuggestion := bookFields[13].Descriptor()
+	// book.DefaultTeachingSuggestion holds the default value on creation for the teaching_suggestion field.
+	book.DefaultTeachingSuggestion = bookDescTeachingSuggestion.Default.(string)
+	// bookDescParentReadingGuide is the schema descriptor for parent_reading_guide field.
+	bookDescParentReadingGuide := bookFields[14].Descriptor()
+	// book.DefaultParentReadingGuide holds the default value on creation for the parent_reading_guide field.
+	book.DefaultParentReadingGuide = bookDescParentReadingGuide.Default.(string)
+	// bookDescRecommendedAgeMin is the schema descriptor for recommended_age_min field.
+	bookDescRecommendedAgeMin := bookFields[15].Descriptor()
+	// book.DefaultRecommendedAgeMin holds the default value on creation for the recommended_age_min field.
+	book.DefaultRecommendedAgeMin = bookDescRecommendedAgeMin.Default.(int)
+	// bookDescRecommendedAgeMax is the schema descriptor for recommended_age_max field.
+	bookDescRecommendedAgeMax := bookFields[16].Descriptor()
+	// book.DefaultRecommendedAgeMax holds the default value on creation for the recommended_age_max field.
+	book.DefaultRecommendedAgeMax = bookDescRecommendedAgeMax.Default.(int)
+	// bookDescCoverImageURL is the schema descriptor for cover_image_url field.
+	bookDescCoverImageURL := bookFields[17].Descriptor()
+	// book.DefaultCoverImageURL holds the default value on creation for the cover_image_url field.
+	book.DefaultCoverImageURL = bookDescCoverImageURL.Default.(string)
+	// book.CoverImageURLValidator is a validator for the "cover_image_url" field. It is called by the builders before save.
+	book.CoverImageURLValidator = bookDescCoverImageURL.Validators[0].(func(string) error)
 	// bookDescCoverURL is the schema descriptor for cover_url field.
-	bookDescCoverURL := bookFields[4].Descriptor()
+	bookDescCoverURL := bookFields[18].Descriptor()
 	// book.DefaultCoverURL holds the default value on creation for the cover_url field.
 	book.DefaultCoverURL = bookDescCoverURL.Default.(string)
+	// book.CoverURLValidator is a validator for the "cover_url" field. It is called by the builders before save.
+	book.CoverURLValidator = bookDescCoverURL.Validators[0].(func(string) error)
 	// bookDescFilePath is the schema descriptor for file_path field.
-	bookDescFilePath := bookFields[5].Descriptor()
+	bookDescFilePath := bookFields[19].Descriptor()
 	// book.DefaultFilePath holds the default value on creation for the file_path field.
 	book.DefaultFilePath = bookDescFilePath.Default.(string)
+	// bookDescStatus is the schema descriptor for status field.
+	bookDescStatus := bookFields[20].Descriptor()
+	// book.DefaultStatus holds the default value on creation for the status field.
+	book.DefaultStatus = bookDescStatus.Default.(string)
+	// book.StatusValidator is a validator for the "status" field. It is called by the builders before save.
+	book.StatusValidator = bookDescStatus.Validators[0].(func(string) error)
+	// bookDescViewCount is the schema descriptor for view_count field.
+	bookDescViewCount := bookFields[22].Descriptor()
+	// book.DefaultViewCount holds the default value on creation for the view_count field.
+	book.DefaultViewCount = bookDescViewCount.Default.(int)
 	// bookDescCreatedAt is the schema descriptor for created_at field.
-	bookDescCreatedAt := bookFields[7].Descriptor()
+	bookDescCreatedAt := bookFields[23].Descriptor()
 	// book.DefaultCreatedAt holds the default value on creation for the created_at field.
 	book.DefaultCreatedAt = bookDescCreatedAt.Default.(func() time.Time)
 	// bookDescUpdatedAt is the schema descriptor for updated_at field.
-	bookDescUpdatedAt := bookFields[8].Descriptor()
+	bookDescUpdatedAt := bookFields[24].Descriptor()
 	// book.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	book.DefaultUpdatedAt = bookDescUpdatedAt.Default.(func() time.Time)
 	// book.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

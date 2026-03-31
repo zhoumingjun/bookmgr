@@ -25,12 +25,44 @@ type Book struct {
 	Author string `json:"author,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
+	// PageCount holds the value of the "page_count" field.
+	PageCount int `json:"page_count,omitempty"`
+	// DurationMinutes holds the value of the "duration_minutes" field.
+	DurationMinutes int `json:"duration_minutes,omitempty"`
+	// CoreGoal holds the value of the "core_goal" field.
+	CoreGoal string `json:"core_goal,omitempty"`
+	// CognitiveLevel holds the value of the "cognitive_level" field.
+	CognitiveLevel string `json:"cognitive_level,omitempty"`
+	// ResourceType holds the value of the "resource_type" field.
+	ResourceType string `json:"resource_type,omitempty"`
+	// HasPrint holds the value of the "has_print" field.
+	HasPrint bool `json:"has_print,omitempty"`
+	// HasDigital holds the value of the "has_digital" field.
+	HasDigital bool `json:"has_digital,omitempty"`
+	// HasAudio holds the value of the "has_audio" field.
+	HasAudio bool `json:"has_audio,omitempty"`
+	// HasVideo holds the value of the "has_video" field.
+	HasVideo bool `json:"has_video,omitempty"`
+	// TeachingSuggestion holds the value of the "teaching_suggestion" field.
+	TeachingSuggestion string `json:"teaching_suggestion,omitempty"`
+	// ParentReadingGuide holds the value of the "parent_reading_guide" field.
+	ParentReadingGuide string `json:"parent_reading_guide,omitempty"`
+	// RecommendedAgeMin holds the value of the "recommended_age_min" field.
+	RecommendedAgeMin int `json:"recommended_age_min,omitempty"`
+	// RecommendedAgeMax holds the value of the "recommended_age_max" field.
+	RecommendedAgeMax int `json:"recommended_age_max,omitempty"`
+	// CoverImageURL holds the value of the "cover_image_url" field.
+	CoverImageURL string `json:"cover_image_url,omitempty"`
 	// CoverURL holds the value of the "cover_url" field.
 	CoverURL string `json:"cover_url,omitempty"`
 	// FilePath holds the value of the "file_path" field.
 	FilePath string `json:"file_path,omitempty"`
+	// Status holds the value of the "status" field.
+	Status string `json:"status,omitempty"`
 	// UploaderID holds the value of the "uploader_id" field.
 	UploaderID uuid.UUID `json:"uploader_id,omitempty"`
+	// ViewCount holds the value of the "view_count" field.
+	ViewCount int `json:"view_count,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -77,7 +109,11 @@ func (*Book) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case book.FieldTitle, book.FieldAuthor, book.FieldDescription, book.FieldCoverURL, book.FieldFilePath:
+		case book.FieldHasPrint, book.FieldHasDigital, book.FieldHasAudio, book.FieldHasVideo:
+			values[i] = new(sql.NullBool)
+		case book.FieldPageCount, book.FieldDurationMinutes, book.FieldRecommendedAgeMin, book.FieldRecommendedAgeMax, book.FieldViewCount:
+			values[i] = new(sql.NullInt64)
+		case book.FieldTitle, book.FieldAuthor, book.FieldDescription, book.FieldCoreGoal, book.FieldCognitiveLevel, book.FieldResourceType, book.FieldTeachingSuggestion, book.FieldParentReadingGuide, book.FieldCoverImageURL, book.FieldCoverURL, book.FieldFilePath, book.FieldStatus:
 			values[i] = new(sql.NullString)
 		case book.FieldCreatedAt, book.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -122,6 +158,90 @@ func (_m *Book) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Description = value.String
 			}
+		case book.FieldPageCount:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field page_count", values[i])
+			} else if value.Valid {
+				_m.PageCount = int(value.Int64)
+			}
+		case book.FieldDurationMinutes:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field duration_minutes", values[i])
+			} else if value.Valid {
+				_m.DurationMinutes = int(value.Int64)
+			}
+		case book.FieldCoreGoal:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field core_goal", values[i])
+			} else if value.Valid {
+				_m.CoreGoal = value.String
+			}
+		case book.FieldCognitiveLevel:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field cognitive_level", values[i])
+			} else if value.Valid {
+				_m.CognitiveLevel = value.String
+			}
+		case book.FieldResourceType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field resource_type", values[i])
+			} else if value.Valid {
+				_m.ResourceType = value.String
+			}
+		case book.FieldHasPrint:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field has_print", values[i])
+			} else if value.Valid {
+				_m.HasPrint = value.Bool
+			}
+		case book.FieldHasDigital:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field has_digital", values[i])
+			} else if value.Valid {
+				_m.HasDigital = value.Bool
+			}
+		case book.FieldHasAudio:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field has_audio", values[i])
+			} else if value.Valid {
+				_m.HasAudio = value.Bool
+			}
+		case book.FieldHasVideo:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field has_video", values[i])
+			} else if value.Valid {
+				_m.HasVideo = value.Bool
+			}
+		case book.FieldTeachingSuggestion:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field teaching_suggestion", values[i])
+			} else if value.Valid {
+				_m.TeachingSuggestion = value.String
+			}
+		case book.FieldParentReadingGuide:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field parent_reading_guide", values[i])
+			} else if value.Valid {
+				_m.ParentReadingGuide = value.String
+			}
+		case book.FieldRecommendedAgeMin:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field recommended_age_min", values[i])
+			} else if value.Valid {
+				_m.RecommendedAgeMin = int(value.Int64)
+			}
+		case book.FieldRecommendedAgeMax:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field recommended_age_max", values[i])
+			} else if value.Valid {
+				_m.RecommendedAgeMax = int(value.Int64)
+			}
+		case book.FieldCoverImageURL:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field cover_image_url", values[i])
+			} else if value.Valid {
+				_m.CoverImageURL = value.String
+			}
 		case book.FieldCoverURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field cover_url", values[i])
@@ -134,11 +254,23 @@ func (_m *Book) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.FilePath = value.String
 			}
+		case book.FieldStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				_m.Status = value.String
+			}
 		case book.FieldUploaderID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field uploader_id", values[i])
 			} else if value != nil {
 				_m.UploaderID = *value
+			}
+		case book.FieldViewCount:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field view_count", values[i])
+			} else if value.Valid {
+				_m.ViewCount = int(value.Int64)
 			}
 		case book.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -207,14 +339,62 @@ func (_m *Book) String() string {
 	builder.WriteString("description=")
 	builder.WriteString(_m.Description)
 	builder.WriteString(", ")
+	builder.WriteString("page_count=")
+	builder.WriteString(fmt.Sprintf("%v", _m.PageCount))
+	builder.WriteString(", ")
+	builder.WriteString("duration_minutes=")
+	builder.WriteString(fmt.Sprintf("%v", _m.DurationMinutes))
+	builder.WriteString(", ")
+	builder.WriteString("core_goal=")
+	builder.WriteString(_m.CoreGoal)
+	builder.WriteString(", ")
+	builder.WriteString("cognitive_level=")
+	builder.WriteString(_m.CognitiveLevel)
+	builder.WriteString(", ")
+	builder.WriteString("resource_type=")
+	builder.WriteString(_m.ResourceType)
+	builder.WriteString(", ")
+	builder.WriteString("has_print=")
+	builder.WriteString(fmt.Sprintf("%v", _m.HasPrint))
+	builder.WriteString(", ")
+	builder.WriteString("has_digital=")
+	builder.WriteString(fmt.Sprintf("%v", _m.HasDigital))
+	builder.WriteString(", ")
+	builder.WriteString("has_audio=")
+	builder.WriteString(fmt.Sprintf("%v", _m.HasAudio))
+	builder.WriteString(", ")
+	builder.WriteString("has_video=")
+	builder.WriteString(fmt.Sprintf("%v", _m.HasVideo))
+	builder.WriteString(", ")
+	builder.WriteString("teaching_suggestion=")
+	builder.WriteString(_m.TeachingSuggestion)
+	builder.WriteString(", ")
+	builder.WriteString("parent_reading_guide=")
+	builder.WriteString(_m.ParentReadingGuide)
+	builder.WriteString(", ")
+	builder.WriteString("recommended_age_min=")
+	builder.WriteString(fmt.Sprintf("%v", _m.RecommendedAgeMin))
+	builder.WriteString(", ")
+	builder.WriteString("recommended_age_max=")
+	builder.WriteString(fmt.Sprintf("%v", _m.RecommendedAgeMax))
+	builder.WriteString(", ")
+	builder.WriteString("cover_image_url=")
+	builder.WriteString(_m.CoverImageURL)
+	builder.WriteString(", ")
 	builder.WriteString("cover_url=")
 	builder.WriteString(_m.CoverURL)
 	builder.WriteString(", ")
 	builder.WriteString("file_path=")
 	builder.WriteString(_m.FilePath)
 	builder.WriteString(", ")
+	builder.WriteString("status=")
+	builder.WriteString(_m.Status)
+	builder.WriteString(", ")
 	builder.WriteString("uploader_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.UploaderID))
+	builder.WriteString(", ")
+	builder.WriteString("view_count=")
+	builder.WriteString(fmt.Sprintf("%v", _m.ViewCount))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
