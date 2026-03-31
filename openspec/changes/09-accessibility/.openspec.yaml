@@ -1,0 +1,17 @@
+name: 09-accessibility
+type: feature
+status: proposed
+priority: P2
+title: 前端特教适配
+description: 放大字体、高对比模式、教师端+家长端界面适配、触摸友好设计
+owner: bookmgr team
+depends:
+  - "06-book-display"
+  - "08-book-feedback"
+artifacts:
+  - id: proposal
+    status: ready
+  - id: design
+    status: ready
+  - id: bdd
+    status: ready

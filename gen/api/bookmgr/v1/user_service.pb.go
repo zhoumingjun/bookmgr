@@ -511,6 +511,136 @@ func (*DeleteUserResponse) Descriptor() ([]byte, []int) {
 	return file_bookmgr_v1_user_service_proto_rawDescGZIP(), []int{8}
 }
 
+// CreateUserRequest is the request for CreateUser.
+// Self-registration is disabled; only admins can create users.
+type CreateUserRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The username for the new user.
+	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	// The email address.
+	Email string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	// The role for the new user (super_admin/admin/teacher/parent).
+	Role Role `protobuf:"varint,3,opt,name=role,proto3,enum=bookmgr.v1.Role" json:"role,omitempty"`
+	// Initial password. If empty, a random 12-char password is generated.
+	Password      string `protobuf:"bytes,4,opt,name=password,proto3" json:"password,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateUserRequest) Reset() {
+	*x = CreateUserRequest{}
+	mi := &file_bookmgr_v1_user_service_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateUserRequest) ProtoMessage() {}
+
+func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bookmgr_v1_user_service_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateUserRequest.ProtoReflect.Descriptor instead.
+func (*CreateUserRequest) Descriptor() ([]byte, []int) {
+	return file_bookmgr_v1_user_service_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *CreateUserRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *CreateUserRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *CreateUserRequest) GetRole() Role {
+	if x != nil {
+		return x.Role
+	}
+	return Role_ROLE_UNSPECIFIED
+}
+
+func (x *CreateUserRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+// CreateUserResponse is the response for CreateUser.
+type CreateUserResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The newly created user (password_hash is not included).
+	User *User `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
+	// The initial password (only set if auto-generated).
+	// Admin must communicate this to the user.
+	GeneratedPassword string `protobuf:"bytes,2,opt,name=generated_password,json=generatedPassword,proto3" json:"generated_password,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *CreateUserResponse) Reset() {
+	*x = CreateUserResponse{}
+	mi := &file_bookmgr_v1_user_service_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateUserResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateUserResponse) ProtoMessage() {}
+
+func (x *CreateUserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bookmgr_v1_user_service_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateUserResponse.ProtoReflect.Descriptor instead.
+func (*CreateUserResponse) Descriptor() ([]byte, []int) {
+	return file_bookmgr_v1_user_service_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *CreateUserResponse) GetUser() *User {
+	if x != nil {
+		return x.User
+	}
+	return nil
+}
+
+func (x *CreateUserResponse) GetGeneratedPassword() string {
+	if x != nil {
+		return x.GeneratedPassword
+	}
+	return ""
+}
+
 var File_bookmgr_v1_user_service_proto protoreflect.FileDescriptor
 
 const file_bookmgr_v1_user_service_proto_rawDesc = "" +
@@ -546,8 +676,18 @@ const file_bookmgr_v1_user_service_proto_rawDesc = "" +
 	"\x04user\x18\x01 \x01(\v2\x10.bookmgr.v1.UserR\x04user\",\n" +
 	"\x11DeleteUserRequest\x12\x17\n" +
 	"\x02id\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x02id\"\x14\n" +
-	"\x12DeleteUserResponse2\xa8\x03\n" +
-	"\vUserService\x12_\n" +
+	"\x12DeleteUserResponse\"\xbc\x01\n" +
+	"\x11CreateUserRequest\x12<\n" +
+	"\busername\x18\x01 \x01(\tB \xbaH\x1dr\x1b\x10\x03\x18@2\x15^[a-zA-Z0-9_-]{3,64}$R\busername\x12\x1d\n" +
+	"\x05email\x18\x02 \x01(\tB\a\xbaH\x04r\x02`\x01R\x05email\x12.\n" +
+	"\x04role\x18\x03 \x01(\x0e2\x10.bookmgr.v1.RoleB\b\xbaH\x05\x82\x01\x02 \x00R\x04role\x12\x1a\n" +
+	"\bpassword\x18\x04 \x01(\tR\bpassword\"i\n" +
+	"\x12CreateUserResponse\x12$\n" +
+	"\x04user\x18\x01 \x01(\v2\x10.bookmgr.v1.UserR\x04user\x12-\n" +
+	"\x12generated_password\x18\x02 \x01(\tR\x11generatedPassword2\x8f\x04\n" +
+	"\vUserService\x12e\n" +
+	"\n" +
+	"CreateUser\x12\x1d.bookmgr.v1.CreateUserRequest\x1a\x1e.bookmgr.v1.CreateUserResponse\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/v1/users\x12_\n" +
 	"\tListUsers\x12\x1c.bookmgr.v1.ListUsersRequest\x1a\x1d.bookmgr.v1.ListUsersResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/api/v1/users\x12^\n" +
 	"\aGetUser\x12\x1a.bookmgr.v1.GetUserRequest\x1a\x1b.bookmgr.v1.GetUserResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/api/v1/users/{id}\x12o\n" +
 	"\n" +
@@ -567,7 +707,7 @@ func file_bookmgr_v1_user_service_proto_rawDescGZIP() []byte {
 	return file_bookmgr_v1_user_service_proto_rawDescData
 }
 
-var file_bookmgr_v1_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_bookmgr_v1_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_bookmgr_v1_user_service_proto_goTypes = []any{
 	(*User)(nil),                  // 0: bookmgr.v1.User
 	(*ListUsersRequest)(nil),      // 1: bookmgr.v1.ListUsersRequest
@@ -578,32 +718,38 @@ var file_bookmgr_v1_user_service_proto_goTypes = []any{
 	(*UpdateUserResponse)(nil),    // 6: bookmgr.v1.UpdateUserResponse
 	(*DeleteUserRequest)(nil),     // 7: bookmgr.v1.DeleteUserRequest
 	(*DeleteUserResponse)(nil),    // 8: bookmgr.v1.DeleteUserResponse
-	(Role)(0),                     // 9: bookmgr.v1.Role
-	(*timestamppb.Timestamp)(nil), // 10: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil), // 11: google.protobuf.FieldMask
+	(*CreateUserRequest)(nil),     // 9: bookmgr.v1.CreateUserRequest
+	(*CreateUserResponse)(nil),    // 10: bookmgr.v1.CreateUserResponse
+	(Role)(0),                     // 11: bookmgr.v1.Role
+	(*timestamppb.Timestamp)(nil), // 12: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil), // 13: google.protobuf.FieldMask
 }
 var file_bookmgr_v1_user_service_proto_depIdxs = []int32{
-	9,  // 0: bookmgr.v1.User.role:type_name -> bookmgr.v1.Role
-	10, // 1: bookmgr.v1.User.create_time:type_name -> google.protobuf.Timestamp
-	10, // 2: bookmgr.v1.User.update_time:type_name -> google.protobuf.Timestamp
+	11, // 0: bookmgr.v1.User.role:type_name -> bookmgr.v1.Role
+	12, // 1: bookmgr.v1.User.create_time:type_name -> google.protobuf.Timestamp
+	12, // 2: bookmgr.v1.User.update_time:type_name -> google.protobuf.Timestamp
 	0,  // 3: bookmgr.v1.ListUsersResponse.users:type_name -> bookmgr.v1.User
 	0,  // 4: bookmgr.v1.UpdateUserRequest.user:type_name -> bookmgr.v1.User
-	11, // 5: bookmgr.v1.UpdateUserRequest.update_mask:type_name -> google.protobuf.FieldMask
+	13, // 5: bookmgr.v1.UpdateUserRequest.update_mask:type_name -> google.protobuf.FieldMask
 	0,  // 6: bookmgr.v1.GetUserResponse.user:type_name -> bookmgr.v1.User
 	0,  // 7: bookmgr.v1.UpdateUserResponse.user:type_name -> bookmgr.v1.User
-	1,  // 8: bookmgr.v1.UserService.ListUsers:input_type -> bookmgr.v1.ListUsersRequest
-	3,  // 9: bookmgr.v1.UserService.GetUser:input_type -> bookmgr.v1.GetUserRequest
-	4,  // 10: bookmgr.v1.UserService.UpdateUser:input_type -> bookmgr.v1.UpdateUserRequest
-	7,  // 11: bookmgr.v1.UserService.DeleteUser:input_type -> bookmgr.v1.DeleteUserRequest
-	2,  // 12: bookmgr.v1.UserService.ListUsers:output_type -> bookmgr.v1.ListUsersResponse
-	5,  // 13: bookmgr.v1.UserService.GetUser:output_type -> bookmgr.v1.GetUserResponse
-	6,  // 14: bookmgr.v1.UserService.UpdateUser:output_type -> bookmgr.v1.UpdateUserResponse
-	8,  // 15: bookmgr.v1.UserService.DeleteUser:output_type -> bookmgr.v1.DeleteUserResponse
-	12, // [12:16] is the sub-list for method output_type
-	8,  // [8:12] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	11, // 8: bookmgr.v1.CreateUserRequest.role:type_name -> bookmgr.v1.Role
+	0,  // 9: bookmgr.v1.CreateUserResponse.user:type_name -> bookmgr.v1.User
+	9,  // 10: bookmgr.v1.UserService.CreateUser:input_type -> bookmgr.v1.CreateUserRequest
+	1,  // 11: bookmgr.v1.UserService.ListUsers:input_type -> bookmgr.v1.ListUsersRequest
+	3,  // 12: bookmgr.v1.UserService.GetUser:input_type -> bookmgr.v1.GetUserRequest
+	4,  // 13: bookmgr.v1.UserService.UpdateUser:input_type -> bookmgr.v1.UpdateUserRequest
+	7,  // 14: bookmgr.v1.UserService.DeleteUser:input_type -> bookmgr.v1.DeleteUserRequest
+	10, // 15: bookmgr.v1.UserService.CreateUser:output_type -> bookmgr.v1.CreateUserResponse
+	2,  // 16: bookmgr.v1.UserService.ListUsers:output_type -> bookmgr.v1.ListUsersResponse
+	5,  // 17: bookmgr.v1.UserService.GetUser:output_type -> bookmgr.v1.GetUserResponse
+	6,  // 18: bookmgr.v1.UserService.UpdateUser:output_type -> bookmgr.v1.UpdateUserResponse
+	8,  // 19: bookmgr.v1.UserService.DeleteUser:output_type -> bookmgr.v1.DeleteUserResponse
+	15, // [15:20] is the sub-list for method output_type
+	10, // [10:15] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_bookmgr_v1_user_service_proto_init() }
@@ -618,7 +764,7 @@ func file_bookmgr_v1_user_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_bookmgr_v1_user_service_proto_rawDesc), len(file_bookmgr_v1_user_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

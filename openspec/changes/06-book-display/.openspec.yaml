@@ -1,0 +1,15 @@
+name: 06-book-display
+type: feature
+status: proposed
+priority: P1
+title: 绘本展示浏览
+description: 卡片式列表、详情页、在线 PDF/EPUB 阅读、阅读进度保存
+owner: bookmgr team
+depends: ["03-book-data", "04-book-upload"]
+artifacts:
+  - id: proposal
+    status: ready
+  - id: design
+    status: ready
+  - id: bdd
+    status: ready

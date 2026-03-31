@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card, Form, Input, Select, Button, message, Typography, Spin } from 'antd';
-import { useTranslation } from 'react-i18next';
-import { getUser, updateUser } from '../../api/users';
+import { getUser, updateUser, RoleOptions } from '../../api/users';
 
 const { Title } = Typography;
 
 export default function UserEditPage() {
-  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [form] = Form.useForm();
@@ -24,7 +22,7 @@ export default function UserEditPage() {
         role: res.user.role,
       });
       setOriginalRole(res.user.role);
-    }).catch(() => message.error(t('userEdit.loadFailed')))
+    }).catch(() => message.error('加载用户信息失败'))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -45,10 +43,10 @@ export default function UserEditPage() {
       if (mask.length > 0) {
         await updateUser(id, fields, mask);
       }
-      message.success(t('userEdit.success'));
+      message.success('保存成功');
       navigate('/admin/users');
     } catch {
-      message.error(t('userEdit.error'));
+      message.error('保存失败');
     } finally {
       setSaving(false);
     }
@@ -58,29 +56,30 @@ export default function UserEditPage() {
 
   return (
     <div>
-      <Title level={4}>{t('userEdit.title')}</Title>
+      <Title level={4}>编辑用户</Title>
       <Card style={{ maxWidth: 500 }}>
         <Form form={form} onFinish={handleSubmit} layout="vertical">
-          <Form.Item label={t('users.username')} name="username">
+          <Form.Item label="用户名" name="username">
             <Input disabled />
           </Form.Item>
-          <Form.Item label={t('users.email')} name="email">
+          <Form.Item label="邮箱" name="email">
             <Input disabled />
           </Form.Item>
-          <Form.Item label={t('userEdit.role')} name="role" rules={[{ required: true }]}>
-            <Select>
-              <Select.Option value="ROLE_USER">{t('user.roleUser')}</Select.Option>
-              <Select.Option value="ROLE_ADMIN">{t('user.roleAdmin')}</Select.Option>
+          <Form.Item label="角色" name="role" rules={[{ required: true, message: '请选择角色' }]}>
+            <Select placeholder="选择用户角色">
+              {RoleOptions.map(opt => (
+                <Select.Option key={opt.value} value={opt.value}>{opt.label}</Select.Option>
+              ))}
             </Select>
           </Form.Item>
-          <Form.Item label={t('userEdit.newPassword')} name="password">
-            <Input.Password placeholder={t('userEdit.newPasswordPlaceholder')} />
+          <Form.Item label="新密码（留空不修改）" name="password">
+            <Input.Password placeholder="留空则保持原密码" />
           </Form.Item>
-          <Form.Item>
+          <Form.Item style={{ marginBottom: 0 }}>
             <Button type="primary" htmlType="submit" loading={saving} style={{ marginRight: 8 }}>
-              {t('userEdit.save')}
+              保存
             </Button>
-            <Button onClick={() => navigate('/admin/users')}>{t('userEdit.cancel')}</Button>
+            <Button onClick={() => navigate('/admin/users')}>取消</Button>
           </Form.Item>
         </Form>
       </Card>

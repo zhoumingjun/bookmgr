@@ -27,6 +27,40 @@ func NewUserHandler(userService *service.UserService) *UserHandler {
 	return &UserHandler{userService: userService}
 }
 
+// CreateUser creates a new user. Requires admin/super_admin role (enforced by middleware).
+func (h *UserHandler) CreateUser(ctx context.Context, req *bookmgrv1.CreateUserRequest) (*bookmgrv1.CreateUserResponse, error) {
+	if req.GetUsername() == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "username is required")
+	}
+	if req.GetEmail() == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "email is required")
+	}
+	if req.GetRole() == bookmgrv1.Role_ROLE_UNSPECIFIED {
+		return nil, status.Errorf(codes.InvalidArgument, "role is required")
+	}
+
+	result, err := h.userService.Create(ctx, service.CreateFields{
+		Username: req.GetUsername(),
+		Email:    req.GetEmail(),
+		Role:     protoRoleToEnt(req.GetRole()),
+		Password: req.GetPassword(),
+	})
+	if err != nil {
+		if strings.Contains(strings.ToLower(err.Error()), "duplicate") {
+			return nil, status.Errorf(codes.AlreadyExists, "user already exists")
+		}
+		return nil, status.Errorf(codes.Internal, "creating user: %v", err)
+	}
+
+	resp := &bookmgrv1.CreateUserResponse{
+		User: entUserToProto(result.User),
+	}
+	if result.GeneratedPassword != "" {
+		resp.GeneratedPassword = result.GeneratedPassword
+	}
+	return resp, nil
+}
+
 func (h *UserHandler) ListUsers(ctx context.Context, req *bookmgrv1.ListUsersRequest) (*bookmgrv1.ListUsersResponse, error) {
 	result, err := h.userService.List(ctx, int(req.GetPageSize()), req.GetPageToken())
 	if err != nil {
@@ -150,9 +184,30 @@ func entUserToProto(u *ent.User) *bookmgrv1.User {
 
 func protoRoleToEnt(r bookmgrv1.Role) user.Role {
 	switch r {
+	case bookmgrv1.Role_ROLE_SUPER_ADMIN:
+		return user.RoleSuperAdmin
 	case bookmgrv1.Role_ROLE_ADMIN:
 		return user.RoleAdmin
+	case bookmgrv1.Role_ROLE_TEACHER:
+		return user.RoleTeacher
+	case bookmgrv1.Role_ROLE_PARENT:
+		return user.RoleParent
 	default:
-		return user.RoleUser
+		return user.RoleTeacher
+	}
+}
+
+func entRoleToProto(r user.Role) bookmgrv1.Role {
+	switch r {
+	case user.RoleSuperAdmin:
+		return bookmgrv1.Role_ROLE_SUPER_ADMIN
+	case user.RoleAdmin:
+		return bookmgrv1.Role_ROLE_ADMIN
+	case user.RoleTeacher:
+		return bookmgrv1.Role_ROLE_TEACHER
+	case user.RoleParent:
+		return bookmgrv1.Role_ROLE_PARENT
+	default:
+		return bookmgrv1.Role_ROLE_TEACHER
 	}
 }

@@ -1,0 +1,16 @@
+name: 05-book-review
+type: feature
+status: proposed
+priority: P1
+title: 绘本审核流程
+description: 实现审核状态机流转，支持提交、审核通过/拒绝、撤回操作
+owner: bookmgr team
+depends:
+  - "03-book-data"
+artifacts:
+  - id: proposal
+    status: ready
+  - id: design
+    status: ready
+  - id: bdd
+    status: ready

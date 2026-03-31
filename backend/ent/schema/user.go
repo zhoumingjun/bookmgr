@@ -44,8 +44,8 @@ func (User) Fields() []ent.Field {
 			NotEmpty().
 			Sensitive(),
 		field.Enum("role").
-			Values("admin", "user").
-			Default("user"),
+			Values("super_admin", "admin", "teacher", "parent").
+			Default("teacher"),
 		field.Time("created_at").
 			Default(time.Now).
 			Immutable(),

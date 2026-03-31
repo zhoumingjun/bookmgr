@@ -40,7 +40,7 @@ var (
 		{Name: "username", Type: field.TypeString, Unique: true, Size: 64},
 		{Name: "email", Type: field.TypeString, Unique: true},
 		{Name: "password_hash", Type: field.TypeString},
-		{Name: "role", Type: field.TypeEnum, Enums: []string{"admin", "user"}, Default: "user"},
+		{Name: "role", Type: field.TypeEnum, Enums: []string{"super_admin", "admin", "teacher", "parent"}, Default: "teacher"},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}

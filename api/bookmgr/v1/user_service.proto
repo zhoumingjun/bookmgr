@@ -10,9 +10,18 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/zhoumingjun/bookmgr/gen/api/bookmgr/v1;bookmgrv1";
 
-// UserService manages user resources. All RPCs require admin role.
+// UserService manages user resources.
 service UserService {
-  // ListUsers returns a paginated list of users.
+  // CreateUser creates a new user. Admin/super_admin only.
+  // Self-registration is disabled.
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/users"
+      body: "*"
+    };
+  }
+
+  // ListUsers returns a paginated list of users. Admin/super_admin only.
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
     option (google.api.http) = {
       get: "/api/v1/users"
@@ -122,3 +131,41 @@ message DeleteUserRequest {
 
 // DeleteUserResponse is the response for DeleteUser.
 message DeleteUserResponse {}
+
+// CreateUserRequest is the request for CreateUser.
+// Self-registration is disabled; only admins can create users.
+message CreateUserRequest {
+  // The username for the new user.
+  string username = 1 [
+    (buf.validate.field).string = {
+      min_len: 3,
+      max_len: 64,
+      pattern: "^[a-zA-Z0-9_-]{3,64}$"
+    }
+  ];
+
+  // The email address.
+  string email = 2 [
+    (buf.validate.field).string.email = true
+  ];
+
+  // The role for the new user (super_admin/admin/teacher/parent).
+  Role role = 3 [
+    (buf.validate.field).enum = {
+      not_in: [0]  // Cannot be ROLE_UNSPECIFIED
+    }
+  ];
+
+  // Initial password. If empty, a random 12-char password is generated.
+  string password = 4;
+}
+
+// CreateUserResponse is the response for CreateUser.
+message CreateUserResponse {
+  // The newly created user (password_hash is not included).
+  User user = 1;
+
+  // The initial password (only set if auto-generated).
+  // Admin must communicate this to the user.
+  string generated_password = 2;
+}

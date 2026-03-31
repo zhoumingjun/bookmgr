@@ -1,0 +1,16 @@
+name: 02-dimension-category
+type: feature
+status: proposed
+priority: P1
+title: 维度分类管理
+description: 实现五大适应维度及二级子分类的 CRUD 管理
+owner: bookmgr team
+depends:
+  - 01-role-permission
+artifacts:
+  - id: proposal
+    status: ready
+  - id: design
+    status: ready
+  - id: bdd
+    status: ready

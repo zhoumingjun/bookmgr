@@ -1,0 +1,16 @@
+name: 03-book-data
+type: feature
+status: proposed
+priority: P0
+title: 绘本基础数据管理
+description: 实现绘本主表的标准化字段定义、CRUD API 及前端基础表单
+owner: bookmgr team
+depends:
+  - 02-dimension-category
+artifacts:
+  - id: proposal
+    status: ready
+  - id: design
+    status: ready
+  - id: bdd
+    status: ready

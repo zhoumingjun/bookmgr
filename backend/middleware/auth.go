@@ -17,9 +17,10 @@ type ctxKey int
 const claimsKey ctxKey = 0
 
 // publicMethods that don't require authentication.
+// NOTE: Register is disabled - self-registration is not allowed.
+// All users must be created by super_admin or admin.
 var publicMethods = map[string]bool{
-	"/bookmgr.v1.AuthService/Register": true,
-	"/bookmgr.v1.AuthService/Login":    true,
+	"/bookmgr.v1.AuthService/Login": true,
 }
 
 // AuthInterceptor returns a gRPC unary interceptor that validates JWT tokens.

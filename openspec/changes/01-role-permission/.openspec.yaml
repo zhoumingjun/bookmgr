@@ -1,0 +1,15 @@
+name: 01-role-permission
+type: feature
+status: proposed
+priority: P0
+title: 角色权限体系
+description: 实现 4 级角色权限体系（超级管理员/普通管理员/教师/家长），关闭自主注册，JWT role claim 权限控制
+owner: bookmgr team
+depends: []
+artifacts:
+  - id: proposal
+    status: ready
+  - id: design
+    status: ready
+  - id: bdd
+    status: ready

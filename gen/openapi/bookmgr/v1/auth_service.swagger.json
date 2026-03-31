@@ -184,11 +184,13 @@
       "type": "string",
       "enum": [
         "ROLE_UNSPECIFIED",
-        "ROLE_USER",
-        "ROLE_ADMIN"
+        "ROLE_SUPER_ADMIN",
+        "ROLE_ADMIN",
+        "ROLE_TEACHER",
+        "ROLE_PARENT"
       ],
       "default": "ROLE_UNSPECIFIED",
-      "description": "Role represents the access level of a user in the system.\n\n - ROLE_UNSPECIFIED: Default value, should not be used.\n - ROLE_USER: Regular user with read-only access to books.\n - ROLE_ADMIN: Administrator with full CRUD access."
+      "description": "Role represents the access level of a user in the system.\n4-level role hierarchy for the picturebook platform.\n\n - ROLE_UNSPECIFIED: Default value, should not be used.\n - ROLE_SUPER_ADMIN: 超级管理员：课题负责人，拥有全部权限\n - ROLE_ADMIN: 普通管理员：课题核心成员，可上传和审核绘本\n - ROLE_TEACHER: 教师用户：可检索、浏览、下载绘本，提交反馈\n - ROLE_PARENT: 家长用户：仅可查看、浏览课题组推送的绘本"
     }
   }
 }

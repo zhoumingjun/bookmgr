@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	UserService_CreateUser_FullMethodName = "/bookmgr.v1.UserService/CreateUser"
 	UserService_ListUsers_FullMethodName  = "/bookmgr.v1.UserService/ListUsers"
 	UserService_GetUser_FullMethodName    = "/bookmgr.v1.UserService/GetUser"
 	UserService_UpdateUser_FullMethodName = "/bookmgr.v1.UserService/UpdateUser"
@@ -29,9 +30,12 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// UserService manages user resources. All RPCs require admin role.
+// UserService manages user resources.
 type UserServiceClient interface {
-	// ListUsers returns a paginated list of users.
+	// CreateUser creates a new user. Admin/super_admin only.
+	// Self-registration is disabled.
+	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
+	// ListUsers returns a paginated list of users. Admin/super_admin only.
 	ListUsers(ctx context.Context, in *ListUsersRequest, opts ...grpc.CallOption) (*ListUsersResponse, error)
 	// GetUser returns a single user by ID.
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
@@ -47,6 +51,16 @@ type userServiceClient struct {
 
 func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 	return &userServiceClient{cc}
+}
+
+func (c *userServiceClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateUserResponse)
+	err := c.cc.Invoke(ctx, UserService_CreateUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *userServiceClient) ListUsers(ctx context.Context, in *ListUsersRequest, opts ...grpc.CallOption) (*ListUsersResponse, error) {
@@ -93,9 +107,12 @@ func (c *userServiceClient) DeleteUser(ctx context.Context, in *DeleteUserReques
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
 //
-// UserService manages user resources. All RPCs require admin role.
+// UserService manages user resources.
 type UserServiceServer interface {
-	// ListUsers returns a paginated list of users.
+	// CreateUser creates a new user. Admin/super_admin only.
+	// Self-registration is disabled.
+	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
+	// ListUsers returns a paginated list of users. Admin/super_admin only.
 	ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error)
 	// GetUser returns a single user by ID.
 	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
@@ -113,6 +130,9 @@ type UserServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedUserServiceServer struct{}
 
+func (UnimplementedUserServiceServer) CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateUser not implemented")
+}
 func (UnimplementedUserServiceServer) ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListUsers not implemented")
 }
@@ -144,6 +164,24 @@ func RegisterUserServiceServer(s grpc.ServiceRegistrar, srv UserServiceServer) {
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&UserService_ServiceDesc, srv)
+}
+
+func _UserService_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).CreateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_CreateUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).CreateUser(ctx, req.(*CreateUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _UserService_ListUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -225,6 +263,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "bookmgr.v1.UserService",
 	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateUser",
+			Handler:    _UserService_CreateUser_Handler,
+		},
 		{
 			MethodName: "ListUsers",
 			Handler:    _UserService_ListUsers_Handler,

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Card, Form, Input, Button, Typography, message, ConfigProvider, Grid } from 'antd';
 import { UserOutlined, LockOutlined, GlobalOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -31,7 +31,16 @@ export default function LoginPage() {
       const res = await login(values.username, values.password);
       setToken(res.token);
       const payload = JSON.parse(atob(res.token.split('.')[1]));
-      navigate(payload.role === 'admin' ? '/admin' : '/console', { replace: true });
+      // Role-based routing
+      if (payload.role === 'super_admin' || payload.role === 'admin') {
+        navigate('/admin', { replace: true });
+      } else if (payload.role === 'teacher') {
+        navigate('/teacher/console', { replace: true });
+      } else if (payload.role === 'parent') {
+        navigate('/parent/console', { replace: true });
+      } else {
+        navigate('/console', { replace: true });
+      }
     } catch {
       message.error(t('login.error'));
     } finally {
@@ -77,8 +86,7 @@ export default function LoginPage() {
             </Form.Item>
           </Form>
           <div style={{ textAlign: 'center' }}>
-            <Text type="secondary">{t('login.noAccount')} </Text>
-            <Link to="/register">{t('login.register')}</Link>
+            <Text type="secondary">如需开通账号，请联系管理员</Text>
           </div>
         </Card>
       </div>

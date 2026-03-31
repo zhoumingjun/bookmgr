@@ -1,0 +1,15 @@
+name: 08-book-feedback
+type: feature
+status: proposed
+priority: P2
+title: 收藏与反馈
+description: 收藏绘本、阅读进度反馈、难度评分、使用场景记录
+owner: bookmgr team
+depends: ["06-book-display"]
+artifacts:
+  - id: proposal
+    status: ready
+  - id: design
+    status: ready
+  - id: bdd
+    status: ready

@@ -1,0 +1,15 @@
+name: 07-book-search
+type: feature
+status: proposed
+priority: P1
+title: 绘本检索筛选
+description: 全文关键词搜索、多维度筛选、资源类型筛选、排序分页
+owner: bookmgr team
+depends: ["03-book-data", "06-book-display"]
+artifacts:
+  - id: proposal
+    status: ready
+  - id: design
+    status: ready
+  - id: bdd
+    status: ready

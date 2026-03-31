@@ -7,6 +7,8 @@
 package bookmgrv1
 
 import (
+	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -22,28 +24,37 @@ const (
 )
 
 // Role represents the access level of a user in the system.
+// 4-level role hierarchy for the picturebook platform.
 type Role int32
 
 const (
 	// Default value, should not be used.
 	Role_ROLE_UNSPECIFIED Role = 0
-	// Regular user with read-only access to books.
-	Role_ROLE_USER Role = 1
-	// Administrator with full CRUD access.
+	// 超级管理员：课题负责人，拥有全部权限
+	Role_ROLE_SUPER_ADMIN Role = 1
+	// 普通管理员：课题核心成员，可上传和审核绘本
 	Role_ROLE_ADMIN Role = 2
+	// 教师用户：可检索、浏览、下载绘本，提交反馈
+	Role_ROLE_TEACHER Role = 3
+	// 家长用户：仅可查看、浏览课题组推送的绘本
+	Role_ROLE_PARENT Role = 4
 )
 
 // Enum value maps for Role.
 var (
 	Role_name = map[int32]string{
 		0: "ROLE_UNSPECIFIED",
-		1: "ROLE_USER",
+		1: "ROLE_SUPER_ADMIN",
 		2: "ROLE_ADMIN",
+		3: "ROLE_TEACHER",
+		4: "ROLE_PARENT",
 	}
 	Role_value = map[string]int32{
 		"ROLE_UNSPECIFIED": 0,
-		"ROLE_USER":        1,
+		"ROLE_SUPER_ADMIN": 1,
 		"ROLE_ADMIN":       2,
+		"ROLE_TEACHER":     3,
+		"ROLE_PARENT":      4,
 	}
 )
 
@@ -74,17 +85,118 @@ func (Role) EnumDescriptor() ([]byte, []int) {
 	return file_bookmgr_v1_common_proto_rawDescGZIP(), []int{0}
 }
 
+// Dimension represents a category dimension for picturebooks.
+type Dimension struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The unique identifier.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Dimension name (e.g., "身心准备").
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// URL-safe slug (e.g., "physical").
+	Slug string `protobuf:"bytes,3,opt,name=slug,proto3" json:"slug,omitempty"`
+	// Parent dimension ID (null for top-level).
+	ParentId string `protobuf:"bytes,4,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty"`
+	// Display order.
+	SortOrder int32 `protobuf:"varint,5,opt,name=sort_order,json=sortOrder,proto3" json:"sort_order,omitempty"`
+	// Child subcategories.
+	Children      []*Dimension `protobuf:"bytes,6,rep,name=children,proto3" json:"children,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Dimension) Reset() {
+	*x = Dimension{}
+	mi := &file_bookmgr_v1_common_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Dimension) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Dimension) ProtoMessage() {}
+
+func (x *Dimension) ProtoReflect() protoreflect.Message {
+	mi := &file_bookmgr_v1_common_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Dimension.ProtoReflect.Descriptor instead.
+func (*Dimension) Descriptor() ([]byte, []int) {
+	return file_bookmgr_v1_common_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *Dimension) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Dimension) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Dimension) GetSlug() string {
+	if x != nil {
+		return x.Slug
+	}
+	return ""
+}
+
+func (x *Dimension) GetParentId() string {
+	if x != nil {
+		return x.ParentId
+	}
+	return ""
+}
+
+func (x *Dimension) GetSortOrder() int32 {
+	if x != nil {
+		return x.SortOrder
+	}
+	return 0
+}
+
+func (x *Dimension) GetChildren() []*Dimension {
+	if x != nil {
+		return x.Children
+	}
+	return nil
+}
+
 var File_bookmgr_v1_common_proto protoreflect.FileDescriptor
 
 const file_bookmgr_v1_common_proto_rawDesc = "" +
 	"\n" +
 	"\x17bookmgr/v1/common.proto\x12\n" +
-	"bookmgr.v1*;\n" +
-	"\x04Role\x12\x14\n" +
-	"\x10ROLE_UNSPECIFIED\x10\x00\x12\r\n" +
-	"\tROLE_USER\x10\x01\x12\x0e\n" +
+	"bookmgr.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1fgoogle/api/field_behavior.proto\"\xb2\x01\n" +
+	"\tDimension\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
+	"\x04slug\x18\x03 \x01(\tR\x04slug\x12\x1b\n" +
+	"\tparent_id\x18\x04 \x01(\tR\bparentId\x12\x1d\n" +
 	"\n" +
-	"ROLE_ADMIN\x10\x02B=Z;github.com/zhoumingjun/bookmgr/gen/api/bookmgr/v1;bookmgrv1b\x06proto3"
+	"sort_order\x18\x05 \x01(\x05R\tsortOrder\x121\n" +
+	"\bchildren\x18\x06 \x03(\v2\x15.bookmgr.v1.DimensionR\bchildren*e\n" +
+	"\x04Role\x12\x14\n" +
+	"\x10ROLE_UNSPECIFIED\x10\x00\x12\x14\n" +
+	"\x10ROLE_SUPER_ADMIN\x10\x01\x12\x0e\n" +
+	"\n" +
+	"ROLE_ADMIN\x10\x02\x12\x10\n" +
+	"\fROLE_TEACHER\x10\x03\x12\x0f\n" +
+	"\vROLE_PARENT\x10\x04B=Z;github.com/zhoumingjun/bookmgr/gen/api/bookmgr/v1;bookmgrv1b\x06proto3"
 
 var (
 	file_bookmgr_v1_common_proto_rawDescOnce sync.Once
@@ -99,15 +211,18 @@ func file_bookmgr_v1_common_proto_rawDescGZIP() []byte {
 }
 
 var file_bookmgr_v1_common_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_bookmgr_v1_common_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_bookmgr_v1_common_proto_goTypes = []any{
-	(Role)(0), // 0: bookmgr.v1.Role
+	(Role)(0),         // 0: bookmgr.v1.Role
+	(*Dimension)(nil), // 1: bookmgr.v1.Dimension
 }
 var file_bookmgr_v1_common_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	1, // 0: bookmgr.v1.Dimension.children:type_name -> bookmgr.v1.Dimension
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_bookmgr_v1_common_proto_init() }
@@ -121,13 +236,14 @@ func file_bookmgr_v1_common_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_bookmgr_v1_common_proto_rawDesc), len(file_bookmgr_v1_common_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   0,
+			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_bookmgr_v1_common_proto_goTypes,
 		DependencyIndexes: file_bookmgr_v1_common_proto_depIdxs,
 		EnumInfos:         file_bookmgr_v1_common_proto_enumTypes,
+		MessageInfos:      file_bookmgr_v1_common_proto_msgTypes,
 	}.Build()
 	File_bookmgr_v1_common_proto = out.File
 	file_bookmgr_v1_common_proto_goTypes = nil

@@ -6,13 +6,16 @@ import {
   type ReactNode,
 } from 'react';
 
+type Role = 'super_admin' | 'admin' | 'teacher' | 'parent';
+
 interface AuthContextType {
   token: string | null;
-  role: string | null;
+  role: Role | null;
   login: (token: string) => void;
   logout: () => void;
   isAuthenticated: boolean;
-  isAdmin: boolean;
+  isAdmin: boolean;       // super_admin or admin
+  isSuperAdmin: boolean;   // super_admin only
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,12 +34,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(
     localStorage.getItem('token'),
   );
-  const [role, setRole] = useState<string | null>(null);
+  const [role, setRole] = useState<Role | null>(null);
 
   useEffect(() => {
     if (token) {
       const payload = parseJwt(token);
-      setRole((payload?.role as string) ?? null);
+      const r = payload?.role as string;
+      if (r === 'super_admin' || r === 'admin' || r === 'teacher' || r === 'parent') {
+        setRole(r as Role);
+      } else {
+        setRole(null);
+      }
     } else {
       setRole(null);
     }
@@ -60,7 +68,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         logout,
         isAuthenticated: !!token,
-        isAdmin: role === 'admin',
+        isAdmin: role === 'super_admin' || role === 'admin',
+        isSuperAdmin: role === 'super_admin',
       }}
     >
       {children}

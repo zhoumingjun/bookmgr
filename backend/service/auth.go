@@ -7,7 +7,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/zhoumingjun/bookmgr/backend/ent"
-	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 	"github.com/zhoumingjun/bookmgr/backend/repository"
 )
 
@@ -22,17 +21,10 @@ func NewAuthService(repo *repository.UserRepository, jwt *JWTService) *AuthServi
 	return &AuthService{repo: repo, jwt: jwt}
 }
 
-// Register creates a new user account with the given credentials.
+// Register is disabled. This method always returns an error.
+// All users must be created by super_admin via UserService.CreateUser.
 func (s *AuthService) Register(ctx context.Context, username, email, password string) (*ent.User, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, fmt.Errorf("hashing password: %w", err)
-	}
-	u, err := s.repo.Create(ctx, username, email, string(hash), user.RoleUser)
-	if err != nil {
-		return nil, fmt.Errorf("creating user: %w", err)
-	}
-	return u, nil
+	return nil, fmt.Errorf("self-registration is disabled")
 }
 
 // Login verifies credentials and returns a JWT token.

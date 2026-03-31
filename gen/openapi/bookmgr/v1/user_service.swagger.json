@@ -18,7 +18,7 @@
   "paths": {
     "/api/v1/users": {
       "get": {
-        "summary": "ListUsers returns a paginated list of users.",
+        "summary": "ListUsers returns a paginated list of users. Admin/super_admin only.",
         "operationId": "UserService_ListUsers",
         "responses": {
           "200": {
@@ -49,6 +49,38 @@
             "in": "query",
             "required": false,
             "type": "string"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      },
+      "post": {
+        "summary": "CreateUser creates a new user. Admin/super_admin only.\nSelf-registration is disabled.",
+        "operationId": "UserService_CreateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "CreateUserRequest is the request for CreateUser.\nSelf-registration is disabled; only admins can create users.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateUserRequest"
+            }
           }
         ],
         "tags": [
@@ -233,6 +265,42 @@
         }
       }
     },
+    "v1CreateUserRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "The username for the new user."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address."
+        },
+        "role": {
+          "$ref": "#/definitions/v1Role",
+          "description": "The role for the new user (super_admin/admin/teacher/parent)."
+        },
+        "password": {
+          "type": "string",
+          "description": "Initial password. If empty, a random 12-char password is generated."
+        }
+      },
+      "description": "CreateUserRequest is the request for CreateUser.\nSelf-registration is disabled; only admins can create users."
+    },
+    "v1CreateUserResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/v1User",
+          "description": "The newly created user (password_hash is not included)."
+        },
+        "generatedPassword": {
+          "type": "string",
+          "description": "The initial password (only set if auto-generated).\nAdmin must communicate this to the user."
+        }
+      },
+      "description": "CreateUserResponse is the response for CreateUser."
+    },
     "v1DeleteUserResponse": {
       "type": "object",
       "description": "DeleteUserResponse is the response for DeleteUser."
@@ -269,11 +337,13 @@
       "type": "string",
       "enum": [
         "ROLE_UNSPECIFIED",
-        "ROLE_USER",
-        "ROLE_ADMIN"
+        "ROLE_SUPER_ADMIN",
+        "ROLE_ADMIN",
+        "ROLE_TEACHER",
+        "ROLE_PARENT"
       ],
       "default": "ROLE_UNSPECIFIED",
-      "description": "Role represents the access level of a user in the system.\n\n - ROLE_UNSPECIFIED: Default value, should not be used.\n - ROLE_USER: Regular user with read-only access to books.\n - ROLE_ADMIN: Administrator with full CRUD access."
+      "description": "Role represents the access level of a user in the system.\n4-level role hierarchy for the picturebook platform.\n\n - ROLE_UNSPECIFIED: Default value, should not be used.\n - ROLE_SUPER_ADMIN: 超级管理员：课题负责人，拥有全部权限\n - ROLE_ADMIN: 普通管理员：课题核心成员，可上传和审核绘本\n - ROLE_TEACHER: 教师用户：可检索、浏览、下载绘本，提交反馈\n - ROLE_PARENT: 家长用户：仅可查看、浏览课题组推送的绘本"
     },
     "v1UpdateUserResponse": {
       "type": "object",

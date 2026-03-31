@@ -29,7 +29,29 @@
       "Bash(npm install:*)",
       "Bash(npm run:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(./scripts/env.sh prod:*)",
+      "Bash(docker images:*)",
+      "Bash(openspec new:*)",
+      "Bash(openspec status:*)",
+      "Bash(openspec instructions:*)",
+      "Bash(ls backend/migrations/*.sql)",
+      "Bash(GOPROXY=https://goproxy.cn,direct go get modernc.org/sqlite)",
+      "Bash(GOPROXY=https://goproxy.cn,direct make standalone)",
+      "Bash(GOPROXY=https://goproxy.cn,direct go build -ldflags=\"-s -w\" -o ../bin/bookmgr ./cmd/standalone)",
+      "Bash(curl -sf http://localhost:8000/healthz)",
+      "Bash(GOPROXY=https://goproxy.cn,direct go test ./...)",
+      "Bash(BDD_BASE_URL=http://localhost:9000 go test -tags bdd -v ./test/bdd/... -count=1)",
+      "Bash(GOPROXY=https://goproxy.cn,direct BDD_BASE_URL=http://localhost:9000 go test -tags bdd -v ./test/bdd/... -count=1)",
+      "Bash(BASE_URL=http://localhost:9000 npx playwright test)",
+      "Bash(npm ci:*)",
+      "Bash(npx playwright:*)",
+      "Bash(npx bddgen:*)",
+      "Bash(lsof -ti:9000)",
+      "Bash(xargs kill:*)",
+      "Bash(GOPROXY=https://goproxy.cn,direct make release)",
+      "Bash(git check-ignore:*)",
+      "Bash(git push:*)"
     ]
   }
 }

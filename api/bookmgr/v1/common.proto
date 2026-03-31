@@ -2,14 +2,38 @@ syntax = "proto3";
 
 package bookmgr.v1;
 
+import "buf/validate/validate.proto";
+import "google/api/field_behavior.proto";
+
 option go_package = "github.com/zhoumingjun/bookmgr/gen/api/bookmgr/v1;bookmgrv1";
 
 // Role represents the access level of a user in the system.
+// 4-level role hierarchy for the picturebook platform.
 enum Role {
   // Default value, should not be used.
   ROLE_UNSPECIFIED = 0;
-  // Regular user with read-only access to books.
-  ROLE_USER = 1;
-  // Administrator with full CRUD access.
+  // 超级管理员：课题负责人，拥有全部权限
+  ROLE_SUPER_ADMIN = 1;
+  // 普通管理员：课题核心成员，可上传和审核绘本
   ROLE_ADMIN = 2;
+  // 教师用户：可检索、浏览、下载绘本，提交反馈
+  ROLE_TEACHER = 3;
+  // 家长用户：仅可查看、浏览课题组推送的绘本
+  ROLE_PARENT = 4;
+}
+
+// Dimension represents a category dimension for picturebooks.
+message Dimension {
+  // The unique identifier.
+  string id = 1;
+  // Dimension name (e.g., "身心准备").
+  string name = 2;
+  // URL-safe slug (e.g., "physical").
+  string slug = 3;
+  // Parent dimension ID (null for top-level).
+  string parent_id = 4;
+  // Display order.
+  int32 sort_order = 5;
+  // Child subcategories.
+  repeated Dimension children = 6;
 }
