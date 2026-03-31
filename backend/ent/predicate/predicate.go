@@ -21,6 +21,9 @@ type BookReadingProgress func(*sql.Selector)
 // BookReview is the predicate function for bookreview builders.
 type BookReview func(*sql.Selector)
 
+// BookSearchIndex is the predicate function for booksearchindex builders.
+type BookSearchIndex func(*sql.Selector)
+
 // Dimension is the predicate function for dimension builders.
 type Dimension func(*sql.Selector)
 

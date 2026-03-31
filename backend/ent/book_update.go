@@ -17,6 +17,7 @@ import (
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreadingprogress"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreview"
+	"github.com/zhoumingjun/bookmgr/backend/ent/booksearchindex"
 	"github.com/zhoumingjun/bookmgr/backend/ent/predicate"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
@@ -514,6 +515,21 @@ func (_u *BookUpdate) AddReadingProgress(v ...*BookReadingProgress) *BookUpdate 
 	return _u.AddReadingProgresIDs(ids...)
 }
 
+// AddSearchIndexIDs adds the "search_index" edge to the BookSearchIndex entity by IDs.
+func (_u *BookUpdate) AddSearchIndexIDs(ids ...uuid.UUID) *BookUpdate {
+	_u.mutation.AddSearchIndexIDs(ids...)
+	return _u
+}
+
+// AddSearchIndex adds the "search_index" edges to the BookSearchIndex entity.
+func (_u *BookUpdate) AddSearchIndex(v ...*BookSearchIndex) *BookUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddSearchIndexIDs(ids...)
+}
+
 // Mutation returns the BookMutation object of the builder.
 func (_u *BookUpdate) Mutation() *BookMutation {
 	return _u.mutation
@@ -607,6 +623,27 @@ func (_u *BookUpdate) RemoveReadingProgress(v ...*BookReadingProgress) *BookUpda
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveReadingProgresIDs(ids...)
+}
+
+// ClearSearchIndex clears all "search_index" edges to the BookSearchIndex entity.
+func (_u *BookUpdate) ClearSearchIndex() *BookUpdate {
+	_u.mutation.ClearSearchIndex()
+	return _u
+}
+
+// RemoveSearchIndexIDs removes the "search_index" edge to BookSearchIndex entities by IDs.
+func (_u *BookUpdate) RemoveSearchIndexIDs(ids ...uuid.UUID) *BookUpdate {
+	_u.mutation.RemoveSearchIndexIDs(ids...)
+	return _u
+}
+
+// RemoveSearchIndex removes "search_index" edges to BookSearchIndex entities.
+func (_u *BookUpdate) RemoveSearchIndex(v ...*BookSearchIndex) *BookUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveSearchIndexIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -1016,6 +1053,51 @@ func (_u *BookUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(bookreadingprogress.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.SearchIndexCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   book.SearchIndexTable,
+			Columns: []string{book.SearchIndexColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(booksearchindex.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedSearchIndexIDs(); len(nodes) > 0 && !_u.mutation.SearchIndexCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   book.SearchIndexTable,
+			Columns: []string{book.SearchIndexColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(booksearchindex.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.SearchIndexIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   book.SearchIndexTable,
+			Columns: []string{book.SearchIndexColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(booksearchindex.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -1523,6 +1605,21 @@ func (_u *BookUpdateOne) AddReadingProgress(v ...*BookReadingProgress) *BookUpda
 	return _u.AddReadingProgresIDs(ids...)
 }
 
+// AddSearchIndexIDs adds the "search_index" edge to the BookSearchIndex entity by IDs.
+func (_u *BookUpdateOne) AddSearchIndexIDs(ids ...uuid.UUID) *BookUpdateOne {
+	_u.mutation.AddSearchIndexIDs(ids...)
+	return _u
+}
+
+// AddSearchIndex adds the "search_index" edges to the BookSearchIndex entity.
+func (_u *BookUpdateOne) AddSearchIndex(v ...*BookSearchIndex) *BookUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddSearchIndexIDs(ids...)
+}
+
 // Mutation returns the BookMutation object of the builder.
 func (_u *BookUpdateOne) Mutation() *BookMutation {
 	return _u.mutation
@@ -1616,6 +1713,27 @@ func (_u *BookUpdateOne) RemoveReadingProgress(v ...*BookReadingProgress) *BookU
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveReadingProgresIDs(ids...)
+}
+
+// ClearSearchIndex clears all "search_index" edges to the BookSearchIndex entity.
+func (_u *BookUpdateOne) ClearSearchIndex() *BookUpdateOne {
+	_u.mutation.ClearSearchIndex()
+	return _u
+}
+
+// RemoveSearchIndexIDs removes the "search_index" edge to BookSearchIndex entities by IDs.
+func (_u *BookUpdateOne) RemoveSearchIndexIDs(ids ...uuid.UUID) *BookUpdateOne {
+	_u.mutation.RemoveSearchIndexIDs(ids...)
+	return _u
+}
+
+// RemoveSearchIndex removes "search_index" edges to BookSearchIndex entities.
+func (_u *BookUpdateOne) RemoveSearchIndex(v ...*BookSearchIndex) *BookUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveSearchIndexIDs(ids...)
 }
 
 // Where appends a list predicates to the BookUpdate builder.
@@ -2055,6 +2173,51 @@ func (_u *BookUpdateOne) sqlSave(ctx context.Context) (_node *Book, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(bookreadingprogress.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.SearchIndexCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   book.SearchIndexTable,
+			Columns: []string{book.SearchIndexColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(booksearchindex.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedSearchIndexIDs(); len(nodes) > 0 && !_u.mutation.SearchIndexCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   book.SearchIndexTable,
+			Columns: []string{book.SearchIndexColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(booksearchindex.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.SearchIndexIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   book.SearchIndexTable,
+			Columns: []string{book.SearchIndexColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(booksearchindex.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

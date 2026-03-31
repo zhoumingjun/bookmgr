@@ -8,4 +8,5 @@ var Module = fx.Options(
 	fx.Provide(NewDimensionRepository),
 	fx.Provide(NewBookFileRepository),
 	fx.Provide(NewBookReviewRepository),
+	fx.Provide(NewBookSearchRepository),
 )

@@ -124,10 +124,15 @@ type BookListResult struct {
 }
 
 type ListBooksParams struct {
-	Page          int
-	PerPage       int
-	DimensionSlug string
-	Status        string
+	Page           int
+	PerPage        int
+	DimensionSlug  string
+	Status         string
+	SearchQuery    string // keyword for title/author/description
+	SortField     string
+	SortDesc      bool
+	AgeMinYears   int
+	AgeMaxYears   int
 }
 
 func (r *BookRepository) List(ctx context.Context, params ListBooksParams) (*BookListResult, error) {
@@ -137,12 +142,35 @@ func (r *BookRepository) List(ctx context.Context, params ListBooksParams) (*Boo
 	if params.PerPage < 1 {
 		params.PerPage = 20
 	}
+	if params.PerPage > 100 {
+		params.PerPage = 100
+	}
 	offset := (params.Page - 1) * params.PerPage
 
 	query := r.client.Book.Query()
 
+	// Filter by status
+	if params.Status != "" {
+		query = query.Where(book.Status(params.Status))
+	} else {
+		// Default: only approved books
+		query = query.Where(book.Status("approved"))
+	}
+
+	// Keyword search
+	if params.SearchQuery != "" {
+		kw := params.SearchQuery
+		query = query.Where(
+			book.Or(
+				book.TitleContainsFold(kw),
+				book.AuthorContainsFold(kw),
+				book.DescriptionContainsFold(kw),
+			),
+		)
+	}
+
+	// Dimension filter
 	if params.DimensionSlug != "" {
-		// Filter by dimension: find books that have this dimension slug
 		query = query.Where(
 			book.HasBookDimensionsWith(
 				bookdimension.HasDimensionWith(dimension.Slug(params.DimensionSlug)),
@@ -150,8 +178,12 @@ func (r *BookRepository) List(ctx context.Context, params ListBooksParams) (*Boo
 		)
 	}
 
-	if params.Status != "" {
-		query = query.Where(book.Status(params.Status))
+	// Age range filter
+	if params.AgeMinYears > 0 {
+		query = query.Where(book.RecommendedAgeMaxGTE(params.AgeMinYears * 12))
+	}
+	if params.AgeMaxYears < 18 {
+		query = query.Where(book.RecommendedAgeMinLTE(params.AgeMaxYears * 12))
 	}
 
 	total, err := query.Count(ctx)
@@ -159,11 +191,32 @@ func (r *BookRepository) List(ctx context.Context, params ListBooksParams) (*Boo
 		return nil, fmt.Errorf("counting books: %w", err)
 	}
 
+	// Sorting
+	switch params.SortField {
+	case "title":
+		if params.SortDesc {
+			query = query.Order(ent.Desc(book.FieldTitle))
+		} else {
+			query = query.Order(ent.Asc(book.FieldTitle))
+		}
+	case "view_count":
+		if params.SortDesc {
+			query = query.Order(ent.Desc(book.FieldViewCount))
+		} else {
+			query = query.Order(ent.Asc(book.FieldViewCount))
+		}
+	default:
+		if params.SortDesc {
+			query = query.Order(ent.Desc(book.FieldCreatedAt))
+		} else {
+			query = query.Order(ent.Asc(book.FieldCreatedAt))
+		}
+	}
+
 	books, err := query.
 		WithBookDimensions(func(bdq *ent.BookDimensionQuery) {
 			bdq.WithDimension()
 		}).
-		Order(ent.Desc(book.FieldCreatedAt)).
 		Offset(offset).
 		Limit(params.PerPage).
 		All(ctx)

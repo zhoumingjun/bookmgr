@@ -136,6 +136,25 @@ var (
 			},
 		},
 	}
+	// BookSearchIndexesColumns holds the columns for the "book_search_indexes" table.
+	BookSearchIndexesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "book_id", Type: field.TypeUUID},
+	}
+	// BookSearchIndexesTable holds the schema information for the "book_search_indexes" table.
+	BookSearchIndexesTable = &schema.Table{
+		Name:       "book_search_indexes",
+		Columns:    BookSearchIndexesColumns,
+		PrimaryKey: []*schema.Column{BookSearchIndexesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "book_search_indexes_books_search_index",
+				Columns:    []*schema.Column{BookSearchIndexesColumns[1]},
+				RefColumns: []*schema.Column{BooksColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// DimensionsColumns holds the columns for the "dimensions" table.
 	DimensionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
@@ -355,6 +374,7 @@ var (
 		BookFilesTable,
 		BookReadingProgressesTable,
 		BookReviewsTable,
+		BookSearchIndexesTable,
 		DimensionsTable,
 		UsersTable,
 		BookBookDimensionsTable,
@@ -371,6 +391,7 @@ func init() {
 	BooksTable.ForeignKeys[1].RefTable = UsersTable
 	BookReviewsTable.ForeignKeys[0].RefTable = BooksTable
 	BookReviewsTable.ForeignKeys[1].RefTable = UsersTable
+	BookSearchIndexesTable.ForeignKeys[0].RefTable = BooksTable
 	DimensionsTable.ForeignKeys[0].RefTable = DimensionsTable
 	UsersTable.ForeignKeys[0].RefTable = BookReviewsTable
 	BookBookDimensionsTable.ForeignKeys[0].RefTable = BooksTable

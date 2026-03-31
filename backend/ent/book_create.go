@@ -16,6 +16,7 @@ import (
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreadingprogress"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreview"
+	"github.com/zhoumingjun/bookmgr/backend/ent/booksearchindex"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
 
@@ -417,6 +418,21 @@ func (_c *BookCreate) AddReadingProgress(v ...*BookReadingProgress) *BookCreate 
 	return _c.AddReadingProgresIDs(ids...)
 }
 
+// AddSearchIndexIDs adds the "search_index" edge to the BookSearchIndex entity by IDs.
+func (_c *BookCreate) AddSearchIndexIDs(ids ...uuid.UUID) *BookCreate {
+	_c.mutation.AddSearchIndexIDs(ids...)
+	return _c
+}
+
+// AddSearchIndex adds the "search_index" edges to the BookSearchIndex entity.
+func (_c *BookCreate) AddSearchIndex(v ...*BookSearchIndex) *BookCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddSearchIndexIDs(ids...)
+}
+
 // Mutation returns the BookMutation object of the builder.
 func (_c *BookCreate) Mutation() *BookMutation {
 	return _c.mutation
@@ -814,6 +830,22 @@ func (_c *BookCreate) createSpec() (*Book, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(bookreadingprogress.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.SearchIndexIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   book.SearchIndexTable,
+			Columns: []string{book.SearchIndexColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(booksearchindex.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

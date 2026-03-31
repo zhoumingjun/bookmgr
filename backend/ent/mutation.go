@@ -17,6 +17,7 @@ import (
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreadingprogress"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreview"
+	"github.com/zhoumingjun/bookmgr/backend/ent/booksearchindex"
 	"github.com/zhoumingjun/bookmgr/backend/ent/dimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/predicate"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
@@ -36,6 +37,7 @@ const (
 	TypeBookFile            = "BookFile"
 	TypeBookReadingProgress = "BookReadingProgress"
 	TypeBookReview          = "BookReview"
+	TypeBookSearchIndex     = "BookSearchIndex"
 	TypeDimension           = "Dimension"
 	TypeUser                = "User"
 )
@@ -89,6 +91,9 @@ type BookMutation struct {
 	reading_progress        map[uuid.UUID]struct{}
 	removedreading_progress map[uuid.UUID]struct{}
 	clearedreading_progress bool
+	search_index            map[uuid.UUID]struct{}
+	removedsearch_index     map[uuid.UUID]struct{}
+	clearedsearch_index     bool
 	done                    bool
 	oldValue                func(context.Context) (*Book, error)
 	predicates              []predicate.Book
@@ -1550,6 +1555,60 @@ func (m *BookMutation) ResetReadingProgress() {
 	m.removedreading_progress = nil
 }
 
+// AddSearchIndexIDs adds the "search_index" edge to the BookSearchIndex entity by ids.
+func (m *BookMutation) AddSearchIndexIDs(ids ...uuid.UUID) {
+	if m.search_index == nil {
+		m.search_index = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.search_index[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSearchIndex clears the "search_index" edge to the BookSearchIndex entity.
+func (m *BookMutation) ClearSearchIndex() {
+	m.clearedsearch_index = true
+}
+
+// SearchIndexCleared reports if the "search_index" edge to the BookSearchIndex entity was cleared.
+func (m *BookMutation) SearchIndexCleared() bool {
+	return m.clearedsearch_index
+}
+
+// RemoveSearchIndexIDs removes the "search_index" edge to the BookSearchIndex entity by IDs.
+func (m *BookMutation) RemoveSearchIndexIDs(ids ...uuid.UUID) {
+	if m.removedsearch_index == nil {
+		m.removedsearch_index = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.search_index, ids[i])
+		m.removedsearch_index[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSearchIndex returns the removed IDs of the "search_index" edge to the BookSearchIndex entity.
+func (m *BookMutation) RemovedSearchIndexIDs() (ids []uuid.UUID) {
+	for id := range m.removedsearch_index {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// SearchIndexIDs returns the "search_index" edge IDs in the mutation.
+func (m *BookMutation) SearchIndexIDs() (ids []uuid.UUID) {
+	for id := range m.search_index {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetSearchIndex resets all changes to the "search_index" edge.
+func (m *BookMutation) ResetSearchIndex() {
+	m.search_index = nil
+	m.clearedsearch_index = false
+	m.removedsearch_index = nil
+}
+
 // Where appends a list predicates to the BookMutation builder.
 func (m *BookMutation) Where(ps ...predicate.Book) {
 	m.predicates = append(m.predicates, ps...)
@@ -2206,7 +2265,7 @@ func (m *BookMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *BookMutation) AddedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	if m.uploader != nil {
 		edges = append(edges, book.EdgeUploader)
 	}
@@ -2221,6 +2280,9 @@ func (m *BookMutation) AddedEdges() []string {
 	}
 	if m.reading_progress != nil {
 		edges = append(edges, book.EdgeReadingProgress)
+	}
+	if m.search_index != nil {
+		edges = append(edges, book.EdgeSearchIndex)
 	}
 	return edges
 }
@@ -2257,13 +2319,19 @@ func (m *BookMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case book.EdgeSearchIndex:
+		ids := make([]ent.Value, 0, len(m.search_index))
+		for id := range m.search_index {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *BookMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	if m.removedbook_dimensions != nil {
 		edges = append(edges, book.EdgeBookDimensions)
 	}
@@ -2275,6 +2343,9 @@ func (m *BookMutation) RemovedEdges() []string {
 	}
 	if m.removedreading_progress != nil {
 		edges = append(edges, book.EdgeReadingProgress)
+	}
+	if m.removedsearch_index != nil {
+		edges = append(edges, book.EdgeSearchIndex)
 	}
 	return edges
 }
@@ -2307,13 +2378,19 @@ func (m *BookMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case book.EdgeSearchIndex:
+		ids := make([]ent.Value, 0, len(m.removedsearch_index))
+		for id := range m.removedsearch_index {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *BookMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	if m.cleareduploader {
 		edges = append(edges, book.EdgeUploader)
 	}
@@ -2328,6 +2405,9 @@ func (m *BookMutation) ClearedEdges() []string {
 	}
 	if m.clearedreading_progress {
 		edges = append(edges, book.EdgeReadingProgress)
+	}
+	if m.clearedsearch_index {
+		edges = append(edges, book.EdgeSearchIndex)
 	}
 	return edges
 }
@@ -2346,6 +2426,8 @@ func (m *BookMutation) EdgeCleared(name string) bool {
 		return m.clearedreviews
 	case book.EdgeReadingProgress:
 		return m.clearedreading_progress
+	case book.EdgeSearchIndex:
+		return m.clearedsearch_index
 	}
 	return false
 }
@@ -2379,6 +2461,9 @@ func (m *BookMutation) ResetEdge(name string) error {
 		return nil
 	case book.EdgeReadingProgress:
 		m.ResetReadingProgress()
+		return nil
+	case book.EdgeSearchIndex:
+		m.ResetSearchIndex()
 		return nil
 	}
 	return fmt.Errorf("unknown Book edge %s", name)
@@ -5589,6 +5674,392 @@ func (m *BookReviewMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown BookReview edge %s", name)
+}
+
+// BookSearchIndexMutation represents an operation that mutates the BookSearchIndex nodes in the graph.
+type BookSearchIndexMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *uuid.UUID
+	clearedFields map[string]struct{}
+	book          *uuid.UUID
+	clearedbook   bool
+	done          bool
+	oldValue      func(context.Context) (*BookSearchIndex, error)
+	predicates    []predicate.BookSearchIndex
+}
+
+var _ ent.Mutation = (*BookSearchIndexMutation)(nil)
+
+// booksearchindexOption allows management of the mutation configuration using functional options.
+type booksearchindexOption func(*BookSearchIndexMutation)
+
+// newBookSearchIndexMutation creates new mutation for the BookSearchIndex entity.
+func newBookSearchIndexMutation(c config, op Op, opts ...booksearchindexOption) *BookSearchIndexMutation {
+	m := &BookSearchIndexMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeBookSearchIndex,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withBookSearchIndexID sets the ID field of the mutation.
+func withBookSearchIndexID(id uuid.UUID) booksearchindexOption {
+	return func(m *BookSearchIndexMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *BookSearchIndex
+		)
+		m.oldValue = func(ctx context.Context) (*BookSearchIndex, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().BookSearchIndex.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withBookSearchIndex sets the old BookSearchIndex of the mutation.
+func withBookSearchIndex(node *BookSearchIndex) booksearchindexOption {
+	return func(m *BookSearchIndexMutation) {
+		m.oldValue = func(context.Context) (*BookSearchIndex, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m BookSearchIndexMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m BookSearchIndexMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of BookSearchIndex entities.
+func (m *BookSearchIndexMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *BookSearchIndexMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *BookSearchIndexMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().BookSearchIndex.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetBookID sets the "book_id" field.
+func (m *BookSearchIndexMutation) SetBookID(u uuid.UUID) {
+	m.book = &u
+}
+
+// BookID returns the value of the "book_id" field in the mutation.
+func (m *BookSearchIndexMutation) BookID() (r uuid.UUID, exists bool) {
+	v := m.book
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBookID returns the old "book_id" field's value of the BookSearchIndex entity.
+// If the BookSearchIndex object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookSearchIndexMutation) OldBookID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBookID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBookID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBookID: %w", err)
+	}
+	return oldValue.BookID, nil
+}
+
+// ResetBookID resets all changes to the "book_id" field.
+func (m *BookSearchIndexMutation) ResetBookID() {
+	m.book = nil
+}
+
+// ClearBook clears the "book" edge to the Book entity.
+func (m *BookSearchIndexMutation) ClearBook() {
+	m.clearedbook = true
+	m.clearedFields[booksearchindex.FieldBookID] = struct{}{}
+}
+
+// BookCleared reports if the "book" edge to the Book entity was cleared.
+func (m *BookSearchIndexMutation) BookCleared() bool {
+	return m.clearedbook
+}
+
+// BookIDs returns the "book" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// BookID instead. It exists only for internal usage by the builders.
+func (m *BookSearchIndexMutation) BookIDs() (ids []uuid.UUID) {
+	if id := m.book; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetBook resets all changes to the "book" edge.
+func (m *BookSearchIndexMutation) ResetBook() {
+	m.book = nil
+	m.clearedbook = false
+}
+
+// Where appends a list predicates to the BookSearchIndexMutation builder.
+func (m *BookSearchIndexMutation) Where(ps ...predicate.BookSearchIndex) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the BookSearchIndexMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *BookSearchIndexMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.BookSearchIndex, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *BookSearchIndexMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *BookSearchIndexMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (BookSearchIndex).
+func (m *BookSearchIndexMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *BookSearchIndexMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m.book != nil {
+		fields = append(fields, booksearchindex.FieldBookID)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *BookSearchIndexMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case booksearchindex.FieldBookID:
+		return m.BookID()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *BookSearchIndexMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case booksearchindex.FieldBookID:
+		return m.OldBookID(ctx)
+	}
+	return nil, fmt.Errorf("unknown BookSearchIndex field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *BookSearchIndexMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case booksearchindex.FieldBookID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBookID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown BookSearchIndex field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *BookSearchIndexMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *BookSearchIndexMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *BookSearchIndexMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown BookSearchIndex numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *BookSearchIndexMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *BookSearchIndexMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *BookSearchIndexMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown BookSearchIndex nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *BookSearchIndexMutation) ResetField(name string) error {
+	switch name {
+	case booksearchindex.FieldBookID:
+		m.ResetBookID()
+		return nil
+	}
+	return fmt.Errorf("unknown BookSearchIndex field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *BookSearchIndexMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.book != nil {
+		edges = append(edges, booksearchindex.EdgeBook)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *BookSearchIndexMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case booksearchindex.EdgeBook:
+		if id := m.book; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *BookSearchIndexMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *BookSearchIndexMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *BookSearchIndexMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedbook {
+		edges = append(edges, booksearchindex.EdgeBook)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *BookSearchIndexMutation) EdgeCleared(name string) bool {
+	switch name {
+	case booksearchindex.EdgeBook:
+		return m.clearedbook
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *BookSearchIndexMutation) ClearEdge(name string) error {
+	switch name {
+	case booksearchindex.EdgeBook:
+		m.ClearBook()
+		return nil
+	}
+	return fmt.Errorf("unknown BookSearchIndex unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *BookSearchIndexMutation) ResetEdge(name string) error {
+	switch name {
+	case booksearchindex.EdgeBook:
+		m.ResetBook()
+		return nil
+	}
+	return fmt.Errorf("unknown BookSearchIndex edge %s", name)
 }
 
 // DimensionMutation represents an operation that mutates the Dimension nodes in the graph.

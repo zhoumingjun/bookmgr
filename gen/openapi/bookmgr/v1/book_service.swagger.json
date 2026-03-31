@@ -63,6 +63,43 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "searchQuery",
+            "description": "Search query for title/author/description (optional).",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sortField",
+            "description": "Sort field: created_at (default), title, view_count.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sortDesc",
+            "description": "Sort direction: true = DESC, false = ASC.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "ageMin",
+            "description": "Minimum age in years for filtering.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "ageMax",
+            "description": "Maximum age in years for filtering.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [

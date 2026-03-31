@@ -11,6 +11,7 @@ import (
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreadingprogress"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreview"
+	"github.com/zhoumingjun/bookmgr/backend/ent/booksearchindex"
 	"github.com/zhoumingjun/bookmgr/backend/ent/dimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/schema"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
@@ -314,6 +315,12 @@ func init() {
 	bookreviewDescID := bookreviewFields[0].Descriptor()
 	// bookreview.DefaultID holds the default value on creation for the id field.
 	bookreview.DefaultID = bookreviewDescID.Default.(func() uuid.UUID)
+	booksearchindexFields := schema.BookSearchIndex{}.Fields()
+	_ = booksearchindexFields
+	// booksearchindexDescID is the schema descriptor for id field.
+	booksearchindexDescID := booksearchindexFields[0].Descriptor()
+	// booksearchindex.DefaultID holds the default value on creation for the id field.
+	booksearchindex.DefaultID = booksearchindexDescID.Default.(func() uuid.UUID)
 	dimensionFields := schema.Dimension{}.Fields()
 	_ = dimensionFields
 	// dimensionDescName is the schema descriptor for name field.

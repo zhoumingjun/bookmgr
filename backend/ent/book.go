@@ -86,9 +86,11 @@ type BookEdges struct {
 	Reviews []*BookReview `json:"reviews,omitempty"`
 	// ReadingProgress holds the value of the reading_progress edge.
 	ReadingProgress []*BookReadingProgress `json:"reading_progress,omitempty"`
+	// SearchIndex holds the value of the search_index edge.
+	SearchIndex []*BookSearchIndex `json:"search_index,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [6]bool
 }
 
 // UploaderOrErr returns the Uploader value or an error if the edge
@@ -136,6 +138,15 @@ func (e BookEdges) ReadingProgressOrErr() ([]*BookReadingProgress, error) {
 		return e.ReadingProgress, nil
 	}
 	return nil, &NotLoadedError{edge: "reading_progress"}
+}
+
+// SearchIndexOrErr returns the SearchIndex value or an error if the edge
+// was not loaded in eager-loading.
+func (e BookEdges) SearchIndexOrErr() ([]*BookSearchIndex, error) {
+	if e.loadedTypes[5] {
+		return e.SearchIndex, nil
+	}
+	return nil, &NotLoadedError{edge: "search_index"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -363,6 +374,11 @@ func (_m *Book) QueryReviews() *BookReviewQuery {
 // QueryReadingProgress queries the "reading_progress" edge of the Book entity.
 func (_m *Book) QueryReadingProgress() *BookReadingProgressQuery {
 	return NewBookClient(_m.config).QueryReadingProgress(_m)
+}
+
+// QuerySearchIndex queries the "search_index" edge of the Book entity.
+func (_m *Book) QuerySearchIndex() *BookSearchIndexQuery {
+	return NewBookClient(_m.config).QuerySearchIndex(_m)
 }
 
 // Update returns a builder for updating this Book.

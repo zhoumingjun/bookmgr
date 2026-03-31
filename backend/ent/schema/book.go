@@ -110,5 +110,6 @@ func (Book) Edges() []ent.Edge {
 		edge.To("reviews", BookReview.Type),
 		edge.From("reading_progress", BookReadingProgress.Type).
 			Ref("book"),
+		edge.To("search_index", BookSearchIndex.Type),
 	}
 }

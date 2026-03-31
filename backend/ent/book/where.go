@@ -1521,6 +1521,29 @@ func HasReadingProgressWith(preds ...predicate.BookReadingProgress) predicate.Bo
 	})
 }
 
+// HasSearchIndex applies the HasEdge predicate on the "search_index" edge.
+func HasSearchIndex() predicate.Book {
+	return predicate.Book(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, SearchIndexTable, SearchIndexColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSearchIndexWith applies the HasEdge predicate on the "search_index" edge with a given conditions (other predicates).
+func HasSearchIndexWith(preds ...predicate.BookSearchIndex) predicate.Book {
+	return predicate.Book(func(s *sql.Selector) {
+		step := newSearchIndexStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Book) predicate.Book {
 	return predicate.Book(sql.AndPredicates(predicates...))

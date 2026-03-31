@@ -69,6 +69,18 @@ func (f BookReviewFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BookReviewMutation", m)
 }
 
+// The BookSearchIndexFunc type is an adapter to allow the use of ordinary
+// function as BookSearchIndex mutator.
+type BookSearchIndexFunc func(context.Context, *ent.BookSearchIndexMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BookSearchIndexFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.BookSearchIndexMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BookSearchIndexMutation", m)
+}
+
 // The DimensionFunc type is an adapter to allow the use of ordinary
 // function as Dimension mutator.
 type DimensionFunc func(context.Context, *ent.DimensionMutation) (ent.Value, error)

@@ -73,6 +73,8 @@ const (
 	EdgeReviews = "reviews"
 	// EdgeReadingProgress holds the string denoting the reading_progress edge name in mutations.
 	EdgeReadingProgress = "reading_progress"
+	// EdgeSearchIndex holds the string denoting the search_index edge name in mutations.
+	EdgeSearchIndex = "search_index"
 	// Table holds the table name of the book in the database.
 	Table = "books"
 	// UploaderTable is the table that holds the uploader relation/edge.
@@ -104,6 +106,13 @@ const (
 	// ReadingProgressInverseTable is the table name for the BookReadingProgress entity.
 	// It exists in this package in order to avoid circular dependency with the "bookreadingprogress" package.
 	ReadingProgressInverseTable = "book_reading_progresses"
+	// SearchIndexTable is the table that holds the search_index relation/edge.
+	SearchIndexTable = "book_search_indexes"
+	// SearchIndexInverseTable is the table name for the BookSearchIndex entity.
+	// It exists in this package in order to avoid circular dependency with the "booksearchindex" package.
+	SearchIndexInverseTable = "book_search_indexes"
+	// SearchIndexColumn is the table column denoting the search_index relation/edge.
+	SearchIndexColumn = "book_id"
 )
 
 // Columns holds all SQL columns for book fields.
@@ -417,6 +426,20 @@ func ByReadingProgress(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newReadingProgressStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// BySearchIndexCount orders the results by search_index count.
+func BySearchIndexCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSearchIndexStep(), opts...)
+	}
+}
+
+// BySearchIndex orders the results by search_index terms.
+func BySearchIndex(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSearchIndexStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newUploaderStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -450,5 +473,12 @@ func newReadingProgressStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ReadingProgressInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, ReadingProgressTable, ReadingProgressPrimaryKey...),
+	)
+}
+func newSearchIndexStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SearchIndexInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SearchIndexTable, SearchIndexColumn),
 	)
 }

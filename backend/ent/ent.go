@@ -17,6 +17,7 @@ import (
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreadingprogress"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreview"
+	"github.com/zhoumingjun/bookmgr/backend/ent/booksearchindex"
 	"github.com/zhoumingjun/bookmgr/backend/ent/dimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
@@ -84,6 +85,7 @@ func checkColumn(t, c string) error {
 			bookfile.Table:            bookfile.ValidColumn,
 			bookreadingprogress.Table: bookreadingprogress.ValidColumn,
 			bookreview.Table:          bookreview.ValidColumn,
+			booksearchindex.Table:     booksearchindex.ValidColumn,
 			dimension.Table:           dimension.ValidColumn,
 			user.Table:                user.ValidColumn,
 		})

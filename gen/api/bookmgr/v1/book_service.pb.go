@@ -289,7 +289,17 @@ type ListBooksRequest struct {
 	// Filter by dimension slug (optional).
 	DimensionSlug string `protobuf:"bytes,3,opt,name=dimension_slug,json=dimensionSlug,proto3" json:"dimension_slug,omitempty"`
 	// Filter by status (optional): draft/pending/approved/rejected.
-	Status        string `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
+	Status string `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
+	// Search query for title/author/description (optional).
+	SearchQuery string `protobuf:"bytes,5,opt,name=search_query,json=searchQuery,proto3" json:"search_query,omitempty"`
+	// Sort field: created_at (default), title, view_count.
+	SortField string `protobuf:"bytes,6,opt,name=sort_field,json=sortField,proto3" json:"sort_field,omitempty"`
+	// Sort direction: true = DESC, false = ASC.
+	SortDesc bool `protobuf:"varint,7,opt,name=sort_desc,json=sortDesc,proto3" json:"sort_desc,omitempty"`
+	// Minimum age in years for filtering.
+	AgeMin int32 `protobuf:"varint,8,opt,name=age_min,json=ageMin,proto3" json:"age_min,omitempty"`
+	// Maximum age in years for filtering.
+	AgeMax        int32 `protobuf:"varint,9,opt,name=age_max,json=ageMax,proto3" json:"age_max,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -350,6 +360,41 @@ func (x *ListBooksRequest) GetStatus() string {
 		return x.Status
 	}
 	return ""
+}
+
+func (x *ListBooksRequest) GetSearchQuery() string {
+	if x != nil {
+		return x.SearchQuery
+	}
+	return ""
+}
+
+func (x *ListBooksRequest) GetSortField() string {
+	if x != nil {
+		return x.SortField
+	}
+	return ""
+}
+
+func (x *ListBooksRequest) GetSortDesc() bool {
+	if x != nil {
+		return x.SortDesc
+	}
+	return false
+}
+
+func (x *ListBooksRequest) GetAgeMin() int32 {
+	if x != nil {
+		return x.AgeMin
+	}
+	return 0
+}
+
+func (x *ListBooksRequest) GetAgeMax() int32 {
+	if x != nil {
+		return x.AgeMax
+	}
+	return 0
 }
 
 // ListBooksResponse is the response for ListBooks.
@@ -1050,13 +1095,19 @@ const file_bookmgr_v1_book_service_proto_rawDesc = "" +
 	"\vcreate_time\x18\x17 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"createTime\x12;\n" +
 	"\vupdate_time\x18\x18 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
-	"updateTime\"\x98\x01\n" +
+	"updateTime\"\xa9\x02\n" +
 	"\x10ListBooksRequest\x12&\n" +
 	"\tpage_size\x18\x01 \x01(\x05B\t\xbaH\x06\x1a\x04\x18d(\x00R\bpageSize\x12\x1d\n" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12%\n" +
 	"\x0edimension_slug\x18\x03 \x01(\tR\rdimensionSlug\x12\x16\n" +
-	"\x06status\x18\x04 \x01(\tR\x06status\"c\n" +
+	"\x06status\x18\x04 \x01(\tR\x06status\x12!\n" +
+	"\fsearch_query\x18\x05 \x01(\tR\vsearchQuery\x12\x1d\n" +
+	"\n" +
+	"sort_field\x18\x06 \x01(\tR\tsortField\x12\x1b\n" +
+	"\tsort_desc\x18\a \x01(\bR\bsortDesc\x12\x17\n" +
+	"\aage_min\x18\b \x01(\x05R\x06ageMin\x12\x17\n" +
+	"\aage_max\x18\t \x01(\x05R\x06ageMax\"c\n" +
 	"\x11ListBooksResponse\x12&\n" +
 	"\x05books\x18\x01 \x03(\v2\x10.bookmgr.v1.BookR\x05books\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\")\n" +

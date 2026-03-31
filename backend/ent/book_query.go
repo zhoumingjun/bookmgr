@@ -18,6 +18,7 @@ import (
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreadingprogress"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreview"
+	"github.com/zhoumingjun/bookmgr/backend/ent/booksearchindex"
 	"github.com/zhoumingjun/bookmgr/backend/ent/predicate"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
@@ -34,6 +35,7 @@ type BookQuery struct {
 	withFiles           *BookFileQuery
 	withReviews         *BookReviewQuery
 	withReadingProgress *BookReadingProgressQuery
+	withSearchIndex     *BookSearchIndexQuery
 	withFKs             bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -174,6 +176,28 @@ func (_q *BookQuery) QueryReadingProgress() *BookReadingProgressQuery {
 			sqlgraph.From(book.Table, book.FieldID, selector),
 			sqlgraph.To(bookreadingprogress.Table, bookreadingprogress.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, book.ReadingProgressTable, book.ReadingProgressPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySearchIndex chains the current query on the "search_index" edge.
+func (_q *BookQuery) QuerySearchIndex() *BookSearchIndexQuery {
+	query := (&BookSearchIndexClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(book.Table, book.FieldID, selector),
+			sqlgraph.To(booksearchindex.Table, booksearchindex.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, book.SearchIndexTable, book.SearchIndexColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -378,6 +402,7 @@ func (_q *BookQuery) Clone() *BookQuery {
 		withFiles:           _q.withFiles.Clone(),
 		withReviews:         _q.withReviews.Clone(),
 		withReadingProgress: _q.withReadingProgress.Clone(),
+		withSearchIndex:     _q.withSearchIndex.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -436,6 +461,17 @@ func (_q *BookQuery) WithReadingProgress(opts ...func(*BookReadingProgressQuery)
 		opt(query)
 	}
 	_q.withReadingProgress = query
+	return _q
+}
+
+// WithSearchIndex tells the query-builder to eager-load the nodes that are connected to
+// the "search_index" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *BookQuery) WithSearchIndex(opts ...func(*BookSearchIndexQuery)) *BookQuery {
+	query := (&BookSearchIndexClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withSearchIndex = query
 	return _q
 }
 
@@ -518,12 +554,13 @@ func (_q *BookQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Book, e
 		nodes       = []*Book{}
 		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [6]bool{
 			_q.withUploader != nil,
 			_q.withBookDimensions != nil,
 			_q.withFiles != nil,
 			_q.withReviews != nil,
 			_q.withReadingProgress != nil,
+			_q.withSearchIndex != nil,
 		}
 	)
 	if withFKs {
@@ -578,6 +615,13 @@ func (_q *BookQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Book, e
 		if err := _q.loadReadingProgress(ctx, query, nodes,
 			func(n *Book) { n.Edges.ReadingProgress = []*BookReadingProgress{} },
 			func(n *Book, e *BookReadingProgress) { n.Edges.ReadingProgress = append(n.Edges.ReadingProgress, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withSearchIndex; query != nil {
+		if err := _q.loadSearchIndex(ctx, query, nodes,
+			func(n *Book) { n.Edges.SearchIndex = []*BookSearchIndex{} },
+			func(n *Book, e *BookSearchIndex) { n.Edges.SearchIndex = append(n.Edges.SearchIndex, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -824,6 +868,36 @@ func (_q *BookQuery) loadReadingProgress(ctx context.Context, query *BookReading
 		for kn := range nodes {
 			assign(kn, n)
 		}
+	}
+	return nil
+}
+func (_q *BookQuery) loadSearchIndex(ctx context.Context, query *BookSearchIndexQuery, nodes []*Book, init func(*Book), assign func(*Book, *BookSearchIndex)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Book)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(booksearchindex.FieldBookID)
+	}
+	query.Where(predicate.BookSearchIndex(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(book.SearchIndexColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.BookID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "book_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

@@ -31,10 +31,15 @@ func NewBookHandler(bookService *service.BookService) *BookHandler {
 
 func (h *BookHandler) ListBooks(ctx context.Context, req *bookmgrv1.ListBooksRequest) (*bookmgrv1.ListBooksResponse, error) {
 	params := repository.ListBooksParams{
-		Page:          1,
-		PerPage:       int(req.GetPageSize()),
-		DimensionSlug: req.GetDimensionSlug(),
-		Status:        req.GetStatus(),
+		Page:           1,
+		PerPage:        int(req.GetPageSize()),
+		DimensionSlug:  req.GetDimensionSlug(),
+		Status:         req.GetStatus(),
+		SearchQuery:    req.GetSearchQuery(),
+		SortField:     req.GetSortField(),
+		SortDesc:      req.GetSortDesc(),
+		AgeMinYears:   int(req.GetAgeMin()),
+		AgeMaxYears:   int(req.GetAgeMax()),
 	}
 	if params.PerPage == 0 {
 		params.PerPage = 20

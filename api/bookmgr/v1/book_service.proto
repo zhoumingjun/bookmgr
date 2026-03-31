@@ -149,6 +149,21 @@ message ListBooksRequest {
 
   // Filter by status (optional): draft/pending/approved/rejected.
   string status = 4;
+
+  // Search query for title/author/description (optional).
+  string search_query = 5;
+
+  // Sort field: created_at (default), title, view_count.
+  string sort_field = 6;
+
+  // Sort direction: true = DESC, false = ASC.
+  bool sort_desc = 7;
+
+  // Minimum age in years for filtering.
+  int32 age_min = 8;
+
+  // Maximum age in years for filtering.
+  int32 age_max = 9;
 }
 
 // ListBooksResponse is the response for ListBooks.

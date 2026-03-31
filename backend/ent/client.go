@@ -21,6 +21,7 @@ import (
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreadingprogress"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreview"
+	"github.com/zhoumingjun/bookmgr/backend/ent/booksearchindex"
 	"github.com/zhoumingjun/bookmgr/backend/ent/dimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
@@ -40,6 +41,8 @@ type Client struct {
 	BookReadingProgress *BookReadingProgressClient
 	// BookReview is the client for interacting with the BookReview builders.
 	BookReview *BookReviewClient
+	// BookSearchIndex is the client for interacting with the BookSearchIndex builders.
+	BookSearchIndex *BookSearchIndexClient
 	// Dimension is the client for interacting with the Dimension builders.
 	Dimension *DimensionClient
 	// User is the client for interacting with the User builders.
@@ -60,6 +63,7 @@ func (c *Client) init() {
 	c.BookFile = NewBookFileClient(c.config)
 	c.BookReadingProgress = NewBookReadingProgressClient(c.config)
 	c.BookReview = NewBookReviewClient(c.config)
+	c.BookSearchIndex = NewBookSearchIndexClient(c.config)
 	c.Dimension = NewDimensionClient(c.config)
 	c.User = NewUserClient(c.config)
 }
@@ -159,6 +163,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		BookFile:            NewBookFileClient(cfg),
 		BookReadingProgress: NewBookReadingProgressClient(cfg),
 		BookReview:          NewBookReviewClient(cfg),
+		BookSearchIndex:     NewBookSearchIndexClient(cfg),
 		Dimension:           NewDimensionClient(cfg),
 		User:                NewUserClient(cfg),
 	}, nil
@@ -185,6 +190,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		BookFile:            NewBookFileClient(cfg),
 		BookReadingProgress: NewBookReadingProgressClient(cfg),
 		BookReview:          NewBookReviewClient(cfg),
+		BookSearchIndex:     NewBookSearchIndexClient(cfg),
 		Dimension:           NewDimensionClient(cfg),
 		User:                NewUserClient(cfg),
 	}, nil
@@ -217,7 +223,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.Book, c.BookDimension, c.BookFile, c.BookReadingProgress, c.BookReview,
-		c.Dimension, c.User,
+		c.BookSearchIndex, c.Dimension, c.User,
 	} {
 		n.Use(hooks...)
 	}
@@ -228,7 +234,7 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.Book, c.BookDimension, c.BookFile, c.BookReadingProgress, c.BookReview,
-		c.Dimension, c.User,
+		c.BookSearchIndex, c.Dimension, c.User,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -247,6 +253,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.BookReadingProgress.mutate(ctx, m)
 	case *BookReviewMutation:
 		return c.BookReview.mutate(ctx, m)
+	case *BookSearchIndexMutation:
+		return c.BookSearchIndex.mutate(ctx, m)
 	case *DimensionMutation:
 		return c.Dimension.mutate(ctx, m)
 	case *UserMutation:
@@ -437,6 +445,22 @@ func (c *BookClient) QueryReadingProgress(_m *Book) *BookReadingProgressQuery {
 			sqlgraph.From(book.Table, book.FieldID, id),
 			sqlgraph.To(bookreadingprogress.Table, bookreadingprogress.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, book.ReadingProgressTable, book.ReadingProgressPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySearchIndex queries the search_index edge of a Book.
+func (c *BookClient) QuerySearchIndex(_m *Book) *BookSearchIndexQuery {
+	query := (&BookSearchIndexClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(book.Table, book.FieldID, id),
+			sqlgraph.To(booksearchindex.Table, booksearchindex.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, book.SearchIndexTable, book.SearchIndexColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -1129,6 +1153,155 @@ func (c *BookReviewClient) mutate(ctx context.Context, m *BookReviewMutation) (V
 	}
 }
 
+// BookSearchIndexClient is a client for the BookSearchIndex schema.
+type BookSearchIndexClient struct {
+	config
+}
+
+// NewBookSearchIndexClient returns a client for the BookSearchIndex from the given config.
+func NewBookSearchIndexClient(c config) *BookSearchIndexClient {
+	return &BookSearchIndexClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `booksearchindex.Hooks(f(g(h())))`.
+func (c *BookSearchIndexClient) Use(hooks ...Hook) {
+	c.hooks.BookSearchIndex = append(c.hooks.BookSearchIndex, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `booksearchindex.Intercept(f(g(h())))`.
+func (c *BookSearchIndexClient) Intercept(interceptors ...Interceptor) {
+	c.inters.BookSearchIndex = append(c.inters.BookSearchIndex, interceptors...)
+}
+
+// Create returns a builder for creating a BookSearchIndex entity.
+func (c *BookSearchIndexClient) Create() *BookSearchIndexCreate {
+	mutation := newBookSearchIndexMutation(c.config, OpCreate)
+	return &BookSearchIndexCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of BookSearchIndex entities.
+func (c *BookSearchIndexClient) CreateBulk(builders ...*BookSearchIndexCreate) *BookSearchIndexCreateBulk {
+	return &BookSearchIndexCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *BookSearchIndexClient) MapCreateBulk(slice any, setFunc func(*BookSearchIndexCreate, int)) *BookSearchIndexCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &BookSearchIndexCreateBulk{err: fmt.Errorf("calling to BookSearchIndexClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*BookSearchIndexCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &BookSearchIndexCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for BookSearchIndex.
+func (c *BookSearchIndexClient) Update() *BookSearchIndexUpdate {
+	mutation := newBookSearchIndexMutation(c.config, OpUpdate)
+	return &BookSearchIndexUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BookSearchIndexClient) UpdateOne(_m *BookSearchIndex) *BookSearchIndexUpdateOne {
+	mutation := newBookSearchIndexMutation(c.config, OpUpdateOne, withBookSearchIndex(_m))
+	return &BookSearchIndexUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BookSearchIndexClient) UpdateOneID(id uuid.UUID) *BookSearchIndexUpdateOne {
+	mutation := newBookSearchIndexMutation(c.config, OpUpdateOne, withBookSearchIndexID(id))
+	return &BookSearchIndexUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for BookSearchIndex.
+func (c *BookSearchIndexClient) Delete() *BookSearchIndexDelete {
+	mutation := newBookSearchIndexMutation(c.config, OpDelete)
+	return &BookSearchIndexDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *BookSearchIndexClient) DeleteOne(_m *BookSearchIndex) *BookSearchIndexDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *BookSearchIndexClient) DeleteOneID(id uuid.UUID) *BookSearchIndexDeleteOne {
+	builder := c.Delete().Where(booksearchindex.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BookSearchIndexDeleteOne{builder}
+}
+
+// Query returns a query builder for BookSearchIndex.
+func (c *BookSearchIndexClient) Query() *BookSearchIndexQuery {
+	return &BookSearchIndexQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeBookSearchIndex},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a BookSearchIndex entity by its id.
+func (c *BookSearchIndexClient) Get(ctx context.Context, id uuid.UUID) (*BookSearchIndex, error) {
+	return c.Query().Where(booksearchindex.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BookSearchIndexClient) GetX(ctx context.Context, id uuid.UUID) *BookSearchIndex {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryBook queries the book edge of a BookSearchIndex.
+func (c *BookSearchIndexClient) QueryBook(_m *BookSearchIndex) *BookQuery {
+	query := (&BookClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(booksearchindex.Table, booksearchindex.FieldID, id),
+			sqlgraph.To(book.Table, book.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, booksearchindex.BookTable, booksearchindex.BookColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *BookSearchIndexClient) Hooks() []Hook {
+	return c.hooks.BookSearchIndex
+}
+
+// Interceptors returns the client interceptors.
+func (c *BookSearchIndexClient) Interceptors() []Interceptor {
+	return c.inters.BookSearchIndex
+}
+
+func (c *BookSearchIndexClient) mutate(ctx context.Context, m *BookSearchIndexMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&BookSearchIndexCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&BookSearchIndexUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&BookSearchIndexUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&BookSearchIndexDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown BookSearchIndex mutation op: %q", m.Op())
+	}
+}
+
 // DimensionClient is a client for the Dimension schema.
 type DimensionClient struct {
 	config
@@ -1510,11 +1683,11 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Book, BookDimension, BookFile, BookReadingProgress, BookReview, Dimension,
-		User []ent.Hook
+		Book, BookDimension, BookFile, BookReadingProgress, BookReview, BookSearchIndex,
+		Dimension, User []ent.Hook
 	}
 	inters struct {
-		Book, BookDimension, BookFile, BookReadingProgress, BookReview, Dimension,
-		User []ent.Interceptor
+		Book, BookDimension, BookFile, BookReadingProgress, BookReview, BookSearchIndex,
+		Dimension, User []ent.Interceptor
 	}
 )
