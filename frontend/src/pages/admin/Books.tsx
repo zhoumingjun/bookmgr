@@ -70,9 +70,12 @@ export default function BooksPage() {
       width: 100,
     }] : []),
     {
-      title: t('books.actions'), key: 'actions', width: 120,
+      title: t('books.actions'), key: 'actions', width: 160,
       render: (_: unknown, record: BookDTO) => (
         <Space size={4}>
+          <Button type="link" size="small" onClick={() => navigate(`/admin/books/detail/${record.id}`)}>
+            详情
+          </Button>
           <Button type="link" size="small" onClick={() => navigate(`/admin/books/${record.id}`)}>
             {t('books.edit')}
           </Button>

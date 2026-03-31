@@ -9,9 +9,10 @@ import UserEditPage from './pages/admin/UserEdit';
 import BooksPage from './pages/admin/Books';
 import BookNewPage from './pages/admin/BookNew';
 import BookEditPage from './pages/admin/BookEdit';
+import AdminBookDetailPage from './pages/admin/BookDetail';
 import DimensionManagePage from './pages/admin/DimensionManagePage';
 import ConsoleBooksPage from './pages/console/Books';
-import BookDetailPage from './pages/console/BookDetail';
+import ConsoleBookDetailPage from './pages/console/BookDetail';
 
 function App() {
   return (
@@ -23,7 +24,7 @@ function App() {
           <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
             {/* Console routes — all authenticated users */}
             <Route path="/console/books" element={<ConsoleBooksPage />} />
-            <Route path="/console/books/:id" element={<BookDetailPage />} />
+            <Route path="/console/books/:id" element={<ConsoleBookDetailPage />} />
             <Route path="/console" element={<Navigate to="/console/books" replace />} />
             {/* Admin routes — admin only */}
             <Route path="/admin/users" element={<ProtectedRoute requireAdmin><UsersPage /></ProtectedRoute>} />
@@ -31,6 +32,7 @@ function App() {
             <Route path="/admin/books" element={<ProtectedRoute requireAdmin><BooksPage /></ProtectedRoute>} />
             <Route path="/admin/books/new" element={<ProtectedRoute requireAdmin><BookNewPage /></ProtectedRoute>} />
             <Route path="/admin/books/:id" element={<ProtectedRoute requireAdmin><BookEditPage /></ProtectedRoute>} />
+            <Route path="/admin/books/detail/:id" element={<ProtectedRoute requireAdmin><AdminBookDetailPage /></ProtectedRoute>} />
             <Route path="/admin/dimensions" element={<ProtectedRoute requireAdmin><DimensionManagePage /></ProtectedRoute>} />
             <Route path="/admin" element={<Navigate to="/admin/users" replace />} />
           </Route>
