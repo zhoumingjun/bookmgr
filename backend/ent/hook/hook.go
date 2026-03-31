@@ -33,6 +33,30 @@ func (f BookDimensionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Valu
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BookDimensionMutation", m)
 }
 
+// The BookFavoriteFunc type is an adapter to allow the use of ordinary
+// function as BookFavorite mutator.
+type BookFavoriteFunc func(context.Context, *ent.BookFavoriteMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BookFavoriteFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.BookFavoriteMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BookFavoriteMutation", m)
+}
+
+// The BookFeedbackFunc type is an adapter to allow the use of ordinary
+// function as BookFeedback mutator.
+type BookFeedbackFunc func(context.Context, *ent.BookFeedbackMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BookFeedbackFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.BookFeedbackMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BookFeedbackMutation", m)
+}
+
 // The BookFileFunc type is an adapter to allow the use of ordinary
 // function as BookFile mutator.
 type BookFileFunc func(context.Context, *ent.BookFileMutation) (ent.Value, error)

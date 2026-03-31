@@ -8,6 +8,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookdimension"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookfavorite"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookfeedback"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreadingprogress"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreview"
@@ -151,6 +153,30 @@ func init() {
 	bookdimensionDescID := bookdimensionFields[0].Descriptor()
 	// bookdimension.DefaultID holds the default value on creation for the id field.
 	bookdimension.DefaultID = bookdimensionDescID.Default.(func() uuid.UUID)
+	bookfavoriteFields := schema.BookFavorite{}.Fields()
+	_ = bookfavoriteFields
+	// bookfavoriteDescCreatedAt is the schema descriptor for created_at field.
+	bookfavoriteDescCreatedAt := bookfavoriteFields[3].Descriptor()
+	// bookfavorite.DefaultCreatedAt holds the default value on creation for the created_at field.
+	bookfavorite.DefaultCreatedAt = bookfavoriteDescCreatedAt.Default.(func() time.Time)
+	// bookfavoriteDescID is the schema descriptor for id field.
+	bookfavoriteDescID := bookfavoriteFields[0].Descriptor()
+	// bookfavorite.DefaultID holds the default value on creation for the id field.
+	bookfavorite.DefaultID = bookfavoriteDescID.Default.(func() uuid.UUID)
+	bookfeedbackFields := schema.BookFeedback{}.Fields()
+	_ = bookfeedbackFields
+	// bookfeedbackDescUseScenario is the schema descriptor for use_scenario field.
+	bookfeedbackDescUseScenario := bookfeedbackFields[5].Descriptor()
+	// bookfeedback.UseScenarioValidator is a validator for the "use_scenario" field. It is called by the builders before save.
+	bookfeedback.UseScenarioValidator = bookfeedbackDescUseScenario.Validators[0].(func(string) error)
+	// bookfeedbackDescCreatedAt is the schema descriptor for created_at field.
+	bookfeedbackDescCreatedAt := bookfeedbackFields[6].Descriptor()
+	// bookfeedback.DefaultCreatedAt holds the default value on creation for the created_at field.
+	bookfeedback.DefaultCreatedAt = bookfeedbackDescCreatedAt.Default.(func() time.Time)
+	// bookfeedbackDescID is the schema descriptor for id field.
+	bookfeedbackDescID := bookfeedbackFields[0].Descriptor()
+	// bookfeedback.DefaultID holds the default value on creation for the id field.
+	bookfeedback.DefaultID = bookfeedbackDescID.Default.(func() uuid.UUID)
 	bookfileFields := schema.BookFile{}.Fields()
 	_ = bookfileFields
 	// bookfileDescFileType is the schema descriptor for file_type field.

@@ -69,9 +69,11 @@ type Book struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the BookQuery when eager-loading is set.
-	Edges            BookEdges `json:"edges"`
-	book_review_book *uuid.UUID
-	selectValues     sql.SelectValues
+	Edges              BookEdges `json:"edges"`
+	book_favorite_book *uuid.UUID
+	book_feedback_book *uuid.UUID
+	book_review_book   *uuid.UUID
+	selectValues       sql.SelectValues
 }
 
 // BookEdges holds the relations/edges for other nodes in the graph.
@@ -164,7 +166,11 @@ func (*Book) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullTime)
 		case book.FieldID, book.FieldUploaderID:
 			values[i] = new(uuid.UUID)
-		case book.ForeignKeys[0]: // book_review_book
+		case book.ForeignKeys[0]: // book_favorite_book
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case book.ForeignKeys[1]: // book_feedback_book
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case book.ForeignKeys[2]: // book_review_book
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			values[i] = new(sql.UnknownType)
@@ -332,6 +338,20 @@ func (_m *Book) assignValues(columns []string, values []any) error {
 				_m.UpdatedAt = value.Time
 			}
 		case book.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field book_favorite_book", values[i])
+			} else if value.Valid {
+				_m.book_favorite_book = new(uuid.UUID)
+				*_m.book_favorite_book = *value.S.(*uuid.UUID)
+			}
+		case book.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field book_feedback_book", values[i])
+			} else if value.Valid {
+				_m.book_feedback_book = new(uuid.UUID)
+				*_m.book_feedback_book = *value.S.(*uuid.UUID)
+			}
+		case book.ForeignKeys[2]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field book_review_book", values[i])
 			} else if value.Valid {

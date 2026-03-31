@@ -33,6 +33,8 @@ type User struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges                UserEdges `json:"edges"`
+	book_favorite_user   *uuid.UUID
+	book_feedback_user   *uuid.UUID
 	book_review_reviewer *uuid.UUID
 	selectValues         sql.SelectValues
 }
@@ -99,7 +101,11 @@ func (*User) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullTime)
 		case user.FieldID:
 			values[i] = new(uuid.UUID)
-		case user.ForeignKeys[0]: // book_review_reviewer
+		case user.ForeignKeys[0]: // book_favorite_user
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case user.ForeignKeys[1]: // book_feedback_user
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case user.ForeignKeys[2]: // book_review_reviewer
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			values[i] = new(sql.UnknownType)
@@ -159,6 +165,20 @@ func (_m *User) assignValues(columns []string, values []any) error {
 				_m.UpdatedAt = value.Time
 			}
 		case user.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field book_favorite_user", values[i])
+			} else if value.Valid {
+				_m.book_favorite_user = new(uuid.UUID)
+				*_m.book_favorite_user = *value.S.(*uuid.UUID)
+			}
+		case user.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field book_feedback_user", values[i])
+			} else if value.Valid {
+				_m.book_feedback_user = new(uuid.UUID)
+				*_m.book_feedback_user = *value.S.(*uuid.UUID)
+			}
+		case user.ForeignKeys[2]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field book_review_reviewer", values[i])
 			} else if value.Valid {

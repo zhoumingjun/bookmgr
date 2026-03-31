@@ -16,6 +16,10 @@ type Tx struct {
 	Book *BookClient
 	// BookDimension is the client for interacting with the BookDimension builders.
 	BookDimension *BookDimensionClient
+	// BookFavorite is the client for interacting with the BookFavorite builders.
+	BookFavorite *BookFavoriteClient
+	// BookFeedback is the client for interacting with the BookFeedback builders.
+	BookFeedback *BookFeedbackClient
 	// BookFile is the client for interacting with the BookFile builders.
 	BookFile *BookFileClient
 	// BookReadingProgress is the client for interacting with the BookReadingProgress builders.
@@ -161,6 +165,8 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.Book = NewBookClient(tx.config)
 	tx.BookDimension = NewBookDimensionClient(tx.config)
+	tx.BookFavorite = NewBookFavoriteClient(tx.config)
+	tx.BookFeedback = NewBookFeedbackClient(tx.config)
 	tx.BookFile = NewBookFileClient(tx.config)
 	tx.BookReadingProgress = NewBookReadingProgressClient(tx.config)
 	tx.BookReview = NewBookReviewClient(tx.config)

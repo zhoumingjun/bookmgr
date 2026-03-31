@@ -18,6 +18,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookdimension"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookfavorite"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookfeedback"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreadingprogress"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreview"
@@ -35,6 +37,10 @@ type Client struct {
 	Book *BookClient
 	// BookDimension is the client for interacting with the BookDimension builders.
 	BookDimension *BookDimensionClient
+	// BookFavorite is the client for interacting with the BookFavorite builders.
+	BookFavorite *BookFavoriteClient
+	// BookFeedback is the client for interacting with the BookFeedback builders.
+	BookFeedback *BookFeedbackClient
 	// BookFile is the client for interacting with the BookFile builders.
 	BookFile *BookFileClient
 	// BookReadingProgress is the client for interacting with the BookReadingProgress builders.
@@ -60,6 +66,8 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Book = NewBookClient(c.config)
 	c.BookDimension = NewBookDimensionClient(c.config)
+	c.BookFavorite = NewBookFavoriteClient(c.config)
+	c.BookFeedback = NewBookFeedbackClient(c.config)
 	c.BookFile = NewBookFileClient(c.config)
 	c.BookReadingProgress = NewBookReadingProgressClient(c.config)
 	c.BookReview = NewBookReviewClient(c.config)
@@ -160,6 +168,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:              cfg,
 		Book:                NewBookClient(cfg),
 		BookDimension:       NewBookDimensionClient(cfg),
+		BookFavorite:        NewBookFavoriteClient(cfg),
+		BookFeedback:        NewBookFeedbackClient(cfg),
 		BookFile:            NewBookFileClient(cfg),
 		BookReadingProgress: NewBookReadingProgressClient(cfg),
 		BookReview:          NewBookReviewClient(cfg),
@@ -187,6 +197,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:              cfg,
 		Book:                NewBookClient(cfg),
 		BookDimension:       NewBookDimensionClient(cfg),
+		BookFavorite:        NewBookFavoriteClient(cfg),
+		BookFeedback:        NewBookFeedbackClient(cfg),
 		BookFile:            NewBookFileClient(cfg),
 		BookReadingProgress: NewBookReadingProgressClient(cfg),
 		BookReview:          NewBookReviewClient(cfg),
@@ -222,8 +234,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Book, c.BookDimension, c.BookFile, c.BookReadingProgress, c.BookReview,
-		c.BookSearchIndex, c.Dimension, c.User,
+		c.Book, c.BookDimension, c.BookFavorite, c.BookFeedback, c.BookFile,
+		c.BookReadingProgress, c.BookReview, c.BookSearchIndex, c.Dimension, c.User,
 	} {
 		n.Use(hooks...)
 	}
@@ -233,8 +245,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Book, c.BookDimension, c.BookFile, c.BookReadingProgress, c.BookReview,
-		c.BookSearchIndex, c.Dimension, c.User,
+		c.Book, c.BookDimension, c.BookFavorite, c.BookFeedback, c.BookFile,
+		c.BookReadingProgress, c.BookReview, c.BookSearchIndex, c.Dimension, c.User,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -247,6 +259,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Book.mutate(ctx, m)
 	case *BookDimensionMutation:
 		return c.BookDimension.mutate(ctx, m)
+	case *BookFavoriteMutation:
+		return c.BookFavorite.mutate(ctx, m)
+	case *BookFeedbackMutation:
+		return c.BookFeedback.mutate(ctx, m)
 	case *BookFileMutation:
 		return c.BookFile.mutate(ctx, m)
 	case *BookReadingProgressMutation:
@@ -655,6 +671,336 @@ func (c *BookDimensionClient) mutate(ctx context.Context, m *BookDimensionMutati
 		return (&BookDimensionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown BookDimension mutation op: %q", m.Op())
+	}
+}
+
+// BookFavoriteClient is a client for the BookFavorite schema.
+type BookFavoriteClient struct {
+	config
+}
+
+// NewBookFavoriteClient returns a client for the BookFavorite from the given config.
+func NewBookFavoriteClient(c config) *BookFavoriteClient {
+	return &BookFavoriteClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `bookfavorite.Hooks(f(g(h())))`.
+func (c *BookFavoriteClient) Use(hooks ...Hook) {
+	c.hooks.BookFavorite = append(c.hooks.BookFavorite, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `bookfavorite.Intercept(f(g(h())))`.
+func (c *BookFavoriteClient) Intercept(interceptors ...Interceptor) {
+	c.inters.BookFavorite = append(c.inters.BookFavorite, interceptors...)
+}
+
+// Create returns a builder for creating a BookFavorite entity.
+func (c *BookFavoriteClient) Create() *BookFavoriteCreate {
+	mutation := newBookFavoriteMutation(c.config, OpCreate)
+	return &BookFavoriteCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of BookFavorite entities.
+func (c *BookFavoriteClient) CreateBulk(builders ...*BookFavoriteCreate) *BookFavoriteCreateBulk {
+	return &BookFavoriteCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *BookFavoriteClient) MapCreateBulk(slice any, setFunc func(*BookFavoriteCreate, int)) *BookFavoriteCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &BookFavoriteCreateBulk{err: fmt.Errorf("calling to BookFavoriteClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*BookFavoriteCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &BookFavoriteCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for BookFavorite.
+func (c *BookFavoriteClient) Update() *BookFavoriteUpdate {
+	mutation := newBookFavoriteMutation(c.config, OpUpdate)
+	return &BookFavoriteUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BookFavoriteClient) UpdateOne(_m *BookFavorite) *BookFavoriteUpdateOne {
+	mutation := newBookFavoriteMutation(c.config, OpUpdateOne, withBookFavorite(_m))
+	return &BookFavoriteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BookFavoriteClient) UpdateOneID(id uuid.UUID) *BookFavoriteUpdateOne {
+	mutation := newBookFavoriteMutation(c.config, OpUpdateOne, withBookFavoriteID(id))
+	return &BookFavoriteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for BookFavorite.
+func (c *BookFavoriteClient) Delete() *BookFavoriteDelete {
+	mutation := newBookFavoriteMutation(c.config, OpDelete)
+	return &BookFavoriteDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *BookFavoriteClient) DeleteOne(_m *BookFavorite) *BookFavoriteDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *BookFavoriteClient) DeleteOneID(id uuid.UUID) *BookFavoriteDeleteOne {
+	builder := c.Delete().Where(bookfavorite.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BookFavoriteDeleteOne{builder}
+}
+
+// Query returns a query builder for BookFavorite.
+func (c *BookFavoriteClient) Query() *BookFavoriteQuery {
+	return &BookFavoriteQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeBookFavorite},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a BookFavorite entity by its id.
+func (c *BookFavoriteClient) Get(ctx context.Context, id uuid.UUID) (*BookFavorite, error) {
+	return c.Query().Where(bookfavorite.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BookFavoriteClient) GetX(ctx context.Context, id uuid.UUID) *BookFavorite {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUser queries the user edge of a BookFavorite.
+func (c *BookFavoriteClient) QueryUser(_m *BookFavorite) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(bookfavorite.Table, bookfavorite.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, bookfavorite.UserTable, bookfavorite.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryBook queries the book edge of a BookFavorite.
+func (c *BookFavoriteClient) QueryBook(_m *BookFavorite) *BookQuery {
+	query := (&BookClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(bookfavorite.Table, bookfavorite.FieldID, id),
+			sqlgraph.To(book.Table, book.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, bookfavorite.BookTable, bookfavorite.BookColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *BookFavoriteClient) Hooks() []Hook {
+	return c.hooks.BookFavorite
+}
+
+// Interceptors returns the client interceptors.
+func (c *BookFavoriteClient) Interceptors() []Interceptor {
+	return c.inters.BookFavorite
+}
+
+func (c *BookFavoriteClient) mutate(ctx context.Context, m *BookFavoriteMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&BookFavoriteCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&BookFavoriteUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&BookFavoriteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&BookFavoriteDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown BookFavorite mutation op: %q", m.Op())
+	}
+}
+
+// BookFeedbackClient is a client for the BookFeedback schema.
+type BookFeedbackClient struct {
+	config
+}
+
+// NewBookFeedbackClient returns a client for the BookFeedback from the given config.
+func NewBookFeedbackClient(c config) *BookFeedbackClient {
+	return &BookFeedbackClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `bookfeedback.Hooks(f(g(h())))`.
+func (c *BookFeedbackClient) Use(hooks ...Hook) {
+	c.hooks.BookFeedback = append(c.hooks.BookFeedback, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `bookfeedback.Intercept(f(g(h())))`.
+func (c *BookFeedbackClient) Intercept(interceptors ...Interceptor) {
+	c.inters.BookFeedback = append(c.inters.BookFeedback, interceptors...)
+}
+
+// Create returns a builder for creating a BookFeedback entity.
+func (c *BookFeedbackClient) Create() *BookFeedbackCreate {
+	mutation := newBookFeedbackMutation(c.config, OpCreate)
+	return &BookFeedbackCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of BookFeedback entities.
+func (c *BookFeedbackClient) CreateBulk(builders ...*BookFeedbackCreate) *BookFeedbackCreateBulk {
+	return &BookFeedbackCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *BookFeedbackClient) MapCreateBulk(slice any, setFunc func(*BookFeedbackCreate, int)) *BookFeedbackCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &BookFeedbackCreateBulk{err: fmt.Errorf("calling to BookFeedbackClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*BookFeedbackCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &BookFeedbackCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for BookFeedback.
+func (c *BookFeedbackClient) Update() *BookFeedbackUpdate {
+	mutation := newBookFeedbackMutation(c.config, OpUpdate)
+	return &BookFeedbackUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BookFeedbackClient) UpdateOne(_m *BookFeedback) *BookFeedbackUpdateOne {
+	mutation := newBookFeedbackMutation(c.config, OpUpdateOne, withBookFeedback(_m))
+	return &BookFeedbackUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BookFeedbackClient) UpdateOneID(id uuid.UUID) *BookFeedbackUpdateOne {
+	mutation := newBookFeedbackMutation(c.config, OpUpdateOne, withBookFeedbackID(id))
+	return &BookFeedbackUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for BookFeedback.
+func (c *BookFeedbackClient) Delete() *BookFeedbackDelete {
+	mutation := newBookFeedbackMutation(c.config, OpDelete)
+	return &BookFeedbackDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *BookFeedbackClient) DeleteOne(_m *BookFeedback) *BookFeedbackDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *BookFeedbackClient) DeleteOneID(id uuid.UUID) *BookFeedbackDeleteOne {
+	builder := c.Delete().Where(bookfeedback.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BookFeedbackDeleteOne{builder}
+}
+
+// Query returns a query builder for BookFeedback.
+func (c *BookFeedbackClient) Query() *BookFeedbackQuery {
+	return &BookFeedbackQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeBookFeedback},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a BookFeedback entity by its id.
+func (c *BookFeedbackClient) Get(ctx context.Context, id uuid.UUID) (*BookFeedback, error) {
+	return c.Query().Where(bookfeedback.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BookFeedbackClient) GetX(ctx context.Context, id uuid.UUID) *BookFeedback {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUser queries the user edge of a BookFeedback.
+func (c *BookFeedbackClient) QueryUser(_m *BookFeedback) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(bookfeedback.Table, bookfeedback.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, bookfeedback.UserTable, bookfeedback.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryBook queries the book edge of a BookFeedback.
+func (c *BookFeedbackClient) QueryBook(_m *BookFeedback) *BookQuery {
+	query := (&BookClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(bookfeedback.Table, bookfeedback.FieldID, id),
+			sqlgraph.To(book.Table, book.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, bookfeedback.BookTable, bookfeedback.BookColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *BookFeedbackClient) Hooks() []Hook {
+	return c.hooks.BookFeedback
+}
+
+// Interceptors returns the client interceptors.
+func (c *BookFeedbackClient) Interceptors() []Interceptor {
+	return c.inters.BookFeedback
+}
+
+func (c *BookFeedbackClient) mutate(ctx context.Context, m *BookFeedbackMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&BookFeedbackCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&BookFeedbackUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&BookFeedbackUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&BookFeedbackDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown BookFeedback mutation op: %q", m.Op())
 	}
 }
 
@@ -1683,11 +2029,11 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Book, BookDimension, BookFile, BookReadingProgress, BookReview, BookSearchIndex,
-		Dimension, User []ent.Hook
+		Book, BookDimension, BookFavorite, BookFeedback, BookFile, BookReadingProgress,
+		BookReview, BookSearchIndex, Dimension, User []ent.Hook
 	}
 	inters struct {
-		Book, BookDimension, BookFile, BookReadingProgress, BookReview, BookSearchIndex,
-		Dimension, User []ent.Interceptor
+		Book, BookDimension, BookFavorite, BookFeedback, BookFile, BookReadingProgress,
+		BookReview, BookSearchIndex, Dimension, User []ent.Interceptor
 	}
 )

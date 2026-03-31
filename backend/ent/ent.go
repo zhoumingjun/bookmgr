@@ -14,6 +14,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookdimension"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookfavorite"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookfeedback"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreadingprogress"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreview"
@@ -82,6 +84,8 @@ func checkColumn(t, c string) error {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			book.Table:                book.ValidColumn,
 			bookdimension.Table:       bookdimension.ValidColumn,
+			bookfavorite.Table:        bookfavorite.ValidColumn,
+			bookfeedback.Table:        bookfeedback.ValidColumn,
 			bookfile.Table:            bookfile.ValidColumn,
 			bookreadingprogress.Table: bookreadingprogress.ValidColumn,
 			bookreview.Table:          bookreview.ValidColumn,
