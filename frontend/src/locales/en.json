@@ -8,7 +8,9 @@
     "dimensionManagement": "Dimensions",
     "bookManagement": "Books",
     "bookCatalog": "Book Catalog",
-    "reviewManagement": "Review"
+    "reviewManagement": "Review",
+    "favorites": "My Favorites",
+    "feedback": "My Feedback"
   },
   "user": {
     "profile": "Profile",

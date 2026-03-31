@@ -8,7 +8,9 @@
     "dimensionManagement": "维度分类",
     "bookManagement": "书籍管理",
     "bookCatalog": "图书浏览",
-    "reviewManagement": "审核管理"
+    "reviewManagement": "审核管理",
+    "favorites": "我的收藏",
+    "feedback": "我的反馈"
   },
   "user": {
     "profile": "个人信息",
@@ -135,6 +137,14 @@
     "readOnline": "在线阅读",
     "addedAt": "添加时间",
     "noFile": "此图书暂未上传文件"
+  },
+  "favorites": {
+    "title": "我的收藏",
+    "empty": "暂无收藏"
+  },
+  "feedback": {
+    "title": "我的反馈",
+    "empty": "暂无反馈记录"
   },
   "common": {
     "loading": "加载中...",

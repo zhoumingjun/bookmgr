@@ -19,12 +19,18 @@ import (
 // UserHandler implements the gRPC UserServiceServer.
 type UserHandler struct {
 	bookmgrv1.UnimplementedUserServiceServer
-	userService *service.UserService
+	userService   *service.UserService
+	favService    *service.BookFavoriteService
+	fbService     *service.BookFeedbackService
 }
 
 // NewUserHandler creates a new UserHandler.
-func NewUserHandler(userService *service.UserService) *UserHandler {
-	return &UserHandler{userService: userService}
+func NewUserHandler(userService *service.UserService, favService *service.BookFavoriteService, fbService *service.BookFeedbackService) *UserHandler {
+	return &UserHandler{
+		userService:  userService,
+		favService:   favService,
+		fbService:    fbService,
+	}
 }
 
 // CreateUser creates a new user. Requires admin/super_admin role (enforced by middleware).
@@ -169,6 +175,82 @@ func (h *UserHandler) DeleteUser(ctx context.Context, req *bookmgrv1.DeleteUserR
 	}
 
 	return &bookmgrv1.DeleteUserResponse{}, nil
+}
+
+func (h *UserHandler) ListMyFavorites(ctx context.Context, req *bookmgrv1.ListMyFavoritesRequest) (*bookmgrv1.ListMyFavoritesResponse, error) {
+	claims, ok := middleware.ClaimsFromContext(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "authentication required")
+	}
+
+	userID, _ := uuid.Parse(claims.Subject)
+
+	perPage := int(req.GetPageSize())
+	if perPage <= 0 || perPage > 100 {
+		perPage = 20
+	}
+
+	favorites, total, err := h.favService.ListFavorites(ctx, userID, 1, perPage)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "listing favorites: %v", err)
+	}
+
+	pbFavorites := make([]*bookmgrv1.FavoriteBook, len(favorites))
+	for i, fav := range favorites {
+		pbFav := &bookmgrv1.FavoriteBook{
+			Id:        fav.ID.String(),
+			CreatedAt: timestamppb.New(fav.CreatedAt),
+		}
+		books := fav.Edges.Book
+		if len(books) > 0 && books[0] != nil {
+			pbFav.Book = entBookToProto(books[0])
+		}
+		pbFavorites[i] = pbFav
+	}
+
+	var nextToken string
+	if total > perPage {
+		nextToken = "next"
+	}
+
+	return &bookmgrv1.ListMyFavoritesResponse{
+		Favorites:      pbFavorites,
+		NextPageToken:  nextToken,
+	}, nil
+}
+
+func (h *UserHandler) ListMyFeedback(ctx context.Context, req *bookmgrv1.ListMyFeedbackRequest) (*bookmgrv1.ListMyFeedbackResponse, error) {
+	claims, ok := middleware.ClaimsFromContext(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "authentication required")
+	}
+
+	userID, _ := uuid.Parse(claims.Subject)
+
+	perPage := int(req.GetPageSize())
+	if perPage <= 0 || perPage > 100 {
+		perPage = 20
+	}
+
+	feedbacks, total, err := h.fbService.ListUserFeedback(ctx, userID, 1, perPage)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "listing feedback: %v", err)
+	}
+
+	pbFeedbacks := make([]*bookmgrv1.BookFeedback, len(feedbacks))
+	for i, fb := range feedbacks {
+		pbFeedbacks[i] = entFeedbackToProto(fb)
+	}
+
+	var nextToken string
+	if total > perPage {
+		nextToken = "next"
+	}
+
+	return &bookmgrv1.ListMyFeedbackResponse{
+		Feedbacks:     pbFeedbacks,
+		NextPageToken: nextToken,
+	}, nil
 }
 
 func entUserToProto(u *ent.User) *bookmgrv1.User {

@@ -14,6 +14,8 @@ import DimensionManagePage from './pages/admin/DimensionManagePage';
 import ReviewManagePage from './pages/admin/ReviewManagePage';
 import ConsoleBooksPage from './pages/console/Books';
 import BookDetailPage from './pages/console/BookDetail';
+import FavoritesPage from './pages/console/FavoritesPage';
+import FeedbackPage from './pages/console/FeedbackPage';
 
 function App() {
   return (
@@ -27,6 +29,8 @@ function App() {
               {/* Console routes — all authenticated users */}
               <Route path="/console/books" element={<ConsoleBooksPage />} />
               <Route path="/console/books/:id" element={<BookDetailPage />} />
+              <Route path="/console/favorites" element={<FavoritesPage />} />
+              <Route path="/console/feedback" element={<FeedbackPage />} />
               <Route path="/console" element={<Navigate to="/console/books" replace />} />
               {/* Admin routes — admin only */}
               <Route path="/admin/users" element={<ProtectedRoute requireAdmin><UsersPage /></ProtectedRoute>} />

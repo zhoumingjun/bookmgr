@@ -9,4 +9,6 @@ var Module = fx.Options(
 	fx.Provide(NewBookFileRepository),
 	fx.Provide(NewBookReviewRepository),
 	fx.Provide(NewBookSearchRepository),
+	fx.Provide(NewBookFavoriteRepository),
+	fx.Provide(NewBookFeedbackRepository),
 )

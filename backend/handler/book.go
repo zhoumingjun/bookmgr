@@ -22,11 +22,17 @@ import (
 type BookHandler struct {
 	bookmgrv1.UnimplementedBookServiceServer
 	bookService *service.BookService
+	favService  *service.BookFavoriteService
+	fbService   *service.BookFeedbackService
 }
 
 // NewBookHandler creates a new BookHandler.
-func NewBookHandler(bookService *service.BookService) *BookHandler {
-	return &BookHandler{bookService: bookService}
+func NewBookHandler(bookService *service.BookService, favService *service.BookFavoriteService, fbService *service.BookFeedbackService) *BookHandler {
+	return &BookHandler{
+		bookService: bookService,
+		favService:  favService,
+		fbService:   fbService,
+	}
 }
 
 func (h *BookHandler) ListBooks(ctx context.Context, req *bookmgrv1.ListBooksRequest) (*bookmgrv1.ListBooksResponse, error) {
@@ -248,6 +254,155 @@ func (h *BookHandler) DownloadBook(ctx context.Context, req *bookmgrv1.DownloadB
 			Data:        data,
 		},
 	}, nil
+}
+
+func (h *BookHandler) FavoriteBook(ctx context.Context, req *bookmgrv1.FavoriteBookRequest) (*bookmgrv1.FavoriteBookResponse, error) {
+	claims, ok := middleware.ClaimsFromContext(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "authentication required")
+	}
+
+	bookID, err := uuid.Parse(req.GetBookId())
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid book id")
+	}
+
+	userID, _ := uuid.Parse(claims.Subject)
+	result, err := h.favService.Favorite(ctx, userID, bookID)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			return nil, status.Errorf(codes.NotFound, "book not found")
+		}
+		return nil, status.Errorf(codes.Internal, "favoriting book: %v", err)
+	}
+
+	return &bookmgrv1.FavoriteBookResponse{Favorited: result.Favorited}, nil
+}
+
+func (h *BookHandler) UnfavoriteBook(ctx context.Context, req *bookmgrv1.UnfavoriteBookRequest) (*bookmgrv1.UnfavoriteBookResponse, error) {
+	claims, ok := middleware.ClaimsFromContext(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "authentication required")
+	}
+
+	bookID, err := uuid.Parse(req.GetBookId())
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid book id")
+	}
+
+	userID, _ := uuid.Parse(claims.Subject)
+	if err := h.favService.Unfavorite(ctx, userID, bookID); err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			return nil, status.Errorf(codes.NotFound, "favorite not found")
+		}
+		return nil, status.Errorf(codes.Internal, "unfavoriting book: %v", err)
+	}
+
+	return &bookmgrv1.UnfavoriteBookResponse{}, nil
+}
+
+func (h *BookHandler) GetFavorite(ctx context.Context, req *bookmgrv1.GetFavoriteRequest) (*bookmgrv1.GetFavoriteResponse, error) {
+	claims, ok := middleware.ClaimsFromContext(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "authentication required")
+	}
+
+	bookID, err := uuid.Parse(req.GetBookId())
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid book id")
+	}
+
+	userID, _ := uuid.Parse(claims.Subject)
+	isFav, err := h.favService.IsFavorited(ctx, userID, bookID)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "checking favorite: %v", err)
+	}
+
+	return &bookmgrv1.GetFavoriteResponse{IsFavorited: isFav}, nil
+}
+
+func (h *BookHandler) SubmitFeedback(ctx context.Context, req *bookmgrv1.SubmitFeedbackRequest) (*bookmgrv1.SubmitFeedbackResponse, error) {
+	claims, ok := middleware.ClaimsFromContext(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "authentication required")
+	}
+
+	bookID, err := uuid.Parse(req.GetBookId())
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid book id")
+	}
+
+	userID, _ := uuid.Parse(claims.Subject)
+
+	params := service.SubmitFeedbackParams{
+		UserID:       userID,
+		BookID:       bookID,
+		FeedbackType: req.GetFeedbackType(),
+	}
+
+	if req.GetFeedbackType() == "difficulty_rating" {
+		rating := int(req.GetDifficultyRating())
+		params.DifficultyRating = &rating
+	}
+	if req.GetFeedbackType() == "use_scenario" {
+		scenario := req.GetUseScenario()
+		params.UseScenario = &scenario
+	}
+
+	fb, err := h.fbService.SubmitFeedback(ctx, params)
+	if err != nil {
+		switch {
+		case strings.Contains(err.Error(), "difficulty rating"):
+			return nil, status.Errorf(codes.InvalidArgument, "%v", err)
+		case strings.Contains(err.Error(), "invalid feedback"):
+			return nil, status.Errorf(codes.InvalidArgument, "%v", err)
+		case strings.Contains(err.Error(), "use scenario"):
+			return nil, status.Errorf(codes.InvalidArgument, "%v", err)
+		case strings.Contains(err.Error(), "not found"):
+			return nil, status.Errorf(codes.NotFound, "book not found")
+		default:
+			return nil, status.Errorf(codes.Internal, "submitting feedback: %v", err)
+		}
+	}
+
+	return &bookmgrv1.SubmitFeedbackResponse{
+		Feedback: entFeedbackToProto(fb),
+	}, nil
+}
+
+func (h *BookHandler) GetFeedbackStats(ctx context.Context, req *bookmgrv1.GetFeedbackStatsRequest) (*bookmgrv1.GetFeedbackStatsResponse, error) {
+	_, ok := middleware.ClaimsFromContext(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "authentication required")
+	}
+
+	bookID, err := uuid.Parse(req.GetBookId())
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid book id")
+	}
+
+	stats, err := h.fbService.GetBookStats(ctx, bookID)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "getting feedback stats: %v", err)
+	}
+
+	return &bookmgrv1.GetFeedbackStatsResponse{
+		FavoriteCount:        int32(stats.FavoriteCount),
+		ReadCompleteCount:    int32(stats.ReadCompleteCount),
+		AvgDifficultyRating:  stats.AvgDifficulty,
+	}, nil
+}
+
+func entFeedbackToProto(fb *ent.BookFeedback) *bookmgrv1.BookFeedback {
+	return &bookmgrv1.BookFeedback{
+		Id:               fb.ID.String(),
+		BookId:           fb.BookID.String(),
+		UserId:           fb.UserID.String(),
+		FeedbackType:     string(fb.FeedbackType),
+		DifficultyRating: int32(fb.DifficultyRating),
+		UseScenario:      fb.UseScenario,
+		CreatedAt:        timestamppb.New(fb.CreatedAt),
+	}
 }
 
 func entBookToProto(b *ent.Book) *bookmgrv1.Book {

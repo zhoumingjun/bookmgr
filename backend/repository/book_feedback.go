@@ -32,10 +32,11 @@ type CreateFeedbackParams struct {
 
 // Create creates a new feedback record. Returns existing if same user/book/type combo exists.
 func (r *BookFeedbackRepository) Create(ctx context.Context, params CreateFeedbackParams) (*ent.BookFeedback, error) {
+	fbType := stringToFeedbackType(params.FeedbackType)
 	fb := r.client.BookFeedback.Create().
 		SetUserID(params.UserID).
 		SetBookID(params.BookID).
-		SetFeedbackType(params.FeedbackType)
+		SetFeedbackType(fbType)
 
 	switch params.FeedbackType {
 	case "difficulty_rating":
@@ -57,11 +58,12 @@ func (r *BookFeedbackRepository) Create(ctx context.Context, params CreateFeedba
 
 // Upsert creates or updates a feedback record based on (user_id, book_id, feedback_type) uniqueness.
 func (r *BookFeedbackRepository) Upsert(ctx context.Context, params CreateFeedbackParams) (*ent.BookFeedback, error) {
+	fbType := stringToFeedbackType(params.FeedbackType)
 	// Check if exists
 	existing, err := r.client.BookFeedback.Query().
 		Where(bookfeedback.UserIDEQ(params.UserID)).
 		Where(bookfeedback.BookIDEQ(params.BookID)).
-		Where(bookfeedback.FeedbackTypeEQ(params.FeedbackType)).
+		Where(bookfeedback.FeedbackTypeEQ(fbType)).
 		Only(ctx)
 	if err == nil {
 		// Update existing
@@ -145,7 +147,7 @@ func (r *BookFeedbackRepository) GetBookStats(ctx context.Context, bookID uuid.U
 
 	completeCount, err := r.client.BookFeedback.Query().
 		Where(bookfeedback.BookIDEQ(bookID)).
-		Where(bookfeedback.FeedbackTypeEQ("read_complete")).
+		Where(bookfeedback.FeedbackTypeEQ(bookfeedback.FeedbackTypeReadComplete)).
 		Count(ctx)
 	if err != nil {
 		return 0, 0, 0, fmt.Errorf("counting read_complete: %w", err)
@@ -155,7 +157,7 @@ func (r *BookFeedbackRepository) GetBookStats(ctx context.Context, bookID uuid.U
 	var sum, cnt int
 	diffs, err := r.client.BookFeedback.Query().
 		Where(bookfeedback.BookIDEQ(bookID)).
-		Where(bookfeedback.FeedbackTypeEQ("difficulty_rating")).
+		Where(bookfeedback.FeedbackTypeEQ(bookfeedback.FeedbackTypeDifficultyRating)).
 		All(ctx)
 	if err != nil {
 		return 0, 0, 0, fmt.Errorf("querying difficulty ratings: %w", err)
@@ -176,7 +178,23 @@ func (r *BookFeedbackRepository) GetBookStats(ctx context.Context, bookID uuid.U
 
 // BookStats holds aggregated statistics for a book.
 type BookStats struct {
-	FavoriteCount    int
+	FavoriteCount      int
 	ReadCompleteCount int
-	AvgDifficulty    float64
+	AvgDifficulty     float64
+}
+
+// stringToFeedbackType converts a string to a bookfeedback.FeedbackType.
+func stringToFeedbackType(s string) bookfeedback.FeedbackType {
+	switch s {
+	case "read_start":
+		return bookfeedback.FeedbackTypeReadStart
+	case "read_complete":
+		return bookfeedback.FeedbackTypeReadComplete
+	case "difficulty_rating":
+		return bookfeedback.FeedbackTypeDifficultyRating
+	case "use_scenario":
+		return bookfeedback.FeedbackTypeUseScenario
+	default:
+		return bookfeedback.FeedbackTypeReadStart
+	}
 }

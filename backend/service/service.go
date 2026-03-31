@@ -11,4 +11,6 @@ var Module = fx.Options(
 	fx.Provide(NewFileService),
 	fx.Provide(NewBookReviewService),
 	fx.Provide(NewBookSearchService),
+	fx.Provide(NewBookFavoriteService),
+	fx.Provide(NewBookFeedbackService),
 )

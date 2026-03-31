@@ -28,6 +28,8 @@ import {
   SettingOutlined,
   BgColorsOutlined,
   FontSizeOutlined,
+  HeartOutlined,
+  MessageOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import zhCN from 'antd/locale/zh_CN';
@@ -65,6 +67,8 @@ export default function AppLayout() {
   const navItems = useMemo(() => {
     const items = [
       { key: '/console/books', icon: <BookOutlined />, label: t('nav.bookCatalog') },
+      { key: '/console/favorites', icon: <HeartOutlined />, label: t('nav.favorites', '我的收藏') },
+      { key: '/console/feedback', icon: <MessageOutlined />, label: t('nav.feedback', '我的反馈') },
     ];
     if (isAdmin) {
       items.push(
