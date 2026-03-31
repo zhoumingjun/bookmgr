@@ -31,3 +31,87 @@ body {
     padding: 12px;
   }
 }
+
+/* ===== Accessibility: High Contrast Mode ===== */
+:root.high-contrast {
+  --color-primary: #0066CC;
+  --color-bg: #FFFFFF;
+  --color-text: #000000;
+  --color-border: #000000;
+}
+
+:root.high-contrast body {
+  background: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+:root.high-contrast .ant-layout {
+  background: #FFFFFF !important;
+}
+
+:root.high-contrast .ant-layout-header {
+  background: #000000 !important;
+  border-bottom: 2px solid #FFFFFF;
+}
+
+:root.high-contrast .ant-menu-dark {
+  background: #000000 !important;
+}
+
+:root.high-contrast .ant-btn-primary {
+  background: #0066CC !important;
+  border-color: #0066CC !important;
+}
+
+:root.high-contrast .ant-card {
+  border: 2px solid #000000 !important;
+  background: #FFFFFF !important;
+}
+
+:root.high-contrast .ant-table {
+  border: 2px solid #000000;
+}
+
+:root.high-contrast .ant-table-thead > tr > th {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  border-bottom: 2px solid #000000;
+}
+
+:root.high-contrast .ant-table-tbody > tr > td {
+  border-bottom: 1px solid #000000;
+}
+
+:root.high-contrast .ant-typography,
+:root.high-contrast p,
+:root.high-contrast span {
+  color: #000000 !important;
+}
+
+:root.high-contrast a {
+  color: #0066CC !important;
+  text-decoration: underline;
+}
+
+:root.high-contrast .ant-btn {
+  border: 2px solid #000000;
+  min-height: 44px;
+  font-weight: 600;
+}
+
+:root.high-contrast .ant-input,
+:root.high-contrast .ant-select-selector {
+  border: 2px solid #000000 !important;
+}
+
+/* Focus visible indicator (WCAG) */
+*:focus-visible {
+  outline: 3px solid #0066CC !important;
+  outline-offset: 2px;
+}
+
+/* Touch-friendly buttons at 2x scale */
+:root.font-scale-2x .ant-btn {
+  min-height: 44px !important;
+  padding: 8px 16px !important;
+}

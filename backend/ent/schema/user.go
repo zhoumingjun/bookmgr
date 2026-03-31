@@ -60,6 +60,9 @@ func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("books", Book.Type),
 		edge.From("uploaded_files", BookFile.Type).Ref("uploader"),
+		edge.From("reading_progress", BookReadingProgress.Type).Ref("user"),
+		edge.To("reviews", BookReview.Type),
+		edge.To("reading_progress", BookReadingProgress.Type),
 	}
 }
 

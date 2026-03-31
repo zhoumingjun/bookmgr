@@ -142,5 +142,14 @@
     "cancel": "取消",
     "yes": "是",
     "no": "否"
+  },
+  "a11y": {
+    "settings": "无障碍设置",
+    "fontSize": "字号",
+    "highContrast": "高对比模式",
+    "normal": "正常 (1x)",
+    "large": "大 (1.15x)",
+    "xlarge": "特大 (1.3x)",
+    "xxlarge": "超大 (1.5x)"
   }
 }

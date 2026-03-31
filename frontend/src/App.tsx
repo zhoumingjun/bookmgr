@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './auth/AuthContext';
+import { AccessibilityProvider } from './auth/AccessibilityContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppLayout from './layouts/AppLayout';
 import LoginPage from './pages/Login';
@@ -9,36 +10,38 @@ import UserEditPage from './pages/admin/UserEdit';
 import BooksPage from './pages/admin/Books';
 import BookNewPage from './pages/admin/BookNew';
 import BookEditPage from './pages/admin/BookEdit';
-import AdminBookDetailPage from './pages/admin/BookDetail';
 import DimensionManagePage from './pages/admin/DimensionManagePage';
 import ReviewManagePage from './pages/admin/ReviewManagePage';
 import ConsoleBooksPage from './pages/console/Books';
-import ConsoleBookDetailPage from './pages/console/BookDetail';
+import BookDetailPage from './pages/console/BookDetail';
 
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-            <Route path="/console/books" element={<ConsoleBooksPage />} />
-            <Route path="/console/books/:id" element={<ConsoleBookDetailPage />} />
-            <Route path="/console" element={<Navigate to="/console/books" replace />} />
-            <Route path="/admin/users" element={<ProtectedRoute requireAdmin><UsersPage /></ProtectedRoute>} />
-            <Route path="/admin/users/:id" element={<ProtectedRoute requireAdmin><UserEditPage /></ProtectedRoute>} />
-            <Route path="/admin/books" element={<ProtectedRoute requireAdmin><BooksPage /></ProtectedRoute>} />
-            <Route path="/admin/books/new" element={<ProtectedRoute requireAdmin><BookNewPage /></ProtectedRoute>} />
-            <Route path="/admin/books/:id" element={<ProtectedRoute requireAdmin><BookEditPage /></ProtectedRoute>} />
-            <Route path="/admin/books/detail/:id" element={<ProtectedRoute requireAdmin><AdminBookDetailPage /></ProtectedRoute>} />
-            <Route path="/admin/reviews" element={<ProtectedRoute requireAdmin><ReviewManagePage /></ProtectedRoute>} />
-            <Route path="/admin/dimensions" element={<ProtectedRoute requireAdmin><DimensionManagePage /></ProtectedRoute>} />
-            <Route path="/admin" element={<Navigate to="/admin/users" replace />} />
-          </Route>
-          <Route path="/" element={<Navigate to="/console/books" replace />} />
-        </Routes>
-      </BrowserRouter>
+      <AccessibilityProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+              {/* Console routes — all authenticated users */}
+              <Route path="/console/books" element={<ConsoleBooksPage />} />
+              <Route path="/console/books/:id" element={<BookDetailPage />} />
+              <Route path="/console" element={<Navigate to="/console/books" replace />} />
+              {/* Admin routes — admin only */}
+              <Route path="/admin/users" element={<ProtectedRoute requireAdmin><UsersPage /></ProtectedRoute>} />
+              <Route path="/admin/users/:id" element={<ProtectedRoute requireAdmin><UserEditPage /></ProtectedRoute>} />
+              <Route path="/admin/books" element={<ProtectedRoute requireAdmin><BooksPage /></ProtectedRoute>} />
+              <Route path="/admin/books/new" element={<ProtectedRoute requireAdmin><BookNewPage /></ProtectedRoute>} />
+              <Route path="/admin/books/:id" element={<ProtectedRoute requireAdmin><BookEditPage /></ProtectedRoute>} />
+              <Route path="/admin/dimensions" element={<ProtectedRoute requireAdmin><DimensionManagePage /></ProtectedRoute>} />
+              <Route path="/admin/reviews" element={<ProtectedRoute requireAdmin><ReviewManagePage /></ProtectedRoute>} />
+              <Route path="/admin" element={<Navigate to="/admin/users" replace />} />
+            </Route>
+            <Route path="/" element={<Navigate to="/console/books" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </AccessibilityProvider>
     </AuthProvider>
   );
 }

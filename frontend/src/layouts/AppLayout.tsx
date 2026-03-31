@@ -9,6 +9,11 @@ import {
   Grid,
   ConfigProvider,
   theme,
+  Switch,
+
+
+
+  Space,
 } from 'antd';
 import {
   UserOutlined,
@@ -20,11 +25,15 @@ import {
   LogoutOutlined,
   DownOutlined,
   AppstoreOutlined,
+  SettingOutlined,
+  BgColorsOutlined,
+  FontSizeOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import zhCN from 'antd/locale/zh_CN';
 import enUS from 'antd/locale/en_US';
 import { useAuth } from '../auth/AuthContext';
+import { useAccessibility, FONT_SIZE_LABELS, type FontSize } from '../auth/AccessibilityContext';
 
 const { Header, Content } = Layout;
 const { useBreakpoint } = Grid;
@@ -32,6 +41,7 @@ const { useBreakpoint } = Grid;
 export default function AppLayout() {
   const { t, i18n } = useTranslation();
   const { isAdmin, role, logout } = useAuth();
+  const { setFontSize, highContrast, setHighContrast } = useAccessibility();
   const navigate = useNavigate();
   const location = useLocation();
   const screens = useBreakpoint();
@@ -107,8 +117,55 @@ export default function AppLayout() {
     },
   ];
 
+  const fontSizeOptions: Array<{ label: string; value: FontSize }> = [
+    { label: FONT_SIZE_LABELS.normal, value: 'normal' },
+    { label: FONT_SIZE_LABELS.large, value: 'large' },
+    { label: FONT_SIZE_LABELS.xlarge, value: 'xlarge' },
+    { label: FONT_SIZE_LABELS.xxlarge, value: 'xxlarge' },
+  ];
+
+  const settingsMenu = {
+    items: [
+      {
+        key: 'font-size',
+        label: (
+          <div>
+            <Space>
+              <FontSizeOutlined />
+              <span>{t('a11y.fontSize', '字号')}</span>
+            </Space>
+          </div>
+        ),
+        children: fontSizeOptions.map(opt => ({
+          key: opt.value,
+          label: opt.label,
+          onClick: () => setFontSize(opt.value),
+        })),
+      },
+      {
+        key: 'high-contrast',
+        label: (
+          <Space>
+            <BgColorsOutlined />
+            <span>{t('a11y.highContrast', '高对比模式')}</span>
+            <Switch
+              size="small"
+              checked={highContrast}
+              onChange={(checked) => setHighContrast(checked)}
+              onClick={(checked) => setHighContrast(checked)}
+            />
+          </Space>
+        ),
+        disabled: true,
+      },
+    ],
+  };
+
   const rightSection = (
-    <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 8 : 16 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 4 : 12 }}>
+      <Dropdown menu={settingsMenu} trigger={['click']}>
+        <Button type="text" icon={<SettingOutlined />} style={{ color: '#fff' }} title={t('a11y.settings', '无障碍设置')} />
+      </Dropdown>
       <Button
         type="text"
         icon={<GlobalOutlined />}

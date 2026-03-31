@@ -131,5 +131,14 @@
     "cancel": "Cancel",
     "yes": "Yes",
     "no": "No"
+  },
+  "a11y": {
+    "settings": "Accessibility",
+    "fontSize": "Font Size",
+    "highContrast": "High Contrast",
+    "normal": "Normal (1x)",
+    "large": "Large (1.15x)",
+    "xlarge": "Extra Large (1.3x)",
+    "xxlarge": "Super Large (1.5x)"
   }
 }

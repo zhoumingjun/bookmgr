@@ -108,5 +108,6 @@ func (Book) Edges() []ent.Edge {
 		edge.To("book_dimensions", BookDimension.Type),
 		edge.From("files", BookFile.Type).Ref("book"),
 		edge.To("reviews", BookReview.Type),
+		edge.To("reading_progress", BookReadingProgress.Type),
 	}
 }
