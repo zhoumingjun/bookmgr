@@ -28,6 +28,7 @@ func New() *Config {
 		UploadDir:     getEnv("UPLOAD_DIR", "./uploads"),
 		AdminUsername: getEnv("ADMIN_USERNAME", "admin"),
 		AdminPassword: getEnv("ADMIN_PASSWORD", "changeme"),
+		DataDir:       getEnv("DATA_DIR", "./data"),
 	}
 }
 

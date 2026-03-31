@@ -67,6 +67,8 @@ const (
 	EdgeUploader = "uploader"
 	// EdgeBookDimensions holds the string denoting the book_dimensions edge name in mutations.
 	EdgeBookDimensions = "book_dimensions"
+	// EdgeFiles holds the string denoting the files edge name in mutations.
+	EdgeFiles = "files"
 	// Table holds the table name of the book in the database.
 	Table = "books"
 	// UploaderTable is the table that holds the uploader relation/edge.
@@ -81,6 +83,11 @@ const (
 	// BookDimensionsInverseTable is the table name for the BookDimension entity.
 	// It exists in this package in order to avoid circular dependency with the "bookdimension" package.
 	BookDimensionsInverseTable = "book_dimensions"
+	// FilesTable is the table that holds the files relation/edge. The primary key declared below.
+	FilesTable = "book_file_book"
+	// FilesInverseTable is the table name for the BookFile entity.
+	// It exists in this package in order to avoid circular dependency with the "bookfile" package.
+	FilesInverseTable = "book_files"
 )
 
 // Columns holds all SQL columns for book fields.
@@ -116,6 +123,9 @@ var (
 	// BookDimensionsPrimaryKey and BookDimensionsColumn2 are the table columns denoting the
 	// primary key for the book_dimensions relation (M2M).
 	BookDimensionsPrimaryKey = []string{"book_id", "book_dimension_id"}
+	// FilesPrimaryKey and FilesColumn2 are the table columns denoting the
+	// primary key for the files relation (M2M).
+	FilesPrimaryKey = []string{"book_file_id", "book_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -335,6 +345,20 @@ func ByBookDimensions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newBookDimensionsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByFilesCount orders the results by files count.
+func ByFilesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newFilesStep(), opts...)
+	}
+}
+
+// ByFiles orders the results by files terms.
+func ByFiles(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newFilesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newUploaderStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -347,5 +371,12 @@ func newBookDimensionsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(BookDimensionsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, BookDimensionsTable, BookDimensionsPrimaryKey...),
+	)
+}
+func newFilesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(FilesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, FilesTable, FilesPrimaryKey...),
 	)
 }

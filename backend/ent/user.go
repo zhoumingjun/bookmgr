@@ -40,9 +40,11 @@ type User struct {
 type UserEdges struct {
 	// Books holds the value of the books edge.
 	Books []*Book `json:"books,omitempty"`
+	// UploadedFiles holds the value of the uploaded_files edge.
+	UploadedFiles []*BookFile `json:"uploaded_files,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // BooksOrErr returns the Books value or an error if the edge
@@ -52,6 +54,15 @@ func (e UserEdges) BooksOrErr() ([]*Book, error) {
 		return e.Books, nil
 	}
 	return nil, &NotLoadedError{edge: "books"}
+}
+
+// UploadedFilesOrErr returns the UploadedFiles value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) UploadedFilesOrErr() ([]*BookFile, error) {
+	if e.loadedTypes[1] {
+		return e.UploadedFiles, nil
+	}
+	return nil, &NotLoadedError{edge: "uploaded_files"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -138,6 +149,11 @@ func (_m *User) Value(name string) (ent.Value, error) {
 // QueryBooks queries the "books" edge of the User entity.
 func (_m *User) QueryBooks() *BookQuery {
 	return NewUserClient(_m.config).QueryBooks(_m)
+}
+
+// QueryUploadedFiles queries the "uploaded_files" edge of the User entity.
+func (_m *User) QueryUploadedFiles() *BookFileQuery {
+	return NewUserClient(_m.config).QueryUploadedFiles(_m)
 }
 
 // Update returns a builder for updating this User.

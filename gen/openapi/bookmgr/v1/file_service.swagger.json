@@ -1,0 +1,406 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "bookmgr/v1/file_service.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "FileService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/books/{bookId}/files": {
+      "get": {
+        "summary": "ListBookFiles returns all files for a book.",
+        "operationId": "FileService_ListBookFiles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListBookFilesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "FileService"
+        ]
+      },
+      "post": {
+        "summary": "UploadBookFile uploads a single file for a book.",
+        "operationId": "FileService_UploadBookFile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UploadBookFileResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookId",
+            "description": "The ID of the book to attach the file to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FileServiceUploadBookFileBody"
+            }
+          }
+        ],
+        "tags": [
+          "FileService"
+        ]
+      }
+    },
+    "/api/v1/books/{bookId}/files/batch": {
+      "post": {
+        "summary": "BatchUploadBookFiles uploads multiple files for a book.",
+        "operationId": "FileService_BatchUploadBookFiles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchUploadBookFilesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FileServiceBatchUploadBookFilesBody"
+            }
+          }
+        ],
+        "tags": [
+          "FileService"
+        ]
+      }
+    },
+    "/api/v1/books/{bookId}/files/{fileId}": {
+      "get": {
+        "summary": "DownloadBookFile streams the file content.",
+        "operationId": "FileService_DownloadBookFile",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/v1DownloadBookFileResponse"
+                },
+                "error": {
+                  "$ref": "#/definitions/rpcStatus"
+                }
+              },
+              "title": "Stream result of v1DownloadBookFileResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fileId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "FileService"
+        ]
+      },
+      "delete": {
+        "summary": "DeleteBookFile deletes a file record and its content.",
+        "operationId": "FileService_DeleteBookFile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteBookFileResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fileId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "FileService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "FileServiceBatchUploadBookFilesBody": {
+      "type": "object",
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1BatchFileEntry"
+          },
+          "description": "List of files to upload."
+        }
+      },
+      "description": "BatchUploadBookFilesRequest is the request for BatchUploadBookFiles."
+    },
+    "FileServiceUploadBookFileBody": {
+      "type": "object",
+      "properties": {
+        "fileType": {
+          "$ref": "#/definitions/v1FileType",
+          "description": "The type of file being uploaded."
+        },
+        "fileData": {
+          "type": "string",
+          "format": "byte",
+          "description": "Raw file bytes (binary upload)."
+        },
+        "fileName": {
+          "type": "string",
+          "description": "Original filename."
+        }
+      },
+      "description": "UploadBookFileRequest is the request for UploadBookFile."
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1BatchFileEntry": {
+      "type": "object",
+      "properties": {
+        "fileType": {
+          "$ref": "#/definitions/v1FileType"
+        },
+        "fileData": {
+          "type": "string",
+          "format": "byte"
+        },
+        "fileName": {
+          "type": "string"
+        }
+      },
+      "description": "BatchFileEntry represents a single file in a batch upload."
+    },
+    "v1BatchUploadBookFilesResponse": {
+      "type": "object",
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1BookFile"
+          }
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "BatchUploadBookFilesResponse is the response for BatchUploadBookFiles."
+    },
+    "v1BookFile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the file."
+        },
+        "bookId": {
+          "type": "string",
+          "description": "The ID of the book this file belongs to."
+        },
+        "fileType": {
+          "$ref": "#/definitions/v1FileType",
+          "description": "The type of file."
+        },
+        "originalName": {
+          "type": "string",
+          "description": "Original filename as uploaded."
+        },
+        "fileSize": {
+          "type": "string",
+          "format": "int64",
+          "description": "Size of the file in bytes."
+        },
+        "mimeType": {
+          "type": "string",
+          "description": "MIME type (e.g., application/pdf)."
+        },
+        "uploaderId": {
+          "type": "string",
+          "description": "The ID of the user who uploaded this file."
+        },
+        "createTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the file was uploaded."
+        }
+      },
+      "description": "BookFile represents a file attached to a book."
+    },
+    "v1DeleteBookFileResponse": {
+      "type": "object",
+      "description": "DeleteBookFileResponse is the response for DeleteBookFile."
+    },
+    "v1DownloadBookFileResponse": {
+      "type": "object",
+      "properties": {
+        "chunk": {
+          "type": "string",
+          "format": "byte",
+          "description": "Chunk of file bytes."
+        },
+        "mimeType": {
+          "type": "string",
+          "description": "MIME type of the file."
+        },
+        "fileName": {
+          "type": "string",
+          "description": "Original filename for Content-Disposition header."
+        }
+      },
+      "description": "DownloadBookFileResponse is the streamed response for DownloadBookFile."
+    },
+    "v1FileType": {
+      "type": "string",
+      "enum": [
+        "FILE_TYPE_UNSPECIFIED",
+        "FILE_TYPE_PRINT",
+        "FILE_TYPE_DIGITAL",
+        "FILE_TYPE_AUDIO",
+        "FILE_TYPE_VIDEO"
+      ],
+      "default": "FILE_TYPE_UNSPECIFIED",
+      "description": "FileType represents the type of book resource.\n\n - FILE_TYPE_PRINT: Print edition (PDF)\n - FILE_TYPE_DIGITAL: Digital edition (PDF/EPUB)\n - FILE_TYPE_AUDIO: Audio narration (MP3/M4A)\n - FILE_TYPE_VIDEO: Video/animation (MP4)"
+    },
+    "v1ListBookFilesResponse": {
+      "type": "object",
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1BookFile"
+          }
+        }
+      },
+      "description": "ListBookFilesResponse is the response for ListBookFiles."
+    },
+    "v1UploadBookFileResponse": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "$ref": "#/definitions/v1BookFile"
+        }
+      },
+      "description": "UploadBookFileResponse is the response for UploadBookFile."
+    }
+  }
+}

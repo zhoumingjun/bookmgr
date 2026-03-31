@@ -62,6 +62,25 @@ var (
 		Columns:    BookDimensionsColumns,
 		PrimaryKey: []*schema.Column{BookDimensionsColumns[0]},
 	}
+	// BookFilesColumns holds the columns for the "book_files" table.
+	BookFilesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "book_id", Type: field.TypeUUID},
+		{Name: "file_type", Type: field.TypeString, Size: 20},
+		{Name: "original_name", Type: field.TypeString, Size: 255},
+		{Name: "stored_name", Type: field.TypeString, Size: 255},
+		{Name: "file_path", Type: field.TypeString, Size: 500},
+		{Name: "file_size", Type: field.TypeInt64},
+		{Name: "mime_type", Type: field.TypeString, Nullable: true, Size: 100, Default: ""},
+		{Name: "uploader_id", Type: field.TypeUUID},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// BookFilesTable holds the schema information for the "book_files" table.
+	BookFilesTable = &schema.Table{
+		Name:       "book_files",
+		Columns:    BookFilesColumns,
+		PrimaryKey: []*schema.Column{BookFilesColumns[0]},
+	}
 	// DimensionsColumns holds the columns for the "dimensions" table.
 	DimensionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
@@ -140,6 +159,56 @@ var (
 			},
 		},
 	}
+	// BookFileBookColumns holds the columns for the "book_file_book" table.
+	BookFileBookColumns = []*schema.Column{
+		{Name: "book_file_id", Type: field.TypeUUID},
+		{Name: "book_id", Type: field.TypeUUID},
+	}
+	// BookFileBookTable holds the schema information for the "book_file_book" table.
+	BookFileBookTable = &schema.Table{
+		Name:       "book_file_book",
+		Columns:    BookFileBookColumns,
+		PrimaryKey: []*schema.Column{BookFileBookColumns[0], BookFileBookColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "book_file_book_book_file_id",
+				Columns:    []*schema.Column{BookFileBookColumns[0]},
+				RefColumns: []*schema.Column{BookFilesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "book_file_book_book_id",
+				Columns:    []*schema.Column{BookFileBookColumns[1]},
+				RefColumns: []*schema.Column{BooksColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// BookFileUploaderColumns holds the columns for the "book_file_uploader" table.
+	BookFileUploaderColumns = []*schema.Column{
+		{Name: "book_file_id", Type: field.TypeUUID},
+		{Name: "user_id", Type: field.TypeUUID},
+	}
+	// BookFileUploaderTable holds the schema information for the "book_file_uploader" table.
+	BookFileUploaderTable = &schema.Table{
+		Name:       "book_file_uploader",
+		Columns:    BookFileUploaderColumns,
+		PrimaryKey: []*schema.Column{BookFileUploaderColumns[0], BookFileUploaderColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "book_file_uploader_book_file_id",
+				Columns:    []*schema.Column{BookFileUploaderColumns[0]},
+				RefColumns: []*schema.Column{BookFilesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "book_file_uploader_user_id",
+				Columns:    []*schema.Column{BookFileUploaderColumns[1]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// DimensionBookDimensionsColumns holds the columns for the "dimension_book_dimensions" table.
 	DimensionBookDimensionsColumns = []*schema.Column{
 		{Name: "dimension_id", Type: field.TypeUUID},
@@ -169,9 +238,12 @@ var (
 	Tables = []*schema.Table{
 		BooksTable,
 		BookDimensionsTable,
+		BookFilesTable,
 		DimensionsTable,
 		UsersTable,
 		BookBookDimensionsTable,
+		BookFileBookTable,
+		BookFileUploaderTable,
 		DimensionBookDimensionsTable,
 	}
 )
@@ -181,6 +253,10 @@ func init() {
 	DimensionsTable.ForeignKeys[0].RefTable = DimensionsTable
 	BookBookDimensionsTable.ForeignKeys[0].RefTable = BooksTable
 	BookBookDimensionsTable.ForeignKeys[1].RefTable = BookDimensionsTable
+	BookFileBookTable.ForeignKeys[0].RefTable = BookFilesTable
+	BookFileBookTable.ForeignKeys[1].RefTable = BooksTable
+	BookFileUploaderTable.ForeignKeys[0].RefTable = BookFilesTable
+	BookFileUploaderTable.ForeignKeys[1].RefTable = UsersTable
 	DimensionBookDimensionsTable.ForeignKeys[0].RefTable = DimensionsTable
 	DimensionBookDimensionsTable.ForeignKeys[1].RefTable = BookDimensionsTable
 }

@@ -1,0 +1,154 @@
+syntax = "proto3";
+
+package bookmgr.v1;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/zhoumingjun/bookmgr/gen/api/bookmgr/v1;bookmgrv1";
+
+// FileService manages book file resources (PDF, EPUB, MP3, MP4, etc.).
+service FileService {
+  // UploadBookFile uploads a single file for a book.
+  rpc UploadBookFile(UploadBookFileRequest) returns (UploadBookFileResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/books/{book_id}/files"
+      body: "*"
+    };
+  }
+
+  // BatchUploadBookFiles uploads multiple files for a book.
+  rpc BatchUploadBookFiles(BatchUploadBookFilesRequest) returns (BatchUploadBookFilesResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/books/{book_id}/files/batch"
+      body: "*"
+    };
+  }
+
+  // ListBookFiles returns all files for a book.
+  rpc ListBookFiles(ListBookFilesRequest) returns (ListBookFilesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/books/{book_id}/files"
+    };
+  }
+
+  // DownloadBookFile streams the file content.
+  rpc DownloadBookFile(DownloadBookFileRequest) returns (stream DownloadBookFileResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/books/{book_id}/files/{file_id}"
+    };
+  }
+
+  // DeleteBookFile deletes a file record and its content.
+  rpc DeleteBookFile(DeleteBookFileRequest) returns (DeleteBookFileResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/books/{book_id}/files/{file_id}"
+    };
+  }
+}
+
+// FileType represents the type of book resource.
+enum FileType {
+  FILE_TYPE_UNSPECIFIED = 0;
+  // Print edition (PDF)
+  FILE_TYPE_PRINT = 1;
+  // Digital edition (PDF/EPUB)
+  FILE_TYPE_DIGITAL = 2;
+  // Audio narration (MP3/M4A)
+  FILE_TYPE_AUDIO = 3;
+  // Video/animation (MP4)
+  FILE_TYPE_VIDEO = 4;
+}
+
+// BookFile represents a file attached to a book.
+message BookFile {
+  // Unique identifier of the file.
+  string id = 1;
+  // The ID of the book this file belongs to.
+  string book_id = 2;
+  // The type of file.
+  FileType file_type = 3;
+  // Original filename as uploaded.
+  string original_name = 4;
+  // Size of the file in bytes.
+  int64 file_size = 5;
+  // MIME type (e.g., application/pdf).
+  string mime_type = 6;
+  // The ID of the user who uploaded this file.
+  string uploader_id = 7;
+  // When the file was uploaded.
+  google.protobuf.Timestamp create_time = 8;
+}
+
+// UploadBookFileRequest is the request for UploadBookFile.
+message UploadBookFileRequest {
+  // The ID of the book to attach the file to.
+  string book_id = 1 [(buf.validate.field).string.min_len = 1];
+  // The type of file being uploaded.
+  FileType file_type = 2 [(buf.validate.field).required = true];
+  // Raw file bytes (binary upload).
+  bytes file_data = 3 [(buf.validate.field).required = true];
+  // Original filename.
+  string file_name = 4 [(buf.validate.field).string.min_len = 1, (buf.validate.field).string.max_len = 255];
+}
+
+// UploadBookFileResponse is the response for UploadBookFile.
+message UploadBookFileResponse {
+  BookFile file = 1;
+}
+
+// BatchUploadBookFilesRequest is the request for BatchUploadBookFiles.
+message BatchUploadBookFilesRequest {
+  string book_id = 1 [(buf.validate.field).string.min_len = 1];
+  // List of files to upload.
+  repeated BatchFileEntry files = 2 [(buf.validate.field).required = true, (buf.validate.field).repeated.min_items = 1];
+}
+
+// BatchFileEntry represents a single file in a batch upload.
+message BatchFileEntry {
+  FileType file_type = 1 [(buf.validate.field).required = true];
+  bytes file_data = 2 [(buf.validate.field).required = true];
+  string file_name = 3 [(buf.validate.field).string.min_len = 1, (buf.validate.field).string.max_len = 255];
+}
+
+// BatchUploadBookFilesResponse is the response for BatchUploadBookFiles.
+message BatchUploadBookFilesResponse {
+  repeated BookFile files = 1;
+  repeated string errors = 2;
+}
+
+// ListBookFilesRequest is the request for ListBookFiles.
+message ListBookFilesRequest {
+  string book_id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+// ListBookFilesResponse is the response for ListBookFiles.
+message ListBookFilesResponse {
+  repeated BookFile files = 1;
+}
+
+// DownloadBookFileRequest is the request for DownloadBookFile.
+message DownloadBookFileRequest {
+  string book_id = 1 [(buf.validate.field).string.min_len = 1];
+  string file_id = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+// DownloadBookFileResponse is the streamed response for DownloadBookFile.
+message DownloadBookFileResponse {
+  // Chunk of file bytes.
+  bytes chunk = 1;
+  // MIME type of the file.
+  string mime_type = 2;
+  // Original filename for Content-Disposition header.
+  string file_name = 3;
+}
+
+// DeleteBookFileRequest is the request for DeleteBookFile.
+message DeleteBookFileRequest {
+  string book_id = 1 [(buf.validate.field).string.min_len = 1];
+  string file_id = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+// DeleteBookFileResponse is the response for DeleteBookFile.
+message DeleteBookFileResponse {}

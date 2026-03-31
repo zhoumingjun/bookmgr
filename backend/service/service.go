@@ -8,4 +8,5 @@ var Module = fx.Options(
 	fx.Provide(NewUserService),
 	fx.Provide(NewBookService),
 	fx.Provide(NewDimensionService),
+	fx.Provide(NewFileService),
 )

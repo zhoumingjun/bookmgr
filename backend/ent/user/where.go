@@ -399,6 +399,29 @@ func HasBooksWith(preds ...predicate.Book) predicate.User {
 	})
 }
 
+// HasUploadedFiles applies the HasEdge predicate on the "uploaded_files" edge.
+func HasUploadedFiles() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, UploadedFilesTable, UploadedFilesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUploadedFilesWith applies the HasEdge predicate on the "uploaded_files" edge with a given conditions (other predicates).
+func HasUploadedFilesWith(preds ...predicate.BookFile) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newUploadedFilesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.User) predicate.User {
 	return predicate.User(sql.AndPredicates(predicates...))

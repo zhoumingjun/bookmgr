@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
 	"github.com/zhoumingjun/bookmgr/backend/ent/predicate"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
@@ -107,6 +108,21 @@ func (_u *UserUpdate) AddBooks(v ...*Book) *UserUpdate {
 	return _u.AddBookIDs(ids...)
 }
 
+// AddUploadedFileIDs adds the "uploaded_files" edge to the BookFile entity by IDs.
+func (_u *UserUpdate) AddUploadedFileIDs(ids ...uuid.UUID) *UserUpdate {
+	_u.mutation.AddUploadedFileIDs(ids...)
+	return _u
+}
+
+// AddUploadedFiles adds the "uploaded_files" edges to the BookFile entity.
+func (_u *UserUpdate) AddUploadedFiles(v ...*BookFile) *UserUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddUploadedFileIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (_u *UserUpdate) Mutation() *UserMutation {
 	return _u.mutation
@@ -131,6 +147,27 @@ func (_u *UserUpdate) RemoveBooks(v ...*Book) *UserUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveBookIDs(ids...)
+}
+
+// ClearUploadedFiles clears all "uploaded_files" edges to the BookFile entity.
+func (_u *UserUpdate) ClearUploadedFiles() *UserUpdate {
+	_u.mutation.ClearUploadedFiles()
+	return _u
+}
+
+// RemoveUploadedFileIDs removes the "uploaded_files" edge to BookFile entities by IDs.
+func (_u *UserUpdate) RemoveUploadedFileIDs(ids ...uuid.UUID) *UserUpdate {
+	_u.mutation.RemoveUploadedFileIDs(ids...)
+	return _u
+}
+
+// RemoveUploadedFiles removes "uploaded_files" edges to BookFile entities.
+func (_u *UserUpdate) RemoveUploadedFiles(v ...*BookFile) *UserUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveUploadedFileIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -266,6 +303,51 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.UploadedFilesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.UploadedFilesTable,
+			Columns: user.UploadedFilesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookfile.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedUploadedFilesIDs(); len(nodes) > 0 && !_u.mutation.UploadedFilesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.UploadedFilesTable,
+			Columns: user.UploadedFilesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookfile.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.UploadedFilesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.UploadedFilesTable,
+			Columns: user.UploadedFilesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookfile.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -363,6 +445,21 @@ func (_u *UserUpdateOne) AddBooks(v ...*Book) *UserUpdateOne {
 	return _u.AddBookIDs(ids...)
 }
 
+// AddUploadedFileIDs adds the "uploaded_files" edge to the BookFile entity by IDs.
+func (_u *UserUpdateOne) AddUploadedFileIDs(ids ...uuid.UUID) *UserUpdateOne {
+	_u.mutation.AddUploadedFileIDs(ids...)
+	return _u
+}
+
+// AddUploadedFiles adds the "uploaded_files" edges to the BookFile entity.
+func (_u *UserUpdateOne) AddUploadedFiles(v ...*BookFile) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddUploadedFileIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (_u *UserUpdateOne) Mutation() *UserMutation {
 	return _u.mutation
@@ -387,6 +484,27 @@ func (_u *UserUpdateOne) RemoveBooks(v ...*Book) *UserUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveBookIDs(ids...)
+}
+
+// ClearUploadedFiles clears all "uploaded_files" edges to the BookFile entity.
+func (_u *UserUpdateOne) ClearUploadedFiles() *UserUpdateOne {
+	_u.mutation.ClearUploadedFiles()
+	return _u
+}
+
+// RemoveUploadedFileIDs removes the "uploaded_files" edge to BookFile entities by IDs.
+func (_u *UserUpdateOne) RemoveUploadedFileIDs(ids ...uuid.UUID) *UserUpdateOne {
+	_u.mutation.RemoveUploadedFileIDs(ids...)
+	return _u
+}
+
+// RemoveUploadedFiles removes "uploaded_files" edges to BookFile entities.
+func (_u *UserUpdateOne) RemoveUploadedFiles(v ...*BookFile) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveUploadedFileIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -545,6 +663,51 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(book.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.UploadedFilesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.UploadedFilesTable,
+			Columns: user.UploadedFilesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookfile.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedUploadedFilesIDs(); len(nodes) > 0 && !_u.mutation.UploadedFilesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.UploadedFilesTable,
+			Columns: user.UploadedFilesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookfile.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.UploadedFilesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.UploadedFilesTable,
+			Columns: user.UploadedFilesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookfile.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

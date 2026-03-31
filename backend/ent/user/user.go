@@ -30,6 +30,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// EdgeBooks holds the string denoting the books edge name in mutations.
 	EdgeBooks = "books"
+	// EdgeUploadedFiles holds the string denoting the uploaded_files edge name in mutations.
+	EdgeUploadedFiles = "uploaded_files"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// BooksTable is the table that holds the books relation/edge.
@@ -39,6 +41,11 @@ const (
 	BooksInverseTable = "books"
 	// BooksColumn is the table column denoting the books relation/edge.
 	BooksColumn = "uploader_id"
+	// UploadedFilesTable is the table that holds the uploaded_files relation/edge. The primary key declared below.
+	UploadedFilesTable = "book_file_uploader"
+	// UploadedFilesInverseTable is the table name for the BookFile entity.
+	// It exists in this package in order to avoid circular dependency with the "bookfile" package.
+	UploadedFilesInverseTable = "book_files"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -51,6 +58,12 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
+
+var (
+	// UploadedFilesPrimaryKey and UploadedFilesColumn2 are the table columns denoting the
+	// primary key for the uploaded_files relation (M2M).
+	UploadedFilesPrimaryKey = []string{"book_file_id", "user_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -158,10 +171,31 @@ func ByBooks(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newBooksStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByUploadedFilesCount orders the results by uploaded_files count.
+func ByUploadedFilesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUploadedFilesStep(), opts...)
+	}
+}
+
+// ByUploadedFiles orders the results by uploaded_files terms.
+func ByUploadedFiles(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUploadedFilesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newBooksStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(BooksInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, BooksTable, BooksColumn),
+	)
+}
+func newUploadedFilesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UploadedFilesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, UploadedFilesTable, UploadedFilesPrimaryKey...),
 	)
 }

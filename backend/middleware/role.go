@@ -20,6 +20,9 @@ var adminMethods = map[string]bool{
 	"/bookmgr.v1.DimensionService/CreateDimension": true,
 	"/bookmgr.v1.DimensionService/UpdateDimension": true,
 	"/bookmgr.v1.DimensionService/DeleteDimension": true,
+	"/bookmgr.v1.FileService/UploadBookFile":       true,
+	"/bookmgr.v1.FileService/BatchUploadBookFiles": true,
+	"/bookmgr.v1.FileService/DeleteBookFile":        true,
 }
 
 // superAdminMethods require super_admin role only.

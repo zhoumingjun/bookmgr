@@ -12,6 +12,9 @@ type Book func(*sql.Selector)
 // BookDimension is the predicate function for bookdimension builders.
 type BookDimension func(*sql.Selector)
 
+// BookFile is the predicate function for bookfile builders.
+type BookFile func(*sql.Selector)
+
 // Dimension is the predicate function for dimension builders.
 type Dimension func(*sql.Selector)
 

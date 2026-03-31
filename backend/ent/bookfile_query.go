@@ -19,53 +19,53 @@ import (
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
 
-// UserQuery is the builder for querying User entities.
-type UserQuery struct {
+// BookFileQuery is the builder for querying BookFile entities.
+type BookFileQuery struct {
 	config
-	ctx               *QueryContext
-	order             []user.OrderOption
-	inters            []Interceptor
-	predicates        []predicate.User
-	withBooks         *BookQuery
-	withUploadedFiles *BookFileQuery
+	ctx          *QueryContext
+	order        []bookfile.OrderOption
+	inters       []Interceptor
+	predicates   []predicate.BookFile
+	withBook     *BookQuery
+	withUploader *UserQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
 }
 
-// Where adds a new predicate for the UserQuery builder.
-func (_q *UserQuery) Where(ps ...predicate.User) *UserQuery {
+// Where adds a new predicate for the BookFileQuery builder.
+func (_q *BookFileQuery) Where(ps ...predicate.BookFile) *BookFileQuery {
 	_q.predicates = append(_q.predicates, ps...)
 	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (_q *UserQuery) Limit(limit int) *UserQuery {
+func (_q *BookFileQuery) Limit(limit int) *BookFileQuery {
 	_q.ctx.Limit = &limit
 	return _q
 }
 
 // Offset to start from.
-func (_q *UserQuery) Offset(offset int) *UserQuery {
+func (_q *BookFileQuery) Offset(offset int) *BookFileQuery {
 	_q.ctx.Offset = &offset
 	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (_q *UserQuery) Unique(unique bool) *UserQuery {
+func (_q *BookFileQuery) Unique(unique bool) *BookFileQuery {
 	_q.ctx.Unique = &unique
 	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (_q *UserQuery) Order(o ...user.OrderOption) *UserQuery {
+func (_q *BookFileQuery) Order(o ...bookfile.OrderOption) *BookFileQuery {
 	_q.order = append(_q.order, o...)
 	return _q
 }
 
-// QueryBooks chains the current query on the "books" edge.
-func (_q *UserQuery) QueryBooks() *BookQuery {
+// QueryBook chains the current query on the "book" edge.
+func (_q *BookFileQuery) QueryBook() *BookQuery {
 	query := (&BookClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := _q.prepareQuery(ctx); err != nil {
@@ -76,9 +76,9 @@ func (_q *UserQuery) QueryBooks() *BookQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.From(bookfile.Table, bookfile.FieldID, selector),
 			sqlgraph.To(book.Table, book.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.BooksTable, user.BooksColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, bookfile.BookTable, bookfile.BookPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -86,9 +86,9 @@ func (_q *UserQuery) QueryBooks() *BookQuery {
 	return query
 }
 
-// QueryUploadedFiles chains the current query on the "uploaded_files" edge.
-func (_q *UserQuery) QueryUploadedFiles() *BookFileQuery {
-	query := (&BookFileClient{config: _q.config}).Query()
+// QueryUploader chains the current query on the "uploader" edge.
+func (_q *BookFileQuery) QueryUploader() *UserQuery {
+	query := (&UserClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -98,9 +98,9 @@ func (_q *UserQuery) QueryUploadedFiles() *BookFileQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(bookfile.Table, bookfile.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, user.UploadedFilesTable, user.UploadedFilesPrimaryKey...),
+			sqlgraph.From(bookfile.Table, bookfile.FieldID, selector),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, bookfile.UploaderTable, bookfile.UploaderPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -108,21 +108,21 @@ func (_q *UserQuery) QueryUploadedFiles() *BookFileQuery {
 	return query
 }
 
-// First returns the first User entity from the query.
-// Returns a *NotFoundError when no User was found.
-func (_q *UserQuery) First(ctx context.Context) (*User, error) {
+// First returns the first BookFile entity from the query.
+// Returns a *NotFoundError when no BookFile was found.
+func (_q *BookFileQuery) First(ctx context.Context) (*BookFile, error) {
 	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
-		return nil, &NotFoundError{user.Label}
+		return nil, &NotFoundError{bookfile.Label}
 	}
 	return nodes[0], nil
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (_q *UserQuery) FirstX(ctx context.Context) *User {
+func (_q *BookFileQuery) FirstX(ctx context.Context) *BookFile {
 	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -130,22 +130,22 @@ func (_q *UserQuery) FirstX(ctx context.Context) *User {
 	return node
 }
 
-// FirstID returns the first User ID from the query.
-// Returns a *NotFoundError when no User ID was found.
-func (_q *UserQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+// FirstID returns the first BookFile ID from the query.
+// Returns a *NotFoundError when no BookFile ID was found.
+func (_q *BookFileQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
 	var ids []uuid.UUID
 	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
-		err = &NotFoundError{user.Label}
+		err = &NotFoundError{bookfile.Label}
 		return
 	}
 	return ids[0], nil
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (_q *UserQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (_q *BookFileQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -153,10 +153,10 @@ func (_q *UserQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	return id
 }
 
-// Only returns a single User entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one User entity is found.
-// Returns a *NotFoundError when no User entities are found.
-func (_q *UserQuery) Only(ctx context.Context) (*User, error) {
+// Only returns a single BookFile entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one BookFile entity is found.
+// Returns a *NotFoundError when no BookFile entities are found.
+func (_q *BookFileQuery) Only(ctx context.Context) (*BookFile, error) {
 	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
@@ -165,14 +165,14 @@ func (_q *UserQuery) Only(ctx context.Context) (*User, error) {
 	case 1:
 		return nodes[0], nil
 	case 0:
-		return nil, &NotFoundError{user.Label}
+		return nil, &NotFoundError{bookfile.Label}
 	default:
-		return nil, &NotSingularError{user.Label}
+		return nil, &NotSingularError{bookfile.Label}
 	}
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (_q *UserQuery) OnlyX(ctx context.Context) *User {
+func (_q *BookFileQuery) OnlyX(ctx context.Context) *BookFile {
 	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
@@ -180,10 +180,10 @@ func (_q *UserQuery) OnlyX(ctx context.Context) *User {
 	return node
 }
 
-// OnlyID is like Only, but returns the only User ID in the query.
-// Returns a *NotSingularError when more than one User ID is found.
+// OnlyID is like Only, but returns the only BookFile ID in the query.
+// Returns a *NotSingularError when more than one BookFile ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (_q *UserQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+func (_q *BookFileQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 	var ids []uuid.UUID
 	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
@@ -192,15 +192,15 @@ func (_q *UserQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &NotFoundError{user.Label}
+		err = &NotFoundError{bookfile.Label}
 	default:
-		err = &NotSingularError{user.Label}
+		err = &NotSingularError{bookfile.Label}
 	}
 	return
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (_q *UserQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (_q *BookFileQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -208,18 +208,18 @@ func (_q *UserQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	return id
 }
 
-// All executes the query and returns a list of Users.
-func (_q *UserQuery) All(ctx context.Context) ([]*User, error) {
+// All executes the query and returns a list of BookFiles.
+func (_q *BookFileQuery) All(ctx context.Context) ([]*BookFile, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
 	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	qr := querierAll[[]*User, *UserQuery]()
-	return withInterceptors[[]*User](ctx, _q, qr, _q.inters)
+	qr := querierAll[[]*BookFile, *BookFileQuery]()
+	return withInterceptors[[]*BookFile](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (_q *UserQuery) AllX(ctx context.Context) []*User {
+func (_q *BookFileQuery) AllX(ctx context.Context) []*BookFile {
 	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
@@ -227,20 +227,20 @@ func (_q *UserQuery) AllX(ctx context.Context) []*User {
 	return nodes
 }
 
-// IDs executes the query and returns a list of User IDs.
-func (_q *UserQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
+// IDs executes the query and returns a list of BookFile IDs.
+func (_q *BookFileQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 	if _q.ctx.Unique == nil && _q.path != nil {
 		_q.Unique(true)
 	}
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
-	if err = _q.Select(user.FieldID).Scan(ctx, &ids); err != nil {
+	if err = _q.Select(bookfile.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (_q *UserQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (_q *BookFileQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -249,16 +249,16 @@ func (_q *UserQuery) IDsX(ctx context.Context) []uuid.UUID {
 }
 
 // Count returns the count of the given query.
-func (_q *UserQuery) Count(ctx context.Context) (int, error) {
+func (_q *BookFileQuery) Count(ctx context.Context) (int, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
 	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, _q, querierCount[*UserQuery](), _q.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*BookFileQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (_q *UserQuery) CountX(ctx context.Context) int {
+func (_q *BookFileQuery) CountX(ctx context.Context) int {
 	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
@@ -267,7 +267,7 @@ func (_q *UserQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (_q *UserQuery) Exist(ctx context.Context) (bool, error) {
+func (_q *BookFileQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
 	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
@@ -280,7 +280,7 @@ func (_q *UserQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (_q *UserQuery) ExistX(ctx context.Context) bool {
+func (_q *BookFileQuery) ExistX(ctx context.Context) bool {
 	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
@@ -288,45 +288,45 @@ func (_q *UserQuery) ExistX(ctx context.Context) bool {
 	return exist
 }
 
-// Clone returns a duplicate of the UserQuery builder, including all associated steps. It can be
+// Clone returns a duplicate of the BookFileQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (_q *UserQuery) Clone() *UserQuery {
+func (_q *BookFileQuery) Clone() *BookFileQuery {
 	if _q == nil {
 		return nil
 	}
-	return &UserQuery{
-		config:            _q.config,
-		ctx:               _q.ctx.Clone(),
-		order:             append([]user.OrderOption{}, _q.order...),
-		inters:            append([]Interceptor{}, _q.inters...),
-		predicates:        append([]predicate.User{}, _q.predicates...),
-		withBooks:         _q.withBooks.Clone(),
-		withUploadedFiles: _q.withUploadedFiles.Clone(),
+	return &BookFileQuery{
+		config:       _q.config,
+		ctx:          _q.ctx.Clone(),
+		order:        append([]bookfile.OrderOption{}, _q.order...),
+		inters:       append([]Interceptor{}, _q.inters...),
+		predicates:   append([]predicate.BookFile{}, _q.predicates...),
+		withBook:     _q.withBook.Clone(),
+		withUploader: _q.withUploader.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
 	}
 }
 
-// WithBooks tells the query-builder to eager-load the nodes that are connected to
-// the "books" edge. The optional arguments are used to configure the query builder of the edge.
-func (_q *UserQuery) WithBooks(opts ...func(*BookQuery)) *UserQuery {
+// WithBook tells the query-builder to eager-load the nodes that are connected to
+// the "book" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *BookFileQuery) WithBook(opts ...func(*BookQuery)) *BookFileQuery {
 	query := (&BookClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	_q.withBooks = query
+	_q.withBook = query
 	return _q
 }
 
-// WithUploadedFiles tells the query-builder to eager-load the nodes that are connected to
-// the "uploaded_files" edge. The optional arguments are used to configure the query builder of the edge.
-func (_q *UserQuery) WithUploadedFiles(opts ...func(*BookFileQuery)) *UserQuery {
-	query := (&BookFileClient{config: _q.config}).Query()
+// WithUploader tells the query-builder to eager-load the nodes that are connected to
+// the "uploader" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *BookFileQuery) WithUploader(opts ...func(*UserQuery)) *BookFileQuery {
+	query := (&UserClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	_q.withUploadedFiles = query
+	_q.withUploader = query
 	return _q
 }
 
@@ -336,19 +336,19 @@ func (_q *UserQuery) WithUploadedFiles(opts ...func(*BookFileQuery)) *UserQuery 
 // Example:
 //
 //	var v []struct {
-//		Username string `json:"username,omitempty"`
+//		BookID uuid.UUID `json:"book_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
-//	client.User.Query().
-//		GroupBy(user.FieldUsername).
+//	client.BookFile.Query().
+//		GroupBy(bookfile.FieldBookID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (_q *UserQuery) GroupBy(field string, fields ...string) *UserGroupBy {
+func (_q *BookFileQuery) GroupBy(field string, fields ...string) *BookFileGroupBy {
 	_q.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &UserGroupBy{build: _q}
+	grbuild := &BookFileGroupBy{build: _q}
 	grbuild.flds = &_q.ctx.Fields
-	grbuild.label = user.Label
+	grbuild.label = bookfile.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
 }
@@ -359,26 +359,26 @@ func (_q *UserQuery) GroupBy(field string, fields ...string) *UserGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Username string `json:"username,omitempty"`
+//		BookID uuid.UUID `json:"book_id,omitempty"`
 //	}
 //
-//	client.User.Query().
-//		Select(user.FieldUsername).
+//	client.BookFile.Query().
+//		Select(bookfile.FieldBookID).
 //		Scan(ctx, &v)
-func (_q *UserQuery) Select(fields ...string) *UserSelect {
+func (_q *BookFileQuery) Select(fields ...string) *BookFileSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
-	sbuild := &UserSelect{UserQuery: _q}
-	sbuild.label = user.Label
+	sbuild := &BookFileSelect{BookFileQuery: _q}
+	sbuild.label = bookfile.Label
 	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
-// Aggregate returns a UserSelect configured with the given aggregations.
-func (_q *UserQuery) Aggregate(fns ...AggregateFunc) *UserSelect {
+// Aggregate returns a BookFileSelect configured with the given aggregations.
+func (_q *BookFileQuery) Aggregate(fns ...AggregateFunc) *BookFileSelect {
 	return _q.Select().Aggregate(fns...)
 }
 
-func (_q *UserQuery) prepareQuery(ctx context.Context) error {
+func (_q *BookFileQuery) prepareQuery(ctx context.Context) error {
 	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
@@ -390,7 +390,7 @@ func (_q *UserQuery) prepareQuery(ctx context.Context) error {
 		}
 	}
 	for _, f := range _q.ctx.Fields {
-		if !user.ValidColumn(f) {
+		if !bookfile.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
@@ -404,20 +404,20 @@ func (_q *UserQuery) prepareQuery(ctx context.Context) error {
 	return nil
 }
 
-func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, error) {
+func (_q *BookFileQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*BookFile, error) {
 	var (
-		nodes       = []*User{}
+		nodes       = []*BookFile{}
 		_spec       = _q.querySpec()
 		loadedTypes = [2]bool{
-			_q.withBooks != nil,
-			_q.withUploadedFiles != nil,
+			_q.withBook != nil,
+			_q.withUploader != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
-		return (*User).scanValues(nil, columns)
+		return (*BookFile).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &User{config: _q.config}
+		node := &BookFile{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
@@ -431,57 +431,27 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := _q.withBooks; query != nil {
-		if err := _q.loadBooks(ctx, query, nodes,
-			func(n *User) { n.Edges.Books = []*Book{} },
-			func(n *User, e *Book) { n.Edges.Books = append(n.Edges.Books, e) }); err != nil {
+	if query := _q.withBook; query != nil {
+		if err := _q.loadBook(ctx, query, nodes,
+			func(n *BookFile) { n.Edges.Book = []*Book{} },
+			func(n *BookFile, e *Book) { n.Edges.Book = append(n.Edges.Book, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := _q.withUploadedFiles; query != nil {
-		if err := _q.loadUploadedFiles(ctx, query, nodes,
-			func(n *User) { n.Edges.UploadedFiles = []*BookFile{} },
-			func(n *User, e *BookFile) { n.Edges.UploadedFiles = append(n.Edges.UploadedFiles, e) }); err != nil {
+	if query := _q.withUploader; query != nil {
+		if err := _q.loadUploader(ctx, query, nodes,
+			func(n *BookFile) { n.Edges.Uploader = []*User{} },
+			func(n *BookFile, e *User) { n.Edges.Uploader = append(n.Edges.Uploader, e) }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (_q *UserQuery) loadBooks(ctx context.Context, query *BookQuery, nodes []*User, init func(*User), assign func(*User, *Book)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uuid.UUID]*User)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(book.FieldUploaderID)
-	}
-	query.Where(predicate.Book(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(user.BooksColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.UploaderID
-		node, ok := nodeids[fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "uploader_id" returned %v for node %v`, fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (_q *UserQuery) loadUploadedFiles(ctx context.Context, query *BookFileQuery, nodes []*User, init func(*User), assign func(*User, *BookFile)) error {
+func (_q *BookFileQuery) loadBook(ctx context.Context, query *BookQuery, nodes []*BookFile, init func(*BookFile), assign func(*BookFile, *Book)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[uuid.UUID]*User)
-	nids := make(map[uuid.UUID]map[*User]struct{})
+	byID := make(map[uuid.UUID]*BookFile)
+	nids := make(map[uuid.UUID]map[*BookFile]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
 		byID[node.ID] = node
@@ -490,11 +460,11 @@ func (_q *UserQuery) loadUploadedFiles(ctx context.Context, query *BookFileQuery
 		}
 	}
 	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(user.UploadedFilesTable)
-		s.Join(joinT).On(s.C(bookfile.FieldID), joinT.C(user.UploadedFilesPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(user.UploadedFilesPrimaryKey[1]), edgeIDs...))
+		joinT := sql.Table(bookfile.BookTable)
+		s.Join(joinT).On(s.C(book.FieldID), joinT.C(bookfile.BookPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(bookfile.BookPrimaryKey[0]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(user.UploadedFilesPrimaryKey[1]))
+		s.Select(joinT.C(bookfile.BookPrimaryKey[0]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})
@@ -516,7 +486,7 @@ func (_q *UserQuery) loadUploadedFiles(ctx context.Context, query *BookFileQuery
 				outValue := *values[0].(*uuid.UUID)
 				inValue := *values[1].(*uuid.UUID)
 				if nids[inValue] == nil {
-					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
+					nids[inValue] = map[*BookFile]struct{}{byID[outValue]: {}}
 					return assign(columns[1:], values[1:])
 				}
 				nids[inValue][byID[outValue]] = struct{}{}
@@ -524,14 +494,75 @@ func (_q *UserQuery) loadUploadedFiles(ctx context.Context, query *BookFileQuery
 			}
 		})
 	})
-	neighbors, err := withInterceptors[[]*BookFile](ctx, query, qr, query.inters)
+	neighbors, err := withInterceptors[[]*Book](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
 		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "uploaded_files" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "book" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (_q *BookFileQuery) loadUploader(ctx context.Context, query *UserQuery, nodes []*BookFile, init func(*BookFile), assign func(*BookFile, *User)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[uuid.UUID]*BookFile)
+	nids := make(map[uuid.UUID]map[*BookFile]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(bookfile.UploaderTable)
+		s.Join(joinT).On(s.C(user.FieldID), joinT.C(bookfile.UploaderPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(bookfile.UploaderPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(bookfile.UploaderPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(uuid.UUID)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := *values[0].(*uuid.UUID)
+				inValue := *values[1].(*uuid.UUID)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*BookFile]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*User](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "uploader" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
@@ -540,7 +571,7 @@ func (_q *UserQuery) loadUploadedFiles(ctx context.Context, query *BookFileQuery
 	return nil
 }
 
-func (_q *UserQuery) sqlCount(ctx context.Context) (int, error) {
+func (_q *BookFileQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := _q.querySpec()
 	_spec.Node.Columns = _q.ctx.Fields
 	if len(_q.ctx.Fields) > 0 {
@@ -549,8 +580,8 @@ func (_q *UserQuery) sqlCount(ctx context.Context) (int, error) {
 	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (_q *UserQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID))
+func (_q *BookFileQuery) querySpec() *sqlgraph.QuerySpec {
+	_spec := sqlgraph.NewQuerySpec(bookfile.Table, bookfile.Columns, sqlgraph.NewFieldSpec(bookfile.FieldID, field.TypeUUID))
 	_spec.From = _q.sql
 	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -559,9 +590,9 @@ func (_q *UserQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, user.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, bookfile.FieldID)
 		for i := range fields {
-			if fields[i] != user.FieldID {
+			if fields[i] != bookfile.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
@@ -589,12 +620,12 @@ func (_q *UserQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (_q *UserQuery) sqlQuery(ctx context.Context) *sql.Selector {
+func (_q *BookFileQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(_q.driver.Dialect())
-	t1 := builder.Table(user.Table)
+	t1 := builder.Table(bookfile.Table)
 	columns := _q.ctx.Fields
 	if len(columns) == 0 {
-		columns = user.Columns
+		columns = bookfile.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
 	if _q.sql != nil {
@@ -621,28 +652,28 @@ func (_q *UserQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// UserGroupBy is the group-by builder for User entities.
-type UserGroupBy struct {
+// BookFileGroupBy is the group-by builder for BookFile entities.
+type BookFileGroupBy struct {
 	selector
-	build *UserQuery
+	build *BookFileQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (_g *UserGroupBy) Aggregate(fns ...AggregateFunc) *UserGroupBy {
+func (_g *BookFileGroupBy) Aggregate(fns ...AggregateFunc) *BookFileGroupBy {
 	_g.fns = append(_g.fns, fns...)
 	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (_g *UserGroupBy) Scan(ctx context.Context, v any) error {
+func (_g *BookFileGroupBy) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
 	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*UserQuery, *UserGroupBy](ctx, _g.build, _g, _g.build.inters, v)
+	return scanWithInterceptors[*BookFileQuery, *BookFileGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (_g *UserGroupBy) sqlScan(ctx context.Context, root *UserQuery, v any) error {
+func (_g *BookFileGroupBy) sqlScan(ctx context.Context, root *BookFileQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
 	aggregation := make([]string, 0, len(_g.fns))
 	for _, fn := range _g.fns {
@@ -669,28 +700,28 @@ func (_g *UserGroupBy) sqlScan(ctx context.Context, root *UserQuery, v any) erro
 	return sql.ScanSlice(rows, v)
 }
 
-// UserSelect is the builder for selecting fields of User entities.
-type UserSelect struct {
-	*UserQuery
+// BookFileSelect is the builder for selecting fields of BookFile entities.
+type BookFileSelect struct {
+	*BookFileQuery
 	selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (_s *UserSelect) Aggregate(fns ...AggregateFunc) *UserSelect {
+func (_s *BookFileSelect) Aggregate(fns ...AggregateFunc) *BookFileSelect {
 	_s.fns = append(_s.fns, fns...)
 	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (_s *UserSelect) Scan(ctx context.Context, v any) error {
+func (_s *BookFileSelect) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
 	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*UserQuery, *UserSelect](ctx, _s.UserQuery, _s, _s.inters, v)
+	return scanWithInterceptors[*BookFileQuery, *BookFileSelect](ctx, _s.BookFileQuery, _s, _s.inters, v)
 }
 
-func (_s *UserSelect) sqlScan(ctx context.Context, root *UserQuery, v any) error {
+func (_s *BookFileSelect) sqlScan(ctx context.Context, root *BookFileQuery, v any) error {
 	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(_s.fns))
 	for _, fn := range _s.fns {

@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
 
@@ -109,6 +110,21 @@ func (_c *UserCreate) AddBooks(v ...*Book) *UserCreate {
 		ids[i] = v[i].ID
 	}
 	return _c.AddBookIDs(ids...)
+}
+
+// AddUploadedFileIDs adds the "uploaded_files" edge to the BookFile entity by IDs.
+func (_c *UserCreate) AddUploadedFileIDs(ids ...uuid.UUID) *UserCreate {
+	_c.mutation.AddUploadedFileIDs(ids...)
+	return _c
+}
+
+// AddUploadedFiles adds the "uploaded_files" edges to the BookFile entity.
+func (_c *UserCreate) AddUploadedFiles(v ...*BookFile) *UserCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddUploadedFileIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -272,6 +288,22 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(book.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.UploadedFilesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.UploadedFilesTable,
+			Columns: user.UploadedFilesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookfile.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

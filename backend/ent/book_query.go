@@ -15,6 +15,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookdimension"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
 	"github.com/zhoumingjun/bookmgr/backend/ent/predicate"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
@@ -28,6 +29,7 @@ type BookQuery struct {
 	predicates         []predicate.Book
 	withUploader       *UserQuery
 	withBookDimensions *BookDimensionQuery
+	withFiles          *BookFileQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -101,6 +103,28 @@ func (_q *BookQuery) QueryBookDimensions() *BookDimensionQuery {
 			sqlgraph.From(book.Table, book.FieldID, selector),
 			sqlgraph.To(bookdimension.Table, bookdimension.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, book.BookDimensionsTable, book.BookDimensionsPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryFiles chains the current query on the "files" edge.
+func (_q *BookQuery) QueryFiles() *BookFileQuery {
+	query := (&BookFileClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(book.Table, book.FieldID, selector),
+			sqlgraph.To(bookfile.Table, bookfile.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, book.FilesTable, book.FilesPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -302,6 +326,7 @@ func (_q *BookQuery) Clone() *BookQuery {
 		predicates:         append([]predicate.Book{}, _q.predicates...),
 		withUploader:       _q.withUploader.Clone(),
 		withBookDimensions: _q.withBookDimensions.Clone(),
+		withFiles:          _q.withFiles.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -327,6 +352,17 @@ func (_q *BookQuery) WithBookDimensions(opts ...func(*BookDimensionQuery)) *Book
 		opt(query)
 	}
 	_q.withBookDimensions = query
+	return _q
+}
+
+// WithFiles tells the query-builder to eager-load the nodes that are connected to
+// the "files" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *BookQuery) WithFiles(opts ...func(*BookFileQuery)) *BookQuery {
+	query := (&BookFileClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withFiles = query
 	return _q
 }
 
@@ -408,9 +444,10 @@ func (_q *BookQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Book, e
 	var (
 		nodes       = []*Book{}
 		_spec       = _q.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			_q.withUploader != nil,
 			_q.withBookDimensions != nil,
+			_q.withFiles != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -441,6 +478,13 @@ func (_q *BookQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Book, e
 		if err := _q.loadBookDimensions(ctx, query, nodes,
 			func(n *Book) { n.Edges.BookDimensions = []*BookDimension{} },
 			func(n *Book, e *BookDimension) { n.Edges.BookDimensions = append(n.Edges.BookDimensions, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withFiles; query != nil {
+		if err := _q.loadFiles(ctx, query, nodes,
+			func(n *Book) { n.Edges.Files = []*BookFile{} },
+			func(n *Book, e *BookFile) { n.Edges.Files = append(n.Edges.Files, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -530,6 +574,67 @@ func (_q *BookQuery) loadBookDimensions(ctx context.Context, query *BookDimensio
 		nodes, ok := nids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected "book_dimensions" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (_q *BookQuery) loadFiles(ctx context.Context, query *BookFileQuery, nodes []*Book, init func(*Book), assign func(*Book, *BookFile)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[uuid.UUID]*Book)
+	nids := make(map[uuid.UUID]map[*Book]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(book.FilesTable)
+		s.Join(joinT).On(s.C(bookfile.FieldID), joinT.C(book.FilesPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(book.FilesPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(book.FilesPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(uuid.UUID)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := *values[0].(*uuid.UUID)
+				inValue := *values[1].(*uuid.UUID)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Book]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*BookFile](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "files" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)

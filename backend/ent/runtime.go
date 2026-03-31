@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookdimension"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
 	"github.com/zhoumingjun/bookmgr/backend/ent/dimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/schema"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
@@ -147,6 +148,94 @@ func init() {
 	bookdimensionDescID := bookdimensionFields[0].Descriptor()
 	// bookdimension.DefaultID holds the default value on creation for the id field.
 	bookdimension.DefaultID = bookdimensionDescID.Default.(func() uuid.UUID)
+	bookfileFields := schema.BookFile{}.Fields()
+	_ = bookfileFields
+	// bookfileDescFileType is the schema descriptor for file_type field.
+	bookfileDescFileType := bookfileFields[2].Descriptor()
+	// bookfile.FileTypeValidator is a validator for the "file_type" field. It is called by the builders before save.
+	bookfile.FileTypeValidator = func() func(string) error {
+		validators := bookfileDescFileType.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(file_type string) error {
+			for _, fn := range fns {
+				if err := fn(file_type); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// bookfileDescOriginalName is the schema descriptor for original_name field.
+	bookfileDescOriginalName := bookfileFields[3].Descriptor()
+	// bookfile.OriginalNameValidator is a validator for the "original_name" field. It is called by the builders before save.
+	bookfile.OriginalNameValidator = func() func(string) error {
+		validators := bookfileDescOriginalName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(original_name string) error {
+			for _, fn := range fns {
+				if err := fn(original_name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// bookfileDescStoredName is the schema descriptor for stored_name field.
+	bookfileDescStoredName := bookfileFields[4].Descriptor()
+	// bookfile.StoredNameValidator is a validator for the "stored_name" field. It is called by the builders before save.
+	bookfile.StoredNameValidator = func() func(string) error {
+		validators := bookfileDescStoredName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(stored_name string) error {
+			for _, fn := range fns {
+				if err := fn(stored_name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// bookfileDescFilePath is the schema descriptor for file_path field.
+	bookfileDescFilePath := bookfileFields[5].Descriptor()
+	// bookfile.FilePathValidator is a validator for the "file_path" field. It is called by the builders before save.
+	bookfile.FilePathValidator = func() func(string) error {
+		validators := bookfileDescFilePath.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(file_path string) error {
+			for _, fn := range fns {
+				if err := fn(file_path); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// bookfileDescMimeType is the schema descriptor for mime_type field.
+	bookfileDescMimeType := bookfileFields[7].Descriptor()
+	// bookfile.DefaultMimeType holds the default value on creation for the mime_type field.
+	bookfile.DefaultMimeType = bookfileDescMimeType.Default.(string)
+	// bookfile.MimeTypeValidator is a validator for the "mime_type" field. It is called by the builders before save.
+	bookfile.MimeTypeValidator = bookfileDescMimeType.Validators[0].(func(string) error)
+	// bookfileDescCreatedAt is the schema descriptor for created_at field.
+	bookfileDescCreatedAt := bookfileFields[9].Descriptor()
+	// bookfile.DefaultCreatedAt holds the default value on creation for the created_at field.
+	bookfile.DefaultCreatedAt = bookfileDescCreatedAt.Default.(func() time.Time)
+	// bookfileDescID is the schema descriptor for id field.
+	bookfileDescID := bookfileFields[0].Descriptor()
+	// bookfile.DefaultID holds the default value on creation for the id field.
+	bookfile.DefaultID = bookfileDescID.Default.(func() uuid.UUID)
 	dimensionFields := schema.Dimension{}.Fields()
 	_ = dimensionFields
 	// dimensionDescName is the schema descriptor for name field.
