@@ -7,7 +7,8 @@
     "userManagement": "用户管理",
     "dimensionManagement": "维度分类",
     "bookManagement": "书籍管理",
-    "bookCatalog": "图书浏览"
+    "bookCatalog": "图书浏览",
+    "reviewManagement": "审核管理"
   },
   "user": {
     "profile": "个人信息",

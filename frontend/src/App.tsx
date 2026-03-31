@@ -11,6 +11,7 @@ import BookNewPage from './pages/admin/BookNew';
 import BookEditPage from './pages/admin/BookEdit';
 import AdminBookDetailPage from './pages/admin/BookDetail';
 import DimensionManagePage from './pages/admin/DimensionManagePage';
+import ReviewManagePage from './pages/admin/ReviewManagePage';
 import ConsoleBooksPage from './pages/console/Books';
 import ConsoleBookDetailPage from './pages/console/BookDetail';
 
@@ -22,17 +23,16 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-            {/* Console routes — all authenticated users */}
             <Route path="/console/books" element={<ConsoleBooksPage />} />
             <Route path="/console/books/:id" element={<ConsoleBookDetailPage />} />
             <Route path="/console" element={<Navigate to="/console/books" replace />} />
-            {/* Admin routes — admin only */}
             <Route path="/admin/users" element={<ProtectedRoute requireAdmin><UsersPage /></ProtectedRoute>} />
             <Route path="/admin/users/:id" element={<ProtectedRoute requireAdmin><UserEditPage /></ProtectedRoute>} />
             <Route path="/admin/books" element={<ProtectedRoute requireAdmin><BooksPage /></ProtectedRoute>} />
             <Route path="/admin/books/new" element={<ProtectedRoute requireAdmin><BookNewPage /></ProtectedRoute>} />
             <Route path="/admin/books/:id" element={<ProtectedRoute requireAdmin><BookEditPage /></ProtectedRoute>} />
             <Route path="/admin/books/detail/:id" element={<ProtectedRoute requireAdmin><AdminBookDetailPage /></ProtectedRoute>} />
+            <Route path="/admin/reviews" element={<ProtectedRoute requireAdmin><ReviewManagePage /></ProtectedRoute>} />
             <Route path="/admin/dimensions" element={<ProtectedRoute requireAdmin><DimensionManagePage /></ProtectedRoute>} />
             <Route path="/admin" element={<Navigate to="/admin/users" replace />} />
           </Route>

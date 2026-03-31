@@ -7,7 +7,8 @@
     "userManagement": "Users",
     "dimensionManagement": "Dimensions",
     "bookManagement": "Books",
-    "bookCatalog": "Book Catalog"
+    "bookCatalog": "Book Catalog",
+    "reviewManagement": "Review"
   },
   "user": {
     "profile": "Profile",

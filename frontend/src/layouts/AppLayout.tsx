@@ -12,6 +12,7 @@ import {
 } from 'antd';
 import {
   UserOutlined,
+  CheckCircleOutlined,
   BookOutlined,
   TeamOutlined,
   GlobalOutlined,
@@ -59,6 +60,7 @@ export default function AppLayout() {
       items.push(
         { key: '/admin/users', icon: <TeamOutlined />, label: t('nav.userManagement') },
         { key: '/admin/dimensions', icon: <AppstoreOutlined />, label: t('nav.dimensionManagement') },
+        { key: '/admin/reviews', icon: <CheckCircleOutlined />, label: t('nav.reviewManagement') },
         { key: '/admin/books', icon: <BookOutlined />, label: t('nav.bookManagement') },
       );
     }
