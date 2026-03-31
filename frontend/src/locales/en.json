@@ -5,6 +5,7 @@
   },
   "nav": {
     "userManagement": "Users",
+    "dimensionManagement": "Dimensions",
     "bookManagement": "Books",
     "bookCatalog": "Book Catalog"
   },

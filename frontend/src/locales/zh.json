@@ -5,6 +5,7 @@
   },
   "nav": {
     "userManagement": "用户管理",
+    "dimensionManagement": "维度分类",
     "bookManagement": "书籍管理",
     "bookCatalog": "图书浏览"
   },

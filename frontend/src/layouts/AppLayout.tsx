@@ -18,6 +18,7 @@ import {
   MenuOutlined,
   LogoutOutlined,
   DownOutlined,
+  AppstoreOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import zhCN from 'antd/locale/zh_CN';
@@ -57,6 +58,7 @@ export default function AppLayout() {
     if (isAdmin) {
       items.push(
         { key: '/admin/users', icon: <TeamOutlined />, label: t('nav.userManagement') },
+        { key: '/admin/dimensions', icon: <AppstoreOutlined />, label: t('nav.dimensionManagement') },
         { key: '/admin/books', icon: <BookOutlined />, label: t('nav.bookManagement') },
       );
     }
