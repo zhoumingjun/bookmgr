@@ -77,22 +77,27 @@
     "add": "Add Book",
     "edit": "Edit",
     "delete": "Delete",
-    "deleteConfirm": "Delete book \"{{name}}\"?",
+    "deleteConfirm": "Delete book?",
     "deleteSuccess": "Book deleted",
-    "deleteFailed": "Failed to delete book",
-    "loadFailed": "Failed to load books"
+    "deleteFailed": "Failed to delete",
+    "loadFailed": "Failed to load books",
+    "coreGoal": "Core Goal",
+    "dimensions": "Dimensions"
   },
   "bookNew": {
-    "title": "Add Book",
+    "title": "New Book",
     "bookTitle": "Title",
     "author": "Author",
     "description": "Description",
+    "coreGoal": "Core Adaptation Goal",
+    "cognitiveLevel": "Cognitive Level",
+    "dimensions": "Dimensions",
     "file": "PDF File",
-    "fileTip": "Click or drag PDF file here",
+    "fileTip": "Click or drag PDF here",
     "submit": "Create",
     "cancel": "Cancel",
     "success": "Book created",
-    "error": "Failed to create book"
+    "error": "Failed to create"
   },
   "bookEdit": {
     "title": "Edit Book",
@@ -100,7 +105,7 @@
     "author": "Author",
     "description": "Description",
     "replaceFile": "Replace PDF File",
-    "fileTip": "Click or drag new PDF file",
+    "fileTip": "Click or drag new PDF",
     "save": "Save",
     "cancel": "Cancel",
     "success": "Book updated",

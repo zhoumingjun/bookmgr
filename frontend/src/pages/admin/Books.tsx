@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Button, Popconfirm, message, Typography, Grid } from 'antd';
+import { Table, Button, Popconfirm, message, Typography, Grid, Tag, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { listBooks, deleteBook, type BookDTO } from '../../api/books';
@@ -45,16 +45,34 @@ export default function BooksPage() {
   }
 
   const columns = [
-    { title: t('books.bookTitle'), dataIndex: 'title', key: 'title' },
-    { title: t('books.author'), dataIndex: 'author', key: 'author' },
+    { title: t('books.bookTitle'), dataIndex: 'title', key: 'title', ellipsis: true },
+    { title: t('books.author'), dataIndex: 'author', key: 'author', width: 120, ellipsis: true },
+    ...(!isMobile ? [{
+      title: '核心目标', dataIndex: 'core_goal', key: 'core_goal',
+      render: (v: string) => v ? <span title={v}>{v.slice(0, 30)}{v.length > 30 ? '…' : ''}</span> : '—',
+      ellipsis: true,
+    }] : []),
+    {
+      title: '维度', key: 'dimensions', width: 200,
+      render: (_: unknown, record: BookDTO) => (
+        <Space size={2} wrap>
+          {record.dimensions?.slice(0, 3).map(d => (
+            <Tag key={d.slug} color="blue" style={{ fontSize: 11 }}>{d.name}</Tag>
+          ))}
+          {record.dimensions?.length > 3 && <Tag>+{record.dimensions.length - 3}</Tag>}
+          {!record.dimensions?.length && <span style={{ color: '#999' }}>—</span>}
+        </Space>
+      ),
+    },
     ...(!isMobile ? [{
       title: t('books.createdAt'), dataIndex: 'create_time', key: 'create_time',
       render: (v: string) => new Date(v).toLocaleDateString(),
+      width: 100,
     }] : []),
     {
-      title: t('books.actions'), key: 'actions',
+      title: t('books.actions'), key: 'actions', width: 120,
       render: (_: unknown, record: BookDTO) => (
-        <span>
+        <Space size={4}>
           <Button type="link" size="small" onClick={() => navigate(`/admin/books/${record.id}`)}>
             {t('books.edit')}
           </Button>
@@ -64,7 +82,7 @@ export default function BooksPage() {
           >
             <Button type="link" size="small" danger>{t('books.delete')}</Button>
           </Popconfirm>
-        </span>
+        </Space>
       ),
     },
   ];
@@ -84,7 +102,7 @@ export default function BooksPage() {
         loading={loading}
         pagination={false}
         size={isMobile ? 'small' : 'middle'}
-        scroll={isMobile ? { x: 480 } : undefined}
+        scroll={isMobile ? { x: 600 } : undefined}
       />
       <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
         <Button disabled={prevTokens.length === 0} onClick={() => {

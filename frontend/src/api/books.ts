@@ -1,12 +1,30 @@
 import apiClient from './client';
+import type { DimensionDTO } from './dimension';
 
 export interface BookDTO {
   id: string;
   title: string;
   author: string;
   description: string;
+  page_count: number;
+  duration_minutes: number;
+  core_goal: string;
+  cognitive_level: string;
+  resource_type: string;
+  has_print: boolean;
+  has_digital: boolean;
+  has_audio: boolean;
+  has_video: boolean;
+  teaching_suggestion: string;
+  parent_reading_guide: string;
+  recommended_age_min: number;
+  recommended_age_max: number;
+  cover_image_url: string;
   cover_url: string;
+  status: string;
   uploader_id: string;
+  view_count: number;
+  dimensions: DimensionDTO[];
   create_time: string;
   update_time: string;
 }
@@ -28,9 +46,36 @@ interface UpdateBookResponse {
   book: BookDTO;
 }
 
-export async function listBooks(pageSize = 20, pageToken = ''): Promise<ListBooksResponse> {
+export interface CreateBookParams {
+  title: string;
+  author: string;
+  description?: string;
+  page_count?: number;
+  duration_minutes?: number;
+  core_goal: string;
+  cognitive_level?: string;
+  resource_type?: string;
+  has_print?: boolean;
+  has_digital?: boolean;
+  has_audio?: boolean;
+  has_video?: boolean;
+  teaching_suggestion?: string;
+  parent_reading_guide?: string;
+  recommended_age_min?: number;
+  recommended_age_max?: number;
+  dimension_slugs: string[];
+}
+
+export async function listBooks(
+  pageSize = 20,
+  pageToken = '',
+  dimensionSlug?: string,
+  status?: string,
+): Promise<ListBooksResponse> {
   const params: Record<string, string | number> = { page_size: pageSize };
   if (pageToken) params.page_token = pageToken;
+  if (dimensionSlug) params.dimension_slug = dimensionSlug;
+  if (status) params.status = status;
   const { data } = await apiClient.get<ListBooksResponse>('/books', { params });
   return data;
 }
@@ -40,14 +85,16 @@ export async function getBook(id: string): Promise<GetBookResponse> {
   return data;
 }
 
-export async function createBook(title: string, author: string, description: string): Promise<CreateBookResponse> {
-  const { data } = await apiClient.post<CreateBookResponse>('/books', { title, author, description });
+export async function createBook(params: CreateBookParams): Promise<CreateBookResponse> {
+  const { data } = await apiClient.post<CreateBookResponse>('/books', params);
   return data;
 }
 
+export type UpdateBookParams = Partial<CreateBookParams> & { id: string };
+
 export async function updateBook(
   id: string,
-  fields: { title?: string; author?: string; description?: string; cover_url?: string },
+  fields: Partial<CreateBookParams>,
   updateMask: string[],
 ): Promise<UpdateBookResponse> {
   const { data } = await apiClient.patch<UpdateBookResponse>(`/books/${id}`, {
