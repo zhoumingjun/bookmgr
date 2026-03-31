@@ -13,6 +13,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookdimension"
+	"github.com/zhoumingjun/bookmgr/backend/ent/dimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
 
@@ -74,8 +76,10 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			book.Table: book.ValidColumn,
-			user.Table: user.ValidColumn,
+			book.Table:          book.ValidColumn,
+			bookdimension.Table: bookdimension.ValidColumn,
+			dimension.Table:     dimension.ValidColumn,
+			user.Table:          user.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

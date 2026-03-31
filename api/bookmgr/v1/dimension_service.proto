@@ -1,0 +1,130 @@
+syntax = "proto3";
+
+package bookmgr.v1;
+
+import "bookmgr/v1/common.proto";
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/zhoumingjun/bookmgr/gen/api/bookmgr/v1;bookmgrv1";
+
+// DimensionService manages picturebook category dimensions.
+// All RPCs require admin/super_admin role.
+service DimensionService {
+  // ListDimensions returns a tree of all dimensions.
+  rpc ListDimensions(ListDimensionsRequest) returns (ListDimensionsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/dimensions"
+    };
+  }
+
+  // GetDimension returns a single dimension by slug.
+  rpc GetDimension(GetDimensionRequest) returns (GetDimensionResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/dimensions/{slug}"
+    };
+  }
+
+  // CreateDimension creates a new dimension. Admin/super_admin only.
+  rpc CreateDimension(CreateDimensionRequest) returns (CreateDimensionResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/dimensions"
+      body: "*"
+    };
+  }
+
+  // UpdateDimension updates an existing dimension. Admin/super_admin only.
+  rpc UpdateDimension(UpdateDimensionRequest) returns (UpdateDimensionResponse) {
+    option (google.api.http) = {
+      patch: "/api/v1/dimensions/{slug}"
+      body: "*"
+    };
+  }
+
+  // DeleteDimension deletes a dimension. Admin/super_admin only.
+  // Fails if the dimension has associated books or subcategories.
+  rpc DeleteDimension(DeleteDimensionRequest) returns (DeleteDimensionResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/dimensions/{slug}"
+    };
+  }
+
+  // ListSubcategories returns subcategories of a parent dimension.
+  rpc ListSubcategories(ListSubcategoriesRequest) returns (ListSubcategoriesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/dimensions/{parent_slug}/subcategories"
+    };
+  }
+}
+
+// ListDimensionsRequest is the request for ListDimensions.
+message ListDimensionsRequest {}
+
+// ListDimensionsResponse is the response for ListDimensions.
+message ListDimensionsResponse {
+  // Top-level dimensions with nested children.
+  repeated Dimension dimensions = 1;
+}
+
+// GetDimensionRequest is the request for GetDimension.
+message GetDimensionRequest {
+  string slug = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+// GetDimensionResponse is the response for GetDimension.
+message GetDimensionResponse {
+  Dimension dimension = 1;
+}
+
+// CreateDimensionRequest is the request for CreateDimension.
+message CreateDimensionRequest {
+  string name = 1 [
+    (buf.validate.field).string = { min_len: 1, max_len: 100 }
+  ];
+  string slug = 2 [
+    (buf.validate.field).string = {
+      pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      max_len: 50
+    }
+  ];
+  string description = 3 [(buf.validate.field).string.max_len = 500];
+  int32 sort_order = 4;
+  // Parent slug. If empty, creates a top-level dimension.
+  string parent_slug = 5;
+}
+
+// CreateDimensionResponse is the response for CreateDimension.
+message CreateDimensionResponse {
+  Dimension dimension = 1;
+}
+
+// UpdateDimensionRequest is the request for UpdateDimension.
+message UpdateDimensionRequest {
+  string slug = 1 [(buf.validate.field).string.min_len = 1];
+  string name = 2 [(buf.validate.field).string = { min_len: 1, max_len: 100 }];
+  string description = 3 [(buf.validate.field).string.max_len = 500];
+  int32 sort_order = 4;
+}
+
+// UpdateDimensionResponse is the response for UpdateDimension.
+message UpdateDimensionResponse {
+  Dimension dimension = 1;
+}
+
+// DeleteDimensionRequest is the request for DeleteDimension.
+message DeleteDimensionRequest {
+  string slug = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+// DeleteDimensionResponse is the response for DeleteDimension.
+message DeleteDimensionResponse {}
+
+// ListSubcategoriesRequest is the request for ListSubcategories.
+message ListSubcategoriesRequest {
+  string parent_slug = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+// ListSubcategoriesResponse is the response for ListSubcategories.
+message ListSubcategoriesResponse {
+  repeated Dimension subcategories = 1;
+}

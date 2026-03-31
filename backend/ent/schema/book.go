@@ -53,5 +53,6 @@ func (Book) Edges() []ent.Edge {
 			Field("uploader_id").
 			Required().
 			Unique(),
+		edge.To("book_dimensions", BookDimension.Type),
 	}
 }

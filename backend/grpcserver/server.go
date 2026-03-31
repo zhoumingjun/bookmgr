@@ -36,7 +36,7 @@ func NewBufListener() *BufListener {
 }
 
 // NewGRPCServer creates a gRPC server with protovalidate interceptor and registers service implementations.
-func NewGRPCServer(authHandler *handler.AuthHandler, userHandler *handler.UserHandler, bookHandler *handler.BookHandler, mw *middleware.Interceptors) (*grpc.Server, error) {
+func NewGRPCServer(authHandler *handler.AuthHandler, userHandler *handler.UserHandler, bookHandler *handler.BookHandler, dimensionHandler *handler.DimensionHandler, mw *middleware.Interceptors) (*grpc.Server, error) {
 	validator, err := protovalidate.New()
 	if err != nil {
 		return nil, err
@@ -53,6 +53,7 @@ func NewGRPCServer(authHandler *handler.AuthHandler, userHandler *handler.UserHa
 	bookmgrv1.RegisterAuthServiceServer(srv, authHandler)
 	bookmgrv1.RegisterUserServiceServer(srv, userHandler)
 	bookmgrv1.RegisterBookServiceServer(srv, bookHandler)
+	bookmgrv1.RegisterDimensionServiceServer(srv, dimensionHandler)
 
 	return srv, nil
 }
@@ -93,3 +94,4 @@ func protovalidateUnaryInterceptor(validator protovalidate.Validator) grpc.Unary
 func (bl *BufListener) BufDialer(context.Context, string) (net.Conn, error) {
 	return bl.Dial()
 }
+

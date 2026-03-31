@@ -574,6 +574,29 @@ func HasUploaderWith(preds ...predicate.User) predicate.Book {
 	})
 }
 
+// HasBookDimensions applies the HasEdge predicate on the "book_dimensions" edge.
+func HasBookDimensions() predicate.Book {
+	return predicate.Book(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, BookDimensionsTable, BookDimensionsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasBookDimensionsWith applies the HasEdge predicate on the "book_dimensions" edge with a given conditions (other predicates).
+func HasBookDimensionsWith(preds ...predicate.BookDimension) predicate.Book {
+	return predicate.Book(func(s *sql.Selector) {
+		step := newBookDimensionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Book) predicate.Book {
 	return predicate.Book(sql.AndPredicates(predicates...))

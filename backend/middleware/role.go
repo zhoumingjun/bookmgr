@@ -10,13 +10,16 @@ import (
 
 // adminMethods require super_admin or admin role.
 var adminMethods = map[string]bool{
-	"/bookmgr.v1.UserService/CreateUser":  true,
-	"/bookmgr.v1.UserService/ListUsers":    true,
-	"/bookmgr.v1.UserService/UpdateUser":   true,
-	"/bookmgr.v1.UserService/DeleteUser":   true,
-	"/bookmgr.v1.BookService/CreateBook":   true,
-	"/bookmgr.v1.BookService/UpdateBook":   true,
-	"/bookmgr.v1.BookService/DeleteBook":   true,
+	"/bookmgr.v1.UserService/CreateUser":      true,
+	"/bookmgr.v1.UserService/ListUsers":       true,
+	"/bookmgr.v1.UserService/UpdateUser":      true,
+	"/bookmgr.v1.UserService/DeleteUser":      true,
+	"/bookmgr.v1.BookService/CreateBook":      true,
+	"/bookmgr.v1.BookService/UpdateBook":      true,
+	"/bookmgr.v1.BookService/DeleteBook":      true,
+	"/bookmgr.v1.DimensionService/CreateDimension": true,
+	"/bookmgr.v1.DimensionService/UpdateDimension": true,
+	"/bookmgr.v1.DimensionService/DeleteDimension": true,
 }
 
 // superAdminMethods require super_admin role only.

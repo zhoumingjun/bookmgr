@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookdimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/predicate"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
@@ -143,6 +144,21 @@ func (_u *BookUpdate) SetUploader(v *User) *BookUpdate {
 	return _u.SetUploaderID(v.ID)
 }
 
+// AddBookDimensionIDs adds the "book_dimensions" edge to the BookDimension entity by IDs.
+func (_u *BookUpdate) AddBookDimensionIDs(ids ...uuid.UUID) *BookUpdate {
+	_u.mutation.AddBookDimensionIDs(ids...)
+	return _u
+}
+
+// AddBookDimensions adds the "book_dimensions" edges to the BookDimension entity.
+func (_u *BookUpdate) AddBookDimensions(v ...*BookDimension) *BookUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddBookDimensionIDs(ids...)
+}
+
 // Mutation returns the BookMutation object of the builder.
 func (_u *BookUpdate) Mutation() *BookMutation {
 	return _u.mutation
@@ -152,6 +168,27 @@ func (_u *BookUpdate) Mutation() *BookMutation {
 func (_u *BookUpdate) ClearUploader() *BookUpdate {
 	_u.mutation.ClearUploader()
 	return _u
+}
+
+// ClearBookDimensions clears all "book_dimensions" edges to the BookDimension entity.
+func (_u *BookUpdate) ClearBookDimensions() *BookUpdate {
+	_u.mutation.ClearBookDimensions()
+	return _u
+}
+
+// RemoveBookDimensionIDs removes the "book_dimensions" edge to BookDimension entities by IDs.
+func (_u *BookUpdate) RemoveBookDimensionIDs(ids ...uuid.UUID) *BookUpdate {
+	_u.mutation.RemoveBookDimensionIDs(ids...)
+	return _u
+}
+
+// RemoveBookDimensions removes "book_dimensions" edges to BookDimension entities.
+func (_u *BookUpdate) RemoveBookDimensions(v ...*BookDimension) *BookUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveBookDimensionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -269,6 +306,51 @@ func (_u *BookUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.BookDimensionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   book.BookDimensionsTable,
+			Columns: book.BookDimensionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookdimension.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedBookDimensionsIDs(); len(nodes) > 0 && !_u.mutation.BookDimensionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   book.BookDimensionsTable,
+			Columns: book.BookDimensionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookdimension.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.BookDimensionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   book.BookDimensionsTable,
+			Columns: book.BookDimensionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookdimension.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -409,6 +491,21 @@ func (_u *BookUpdateOne) SetUploader(v *User) *BookUpdateOne {
 	return _u.SetUploaderID(v.ID)
 }
 
+// AddBookDimensionIDs adds the "book_dimensions" edge to the BookDimension entity by IDs.
+func (_u *BookUpdateOne) AddBookDimensionIDs(ids ...uuid.UUID) *BookUpdateOne {
+	_u.mutation.AddBookDimensionIDs(ids...)
+	return _u
+}
+
+// AddBookDimensions adds the "book_dimensions" edges to the BookDimension entity.
+func (_u *BookUpdateOne) AddBookDimensions(v ...*BookDimension) *BookUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddBookDimensionIDs(ids...)
+}
+
 // Mutation returns the BookMutation object of the builder.
 func (_u *BookUpdateOne) Mutation() *BookMutation {
 	return _u.mutation
@@ -418,6 +515,27 @@ func (_u *BookUpdateOne) Mutation() *BookMutation {
 func (_u *BookUpdateOne) ClearUploader() *BookUpdateOne {
 	_u.mutation.ClearUploader()
 	return _u
+}
+
+// ClearBookDimensions clears all "book_dimensions" edges to the BookDimension entity.
+func (_u *BookUpdateOne) ClearBookDimensions() *BookUpdateOne {
+	_u.mutation.ClearBookDimensions()
+	return _u
+}
+
+// RemoveBookDimensionIDs removes the "book_dimensions" edge to BookDimension entities by IDs.
+func (_u *BookUpdateOne) RemoveBookDimensionIDs(ids ...uuid.UUID) *BookUpdateOne {
+	_u.mutation.RemoveBookDimensionIDs(ids...)
+	return _u
+}
+
+// RemoveBookDimensions removes "book_dimensions" edges to BookDimension entities.
+func (_u *BookUpdateOne) RemoveBookDimensions(v ...*BookDimension) *BookUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveBookDimensionIDs(ids...)
 }
 
 // Where appends a list predicates to the BookUpdate builder.
@@ -565,6 +683,51 @@ func (_u *BookUpdateOne) sqlSave(ctx context.Context) (_node *Book, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.BookDimensionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   book.BookDimensionsTable,
+			Columns: book.BookDimensionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookdimension.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedBookDimensionsIDs(); len(nodes) > 0 && !_u.mutation.BookDimensionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   book.BookDimensionsTable,
+			Columns: book.BookDimensionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookdimension.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.BookDimensionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   book.BookDimensionsTable,
+			Columns: book.BookDimensionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookdimension.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

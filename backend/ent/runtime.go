@@ -7,6 +7,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookdimension"
+	"github.com/zhoumingjun/bookmgr/backend/ent/dimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/schema"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
@@ -79,6 +81,81 @@ func init() {
 	bookDescID := bookFields[0].Descriptor()
 	// book.DefaultID holds the default value on creation for the id field.
 	book.DefaultID = bookDescID.Default.(func() uuid.UUID)
+	bookdimensionFields := schema.BookDimension{}.Fields()
+	_ = bookdimensionFields
+	// bookdimensionDescIsPrimary is the schema descriptor for is_primary field.
+	bookdimensionDescIsPrimary := bookdimensionFields[1].Descriptor()
+	// bookdimension.DefaultIsPrimary holds the default value on creation for the is_primary field.
+	bookdimension.DefaultIsPrimary = bookdimensionDescIsPrimary.Default.(bool)
+	// bookdimensionDescCreatedAt is the schema descriptor for created_at field.
+	bookdimensionDescCreatedAt := bookdimensionFields[2].Descriptor()
+	// bookdimension.DefaultCreatedAt holds the default value on creation for the created_at field.
+	bookdimension.DefaultCreatedAt = bookdimensionDescCreatedAt.Default.(func() time.Time)
+	// bookdimensionDescID is the schema descriptor for id field.
+	bookdimensionDescID := bookdimensionFields[0].Descriptor()
+	// bookdimension.DefaultID holds the default value on creation for the id field.
+	bookdimension.DefaultID = bookdimensionDescID.Default.(func() uuid.UUID)
+	dimensionFields := schema.Dimension{}.Fields()
+	_ = dimensionFields
+	// dimensionDescName is the schema descriptor for name field.
+	dimensionDescName := dimensionFields[1].Descriptor()
+	// dimension.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	dimension.NameValidator = func() func(string) error {
+		validators := dimensionDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// dimensionDescSlug is the schema descriptor for slug field.
+	dimensionDescSlug := dimensionFields[2].Descriptor()
+	// dimension.SlugValidator is a validator for the "slug" field. It is called by the builders before save.
+	dimension.SlugValidator = func() func(string) error {
+		validators := dimensionDescSlug.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+			validators[2].(func(string) error),
+		}
+		return func(slug string) error {
+			for _, fn := range fns {
+				if err := fn(slug); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// dimensionDescDescription is the schema descriptor for description field.
+	dimensionDescDescription := dimensionFields[3].Descriptor()
+	// dimension.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	dimension.DescriptionValidator = dimensionDescDescription.Validators[0].(func(string) error)
+	// dimensionDescSortOrder is the schema descriptor for sort_order field.
+	dimensionDescSortOrder := dimensionFields[4].Descriptor()
+	// dimension.DefaultSortOrder holds the default value on creation for the sort_order field.
+	dimension.DefaultSortOrder = dimensionDescSortOrder.Default.(int)
+	// dimensionDescCreatedAt is the schema descriptor for created_at field.
+	dimensionDescCreatedAt := dimensionFields[5].Descriptor()
+	// dimension.DefaultCreatedAt holds the default value on creation for the created_at field.
+	dimension.DefaultCreatedAt = dimensionDescCreatedAt.Default.(func() time.Time)
+	// dimensionDescUpdatedAt is the schema descriptor for updated_at field.
+	dimensionDescUpdatedAt := dimensionFields[6].Descriptor()
+	// dimension.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	dimension.DefaultUpdatedAt = dimensionDescUpdatedAt.Default.(func() time.Time)
+	// dimension.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	dimension.UpdateDefaultUpdatedAt = dimensionDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// dimensionDescID is the schema descriptor for id field.
+	dimensionDescID := dimensionFields[0].Descriptor()
+	// dimension.DefaultID holds the default value on creation for the id field.
+	dimension.DefaultID = dimensionDescID.Default.(func() uuid.UUID)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescUsername is the schema descriptor for username field.

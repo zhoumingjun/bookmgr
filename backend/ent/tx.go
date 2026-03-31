@@ -14,6 +14,10 @@ type Tx struct {
 	config
 	// Book is the client for interacting with the Book builders.
 	Book *BookClient
+	// BookDimension is the client for interacting with the BookDimension builders.
+	BookDimension *BookDimensionClient
+	// Dimension is the client for interacting with the Dimension builders.
+	Dimension *DimensionClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -148,6 +152,8 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Book = NewBookClient(tx.config)
+	tx.BookDimension = NewBookDimensionClient(tx.config)
+	tx.Dimension = NewDimensionClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 

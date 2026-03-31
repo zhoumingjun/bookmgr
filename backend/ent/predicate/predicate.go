@@ -9,5 +9,11 @@ import (
 // Book is the predicate function for book builders.
 type Book func(*sql.Selector)
 
+// BookDimension is the predicate function for bookdimension builders.
+type BookDimension func(*sql.Selector)
+
+// Dimension is the predicate function for dimension builders.
+type Dimension func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

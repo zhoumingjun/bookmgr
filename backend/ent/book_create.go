@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookdimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
 
@@ -127,6 +128,21 @@ func (_c *BookCreate) SetNillableID(v *uuid.UUID) *BookCreate {
 // SetUploader sets the "uploader" edge to the User entity.
 func (_c *BookCreate) SetUploader(v *User) *BookCreate {
 	return _c.SetUploaderID(v.ID)
+}
+
+// AddBookDimensionIDs adds the "book_dimensions" edge to the BookDimension entity by IDs.
+func (_c *BookCreate) AddBookDimensionIDs(ids ...uuid.UUID) *BookCreate {
+	_c.mutation.AddBookDimensionIDs(ids...)
+	return _c
+}
+
+// AddBookDimensions adds the "book_dimensions" edges to the BookDimension entity.
+func (_c *BookCreate) AddBookDimensions(v ...*BookDimension) *BookCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddBookDimensionIDs(ids...)
 }
 
 // Mutation returns the BookMutation object of the builder.
@@ -298,6 +314,22 @@ func (_c *BookCreate) createSpec() (*Book, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.UploaderID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.BookDimensionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   book.BookDimensionsTable,
+			Columns: book.BookDimensionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookdimension.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

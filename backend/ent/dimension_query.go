@@ -13,60 +13,61 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
-	"github.com/zhoumingjun/bookmgr/backend/ent/book"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookdimension"
+	"github.com/zhoumingjun/bookmgr/backend/ent/dimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/predicate"
-	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
 
-// BookQuery is the builder for querying Book entities.
-type BookQuery struct {
+// DimensionQuery is the builder for querying Dimension entities.
+type DimensionQuery struct {
 	config
 	ctx                *QueryContext
-	order              []book.OrderOption
+	order              []dimension.OrderOption
 	inters             []Interceptor
-	predicates         []predicate.Book
-	withUploader       *UserQuery
+	predicates         []predicate.Dimension
+	withParent         *DimensionQuery
+	withChildren       *DimensionQuery
 	withBookDimensions *BookDimensionQuery
+	withFKs            bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
 }
 
-// Where adds a new predicate for the BookQuery builder.
-func (_q *BookQuery) Where(ps ...predicate.Book) *BookQuery {
+// Where adds a new predicate for the DimensionQuery builder.
+func (_q *DimensionQuery) Where(ps ...predicate.Dimension) *DimensionQuery {
 	_q.predicates = append(_q.predicates, ps...)
 	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (_q *BookQuery) Limit(limit int) *BookQuery {
+func (_q *DimensionQuery) Limit(limit int) *DimensionQuery {
 	_q.ctx.Limit = &limit
 	return _q
 }
 
 // Offset to start from.
-func (_q *BookQuery) Offset(offset int) *BookQuery {
+func (_q *DimensionQuery) Offset(offset int) *DimensionQuery {
 	_q.ctx.Offset = &offset
 	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (_q *BookQuery) Unique(unique bool) *BookQuery {
+func (_q *DimensionQuery) Unique(unique bool) *DimensionQuery {
 	_q.ctx.Unique = &unique
 	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (_q *BookQuery) Order(o ...book.OrderOption) *BookQuery {
+func (_q *DimensionQuery) Order(o ...dimension.OrderOption) *DimensionQuery {
 	_q.order = append(_q.order, o...)
 	return _q
 }
 
-// QueryUploader chains the current query on the "uploader" edge.
-func (_q *BookQuery) QueryUploader() *UserQuery {
-	query := (&UserClient{config: _q.config}).Query()
+// QueryParent chains the current query on the "parent" edge.
+func (_q *DimensionQuery) QueryParent() *DimensionQuery {
+	query := (&DimensionClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -76,9 +77,31 @@ func (_q *BookQuery) QueryUploader() *UserQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(book.Table, book.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, book.UploaderTable, book.UploaderColumn),
+			sqlgraph.From(dimension.Table, dimension.FieldID, selector),
+			sqlgraph.To(dimension.Table, dimension.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, dimension.ParentTable, dimension.ParentColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryChildren chains the current query on the "children" edge.
+func (_q *DimensionQuery) QueryChildren() *DimensionQuery {
+	query := (&DimensionClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(dimension.Table, dimension.FieldID, selector),
+			sqlgraph.To(dimension.Table, dimension.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, dimension.ChildrenTable, dimension.ChildrenColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -87,7 +110,7 @@ func (_q *BookQuery) QueryUploader() *UserQuery {
 }
 
 // QueryBookDimensions chains the current query on the "book_dimensions" edge.
-func (_q *BookQuery) QueryBookDimensions() *BookDimensionQuery {
+func (_q *DimensionQuery) QueryBookDimensions() *BookDimensionQuery {
 	query := (&BookDimensionClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := _q.prepareQuery(ctx); err != nil {
@@ -98,9 +121,9 @@ func (_q *BookQuery) QueryBookDimensions() *BookDimensionQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(book.Table, book.FieldID, selector),
+			sqlgraph.From(dimension.Table, dimension.FieldID, selector),
 			sqlgraph.To(bookdimension.Table, bookdimension.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, book.BookDimensionsTable, book.BookDimensionsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, dimension.BookDimensionsTable, dimension.BookDimensionsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -108,21 +131,21 @@ func (_q *BookQuery) QueryBookDimensions() *BookDimensionQuery {
 	return query
 }
 
-// First returns the first Book entity from the query.
-// Returns a *NotFoundError when no Book was found.
-func (_q *BookQuery) First(ctx context.Context) (*Book, error) {
+// First returns the first Dimension entity from the query.
+// Returns a *NotFoundError when no Dimension was found.
+func (_q *DimensionQuery) First(ctx context.Context) (*Dimension, error) {
 	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
-		return nil, &NotFoundError{book.Label}
+		return nil, &NotFoundError{dimension.Label}
 	}
 	return nodes[0], nil
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (_q *BookQuery) FirstX(ctx context.Context) *Book {
+func (_q *DimensionQuery) FirstX(ctx context.Context) *Dimension {
 	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -130,22 +153,22 @@ func (_q *BookQuery) FirstX(ctx context.Context) *Book {
 	return node
 }
 
-// FirstID returns the first Book ID from the query.
-// Returns a *NotFoundError when no Book ID was found.
-func (_q *BookQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+// FirstID returns the first Dimension ID from the query.
+// Returns a *NotFoundError when no Dimension ID was found.
+func (_q *DimensionQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
 	var ids []uuid.UUID
 	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
-		err = &NotFoundError{book.Label}
+		err = &NotFoundError{dimension.Label}
 		return
 	}
 	return ids[0], nil
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (_q *BookQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (_q *DimensionQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -153,10 +176,10 @@ func (_q *BookQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	return id
 }
 
-// Only returns a single Book entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one Book entity is found.
-// Returns a *NotFoundError when no Book entities are found.
-func (_q *BookQuery) Only(ctx context.Context) (*Book, error) {
+// Only returns a single Dimension entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one Dimension entity is found.
+// Returns a *NotFoundError when no Dimension entities are found.
+func (_q *DimensionQuery) Only(ctx context.Context) (*Dimension, error) {
 	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
@@ -165,14 +188,14 @@ func (_q *BookQuery) Only(ctx context.Context) (*Book, error) {
 	case 1:
 		return nodes[0], nil
 	case 0:
-		return nil, &NotFoundError{book.Label}
+		return nil, &NotFoundError{dimension.Label}
 	default:
-		return nil, &NotSingularError{book.Label}
+		return nil, &NotSingularError{dimension.Label}
 	}
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (_q *BookQuery) OnlyX(ctx context.Context) *Book {
+func (_q *DimensionQuery) OnlyX(ctx context.Context) *Dimension {
 	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
@@ -180,10 +203,10 @@ func (_q *BookQuery) OnlyX(ctx context.Context) *Book {
 	return node
 }
 
-// OnlyID is like Only, but returns the only Book ID in the query.
-// Returns a *NotSingularError when more than one Book ID is found.
+// OnlyID is like Only, but returns the only Dimension ID in the query.
+// Returns a *NotSingularError when more than one Dimension ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (_q *BookQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+func (_q *DimensionQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 	var ids []uuid.UUID
 	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
@@ -192,15 +215,15 @@ func (_q *BookQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &NotFoundError{book.Label}
+		err = &NotFoundError{dimension.Label}
 	default:
-		err = &NotSingularError{book.Label}
+		err = &NotSingularError{dimension.Label}
 	}
 	return
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (_q *BookQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (_q *DimensionQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -208,18 +231,18 @@ func (_q *BookQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	return id
 }
 
-// All executes the query and returns a list of Books.
-func (_q *BookQuery) All(ctx context.Context) ([]*Book, error) {
+// All executes the query and returns a list of Dimensions.
+func (_q *DimensionQuery) All(ctx context.Context) ([]*Dimension, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
 	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	qr := querierAll[[]*Book, *BookQuery]()
-	return withInterceptors[[]*Book](ctx, _q, qr, _q.inters)
+	qr := querierAll[[]*Dimension, *DimensionQuery]()
+	return withInterceptors[[]*Dimension](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (_q *BookQuery) AllX(ctx context.Context) []*Book {
+func (_q *DimensionQuery) AllX(ctx context.Context) []*Dimension {
 	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
@@ -227,20 +250,20 @@ func (_q *BookQuery) AllX(ctx context.Context) []*Book {
 	return nodes
 }
 
-// IDs executes the query and returns a list of Book IDs.
-func (_q *BookQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
+// IDs executes the query and returns a list of Dimension IDs.
+func (_q *DimensionQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 	if _q.ctx.Unique == nil && _q.path != nil {
 		_q.Unique(true)
 	}
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
-	if err = _q.Select(book.FieldID).Scan(ctx, &ids); err != nil {
+	if err = _q.Select(dimension.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (_q *BookQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (_q *DimensionQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -249,16 +272,16 @@ func (_q *BookQuery) IDsX(ctx context.Context) []uuid.UUID {
 }
 
 // Count returns the count of the given query.
-func (_q *BookQuery) Count(ctx context.Context) (int, error) {
+func (_q *DimensionQuery) Count(ctx context.Context) (int, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
 	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, _q, querierCount[*BookQuery](), _q.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*DimensionQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (_q *BookQuery) CountX(ctx context.Context) int {
+func (_q *DimensionQuery) CountX(ctx context.Context) int {
 	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
@@ -267,7 +290,7 @@ func (_q *BookQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (_q *BookQuery) Exist(ctx context.Context) (bool, error) {
+func (_q *DimensionQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
 	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
@@ -280,7 +303,7 @@ func (_q *BookQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (_q *BookQuery) ExistX(ctx context.Context) bool {
+func (_q *DimensionQuery) ExistX(ctx context.Context) bool {
 	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
@@ -288,19 +311,20 @@ func (_q *BookQuery) ExistX(ctx context.Context) bool {
 	return exist
 }
 
-// Clone returns a duplicate of the BookQuery builder, including all associated steps. It can be
+// Clone returns a duplicate of the DimensionQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (_q *BookQuery) Clone() *BookQuery {
+func (_q *DimensionQuery) Clone() *DimensionQuery {
 	if _q == nil {
 		return nil
 	}
-	return &BookQuery{
+	return &DimensionQuery{
 		config:             _q.config,
 		ctx:                _q.ctx.Clone(),
-		order:              append([]book.OrderOption{}, _q.order...),
+		order:              append([]dimension.OrderOption{}, _q.order...),
 		inters:             append([]Interceptor{}, _q.inters...),
-		predicates:         append([]predicate.Book{}, _q.predicates...),
-		withUploader:       _q.withUploader.Clone(),
+		predicates:         append([]predicate.Dimension{}, _q.predicates...),
+		withParent:         _q.withParent.Clone(),
+		withChildren:       _q.withChildren.Clone(),
 		withBookDimensions: _q.withBookDimensions.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
@@ -308,20 +332,31 @@ func (_q *BookQuery) Clone() *BookQuery {
 	}
 }
 
-// WithUploader tells the query-builder to eager-load the nodes that are connected to
-// the "uploader" edge. The optional arguments are used to configure the query builder of the edge.
-func (_q *BookQuery) WithUploader(opts ...func(*UserQuery)) *BookQuery {
-	query := (&UserClient{config: _q.config}).Query()
+// WithParent tells the query-builder to eager-load the nodes that are connected to
+// the "parent" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *DimensionQuery) WithParent(opts ...func(*DimensionQuery)) *DimensionQuery {
+	query := (&DimensionClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	_q.withUploader = query
+	_q.withParent = query
+	return _q
+}
+
+// WithChildren tells the query-builder to eager-load the nodes that are connected to
+// the "children" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *DimensionQuery) WithChildren(opts ...func(*DimensionQuery)) *DimensionQuery {
+	query := (&DimensionClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withChildren = query
 	return _q
 }
 
 // WithBookDimensions tells the query-builder to eager-load the nodes that are connected to
 // the "book_dimensions" edge. The optional arguments are used to configure the query builder of the edge.
-func (_q *BookQuery) WithBookDimensions(opts ...func(*BookDimensionQuery)) *BookQuery {
+func (_q *DimensionQuery) WithBookDimensions(opts ...func(*BookDimensionQuery)) *DimensionQuery {
 	query := (&BookDimensionClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
@@ -336,19 +371,19 @@ func (_q *BookQuery) WithBookDimensions(opts ...func(*BookDimensionQuery)) *Book
 // Example:
 //
 //	var v []struct {
-//		Title string `json:"title,omitempty"`
+//		Name string `json:"name,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
-//	client.Book.Query().
-//		GroupBy(book.FieldTitle).
+//	client.Dimension.Query().
+//		GroupBy(dimension.FieldName).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (_q *BookQuery) GroupBy(field string, fields ...string) *BookGroupBy {
+func (_q *DimensionQuery) GroupBy(field string, fields ...string) *DimensionGroupBy {
 	_q.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &BookGroupBy{build: _q}
+	grbuild := &DimensionGroupBy{build: _q}
 	grbuild.flds = &_q.ctx.Fields
-	grbuild.label = book.Label
+	grbuild.label = dimension.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
 }
@@ -359,26 +394,26 @@ func (_q *BookQuery) GroupBy(field string, fields ...string) *BookGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Title string `json:"title,omitempty"`
+//		Name string `json:"name,omitempty"`
 //	}
 //
-//	client.Book.Query().
-//		Select(book.FieldTitle).
+//	client.Dimension.Query().
+//		Select(dimension.FieldName).
 //		Scan(ctx, &v)
-func (_q *BookQuery) Select(fields ...string) *BookSelect {
+func (_q *DimensionQuery) Select(fields ...string) *DimensionSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
-	sbuild := &BookSelect{BookQuery: _q}
-	sbuild.label = book.Label
+	sbuild := &DimensionSelect{DimensionQuery: _q}
+	sbuild.label = dimension.Label
 	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
-// Aggregate returns a BookSelect configured with the given aggregations.
-func (_q *BookQuery) Aggregate(fns ...AggregateFunc) *BookSelect {
+// Aggregate returns a DimensionSelect configured with the given aggregations.
+func (_q *DimensionQuery) Aggregate(fns ...AggregateFunc) *DimensionSelect {
 	return _q.Select().Aggregate(fns...)
 }
 
-func (_q *BookQuery) prepareQuery(ctx context.Context) error {
+func (_q *DimensionQuery) prepareQuery(ctx context.Context) error {
 	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
@@ -390,7 +425,7 @@ func (_q *BookQuery) prepareQuery(ctx context.Context) error {
 		}
 	}
 	for _, f := range _q.ctx.Fields {
-		if !book.ValidColumn(f) {
+		if !dimension.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
@@ -404,20 +439,28 @@ func (_q *BookQuery) prepareQuery(ctx context.Context) error {
 	return nil
 }
 
-func (_q *BookQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Book, error) {
+func (_q *DimensionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Dimension, error) {
 	var (
-		nodes       = []*Book{}
+		nodes       = []*Dimension{}
+		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
-		loadedTypes = [2]bool{
-			_q.withUploader != nil,
+		loadedTypes = [3]bool{
+			_q.withParent != nil,
+			_q.withChildren != nil,
 			_q.withBookDimensions != nil,
 		}
 	)
+	if _q.withParent != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, dimension.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
-		return (*Book).scanValues(nil, columns)
+		return (*Dimension).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &Book{config: _q.config}
+		node := &Dimension{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
@@ -431,27 +474,37 @@ func (_q *BookQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Book, e
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := _q.withUploader; query != nil {
-		if err := _q.loadUploader(ctx, query, nodes, nil,
-			func(n *Book, e *User) { n.Edges.Uploader = e }); err != nil {
+	if query := _q.withParent; query != nil {
+		if err := _q.loadParent(ctx, query, nodes, nil,
+			func(n *Dimension, e *Dimension) { n.Edges.Parent = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withChildren; query != nil {
+		if err := _q.loadChildren(ctx, query, nodes,
+			func(n *Dimension) { n.Edges.Children = []*Dimension{} },
+			func(n *Dimension, e *Dimension) { n.Edges.Children = append(n.Edges.Children, e) }); err != nil {
 			return nil, err
 		}
 	}
 	if query := _q.withBookDimensions; query != nil {
 		if err := _q.loadBookDimensions(ctx, query, nodes,
-			func(n *Book) { n.Edges.BookDimensions = []*BookDimension{} },
-			func(n *Book, e *BookDimension) { n.Edges.BookDimensions = append(n.Edges.BookDimensions, e) }); err != nil {
+			func(n *Dimension) { n.Edges.BookDimensions = []*BookDimension{} },
+			func(n *Dimension, e *BookDimension) { n.Edges.BookDimensions = append(n.Edges.BookDimensions, e) }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (_q *BookQuery) loadUploader(ctx context.Context, query *UserQuery, nodes []*Book, init func(*Book), assign func(*Book, *User)) error {
+func (_q *DimensionQuery) loadParent(ctx context.Context, query *DimensionQuery, nodes []*Dimension, init func(*Dimension), assign func(*Dimension, *Dimension)) error {
 	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*Book)
+	nodeids := make(map[uuid.UUID][]*Dimension)
 	for i := range nodes {
-		fk := nodes[i].UploaderID
+		if nodes[i].dimension_children == nil {
+			continue
+		}
+		fk := *nodes[i].dimension_children
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -460,7 +513,7 @@ func (_q *BookQuery) loadUploader(ctx context.Context, query *UserQuery, nodes [
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(user.IDIn(ids...))
+	query.Where(dimension.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -468,7 +521,7 @@ func (_q *BookQuery) loadUploader(ctx context.Context, query *UserQuery, nodes [
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "uploader_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "dimension_children" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -476,10 +529,41 @@ func (_q *BookQuery) loadUploader(ctx context.Context, query *UserQuery, nodes [
 	}
 	return nil
 }
-func (_q *BookQuery) loadBookDimensions(ctx context.Context, query *BookDimensionQuery, nodes []*Book, init func(*Book), assign func(*Book, *BookDimension)) error {
+func (_q *DimensionQuery) loadChildren(ctx context.Context, query *DimensionQuery, nodes []*Dimension, init func(*Dimension), assign func(*Dimension, *Dimension)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Dimension)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Dimension(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(dimension.ChildrenColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.dimension_children
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "dimension_children" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "dimension_children" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *DimensionQuery) loadBookDimensions(ctx context.Context, query *BookDimensionQuery, nodes []*Dimension, init func(*Dimension), assign func(*Dimension, *BookDimension)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[uuid.UUID]*Book)
-	nids := make(map[uuid.UUID]map[*Book]struct{})
+	byID := make(map[uuid.UUID]*Dimension)
+	nids := make(map[uuid.UUID]map[*Dimension]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
 		byID[node.ID] = node
@@ -488,11 +572,11 @@ func (_q *BookQuery) loadBookDimensions(ctx context.Context, query *BookDimensio
 		}
 	}
 	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(book.BookDimensionsTable)
-		s.Join(joinT).On(s.C(bookdimension.FieldID), joinT.C(book.BookDimensionsPrimaryKey[1]))
-		s.Where(sql.InValues(joinT.C(book.BookDimensionsPrimaryKey[0]), edgeIDs...))
+		joinT := sql.Table(dimension.BookDimensionsTable)
+		s.Join(joinT).On(s.C(bookdimension.FieldID), joinT.C(dimension.BookDimensionsPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(dimension.BookDimensionsPrimaryKey[0]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(book.BookDimensionsPrimaryKey[0]))
+		s.Select(joinT.C(dimension.BookDimensionsPrimaryKey[0]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})
@@ -514,7 +598,7 @@ func (_q *BookQuery) loadBookDimensions(ctx context.Context, query *BookDimensio
 				outValue := *values[0].(*uuid.UUID)
 				inValue := *values[1].(*uuid.UUID)
 				if nids[inValue] == nil {
-					nids[inValue] = map[*Book]struct{}{byID[outValue]: {}}
+					nids[inValue] = map[*Dimension]struct{}{byID[outValue]: {}}
 					return assign(columns[1:], values[1:])
 				}
 				nids[inValue][byID[outValue]] = struct{}{}
@@ -538,7 +622,7 @@ func (_q *BookQuery) loadBookDimensions(ctx context.Context, query *BookDimensio
 	return nil
 }
 
-func (_q *BookQuery) sqlCount(ctx context.Context) (int, error) {
+func (_q *DimensionQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := _q.querySpec()
 	_spec.Node.Columns = _q.ctx.Fields
 	if len(_q.ctx.Fields) > 0 {
@@ -547,8 +631,8 @@ func (_q *BookQuery) sqlCount(ctx context.Context) (int, error) {
 	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (_q *BookQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(book.Table, book.Columns, sqlgraph.NewFieldSpec(book.FieldID, field.TypeUUID))
+func (_q *DimensionQuery) querySpec() *sqlgraph.QuerySpec {
+	_spec := sqlgraph.NewQuerySpec(dimension.Table, dimension.Columns, sqlgraph.NewFieldSpec(dimension.FieldID, field.TypeUUID))
 	_spec.From = _q.sql
 	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -557,14 +641,11 @@ func (_q *BookQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, book.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, dimension.FieldID)
 		for i := range fields {
-			if fields[i] != book.FieldID {
+			if fields[i] != dimension.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
-		}
-		if _q.withUploader != nil {
-			_spec.Node.AddColumnOnce(book.FieldUploaderID)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {
@@ -590,12 +671,12 @@ func (_q *BookQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (_q *BookQuery) sqlQuery(ctx context.Context) *sql.Selector {
+func (_q *DimensionQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(_q.driver.Dialect())
-	t1 := builder.Table(book.Table)
+	t1 := builder.Table(dimension.Table)
 	columns := _q.ctx.Fields
 	if len(columns) == 0 {
-		columns = book.Columns
+		columns = dimension.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
 	if _q.sql != nil {
@@ -622,28 +703,28 @@ func (_q *BookQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// BookGroupBy is the group-by builder for Book entities.
-type BookGroupBy struct {
+// DimensionGroupBy is the group-by builder for Dimension entities.
+type DimensionGroupBy struct {
 	selector
-	build *BookQuery
+	build *DimensionQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (_g *BookGroupBy) Aggregate(fns ...AggregateFunc) *BookGroupBy {
+func (_g *DimensionGroupBy) Aggregate(fns ...AggregateFunc) *DimensionGroupBy {
 	_g.fns = append(_g.fns, fns...)
 	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (_g *BookGroupBy) Scan(ctx context.Context, v any) error {
+func (_g *DimensionGroupBy) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
 	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*BookQuery, *BookGroupBy](ctx, _g.build, _g, _g.build.inters, v)
+	return scanWithInterceptors[*DimensionQuery, *DimensionGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (_g *BookGroupBy) sqlScan(ctx context.Context, root *BookQuery, v any) error {
+func (_g *DimensionGroupBy) sqlScan(ctx context.Context, root *DimensionQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
 	aggregation := make([]string, 0, len(_g.fns))
 	for _, fn := range _g.fns {
@@ -670,28 +751,28 @@ func (_g *BookGroupBy) sqlScan(ctx context.Context, root *BookQuery, v any) erro
 	return sql.ScanSlice(rows, v)
 }
 
-// BookSelect is the builder for selecting fields of Book entities.
-type BookSelect struct {
-	*BookQuery
+// DimensionSelect is the builder for selecting fields of Dimension entities.
+type DimensionSelect struct {
+	*DimensionQuery
 	selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (_s *BookSelect) Aggregate(fns ...AggregateFunc) *BookSelect {
+func (_s *DimensionSelect) Aggregate(fns ...AggregateFunc) *DimensionSelect {
 	_s.fns = append(_s.fns, fns...)
 	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (_s *BookSelect) Scan(ctx context.Context, v any) error {
+func (_s *DimensionSelect) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
 	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*BookQuery, *BookSelect](ctx, _s.BookQuery, _s, _s.inters, v)
+	return scanWithInterceptors[*DimensionQuery, *DimensionSelect](ctx, _s.DimensionQuery, _s, _s.inters, v)
 }
 
-func (_s *BookSelect) sqlScan(ctx context.Context, root *BookQuery, v any) error {
+func (_s *DimensionSelect) sqlScan(ctx context.Context, root *DimensionQuery, v any) error {
 	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(_s.fns))
 	for _, fn := range _s.fns {

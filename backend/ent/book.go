@@ -45,9 +45,11 @@ type Book struct {
 type BookEdges struct {
 	// Uploader holds the value of the uploader edge.
 	Uploader *User `json:"uploader,omitempty"`
+	// BookDimensions holds the value of the book_dimensions edge.
+	BookDimensions []*BookDimension `json:"book_dimensions,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // UploaderOrErr returns the Uploader value or an error if the edge
@@ -59,6 +61,15 @@ func (e BookEdges) UploaderOrErr() (*User, error) {
 		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "uploader"}
+}
+
+// BookDimensionsOrErr returns the BookDimensions value or an error if the edge
+// was not loaded in eager-loading.
+func (e BookEdges) BookDimensionsOrErr() ([]*BookDimension, error) {
+	if e.loadedTypes[1] {
+		return e.BookDimensions, nil
+	}
+	return nil, &NotLoadedError{edge: "book_dimensions"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -157,6 +168,11 @@ func (_m *Book) Value(name string) (ent.Value, error) {
 // QueryUploader queries the "uploader" edge of the Book entity.
 func (_m *Book) QueryUploader() *UserQuery {
 	return NewBookClient(_m.config).QueryUploader(_m)
+}
+
+// QueryBookDimensions queries the "book_dimensions" edge of the Book entity.
+func (_m *Book) QueryBookDimensions() *BookDimensionQuery {
+	return NewBookClient(_m.config).QueryBookDimensions(_m)
 }
 
 // Update returns a builder for updating this Book.

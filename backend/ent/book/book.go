@@ -33,6 +33,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// EdgeUploader holds the string denoting the uploader edge name in mutations.
 	EdgeUploader = "uploader"
+	// EdgeBookDimensions holds the string denoting the book_dimensions edge name in mutations.
+	EdgeBookDimensions = "book_dimensions"
 	// Table holds the table name of the book in the database.
 	Table = "books"
 	// UploaderTable is the table that holds the uploader relation/edge.
@@ -42,6 +44,11 @@ const (
 	UploaderInverseTable = "users"
 	// UploaderColumn is the table column denoting the uploader relation/edge.
 	UploaderColumn = "uploader_id"
+	// BookDimensionsTable is the table that holds the book_dimensions relation/edge. The primary key declared below.
+	BookDimensionsTable = "book_book_dimensions"
+	// BookDimensionsInverseTable is the table name for the BookDimension entity.
+	// It exists in this package in order to avoid circular dependency with the "bookdimension" package.
+	BookDimensionsInverseTable = "book_dimensions"
 )
 
 // Columns holds all SQL columns for book fields.
@@ -56,6 +63,12 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
+
+var (
+	// BookDimensionsPrimaryKey and BookDimensionsColumn2 are the table columns denoting the
+	// primary key for the book_dimensions relation (M2M).
+	BookDimensionsPrimaryKey = []string{"book_id", "book_dimension_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -142,10 +155,31 @@ func ByUploaderField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newUploaderStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByBookDimensionsCount orders the results by book_dimensions count.
+func ByBookDimensionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newBookDimensionsStep(), opts...)
+	}
+}
+
+// ByBookDimensions orders the results by book_dimensions terms.
+func ByBookDimensions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newBookDimensionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newUploaderStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(UploaderInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, UploaderTable, UploaderColumn),
+	)
+}
+func newBookDimensionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(BookDimensionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, BookDimensionsTable, BookDimensionsPrimaryKey...),
 	)
 }

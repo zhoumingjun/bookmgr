@@ -10,4 +10,5 @@ var Module = fx.Options(
 	fx.Provide(NewUserHandler),
 	fx.Provide(NewBookHandler),
 	fx.Provide(NewUploadHandler),
+	fx.Provide(NewDimensionHandler),
 )

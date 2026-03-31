@@ -17,6 +17,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookdimension"
+	"github.com/zhoumingjun/bookmgr/backend/ent/dimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
 
@@ -27,6 +29,10 @@ type Client struct {
 	Schema *migrate.Schema
 	// Book is the client for interacting with the Book builders.
 	Book *BookClient
+	// BookDimension is the client for interacting with the BookDimension builders.
+	BookDimension *BookDimensionClient
+	// Dimension is the client for interacting with the Dimension builders.
+	Dimension *DimensionClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -41,6 +47,8 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Book = NewBookClient(c.config)
+	c.BookDimension = NewBookDimensionClient(c.config)
+	c.Dimension = NewDimensionClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -132,10 +140,12 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Book:   NewBookClient(cfg),
-		User:   NewUserClient(cfg),
+		ctx:           ctx,
+		config:        cfg,
+		Book:          NewBookClient(cfg),
+		BookDimension: NewBookDimensionClient(cfg),
+		Dimension:     NewDimensionClient(cfg),
+		User:          NewUserClient(cfg),
 	}, nil
 }
 
@@ -153,10 +163,12 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Book:   NewBookClient(cfg),
-		User:   NewUserClient(cfg),
+		ctx:           ctx,
+		config:        cfg,
+		Book:          NewBookClient(cfg),
+		BookDimension: NewBookDimensionClient(cfg),
+		Dimension:     NewDimensionClient(cfg),
+		User:          NewUserClient(cfg),
 	}, nil
 }
 
@@ -186,6 +198,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Book.Use(hooks...)
+	c.BookDimension.Use(hooks...)
+	c.Dimension.Use(hooks...)
 	c.User.Use(hooks...)
 }
 
@@ -193,6 +207,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Book.Intercept(interceptors...)
+	c.BookDimension.Intercept(interceptors...)
+	c.Dimension.Intercept(interceptors...)
 	c.User.Intercept(interceptors...)
 }
 
@@ -201,6 +217,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *BookMutation:
 		return c.Book.mutate(ctx, m)
+	case *BookDimensionMutation:
+		return c.BookDimension.mutate(ctx, m)
+	case *DimensionMutation:
+		return c.Dimension.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	default:
@@ -332,6 +352,22 @@ func (c *BookClient) QueryUploader(_m *Book) *UserQuery {
 	return query
 }
 
+// QueryBookDimensions queries the book_dimensions edge of a Book.
+func (c *BookClient) QueryBookDimensions(_m *Book) *BookDimensionQuery {
+	query := (&BookDimensionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(book.Table, book.FieldID, id),
+			sqlgraph.To(bookdimension.Table, bookdimension.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, book.BookDimensionsTable, book.BookDimensionsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *BookClient) Hooks() []Hook {
 	return c.hooks.Book
@@ -354,6 +390,352 @@ func (c *BookClient) mutate(ctx context.Context, m *BookMutation) (Value, error)
 		return (&BookDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Book mutation op: %q", m.Op())
+	}
+}
+
+// BookDimensionClient is a client for the BookDimension schema.
+type BookDimensionClient struct {
+	config
+}
+
+// NewBookDimensionClient returns a client for the BookDimension from the given config.
+func NewBookDimensionClient(c config) *BookDimensionClient {
+	return &BookDimensionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `bookdimension.Hooks(f(g(h())))`.
+func (c *BookDimensionClient) Use(hooks ...Hook) {
+	c.hooks.BookDimension = append(c.hooks.BookDimension, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `bookdimension.Intercept(f(g(h())))`.
+func (c *BookDimensionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.BookDimension = append(c.inters.BookDimension, interceptors...)
+}
+
+// Create returns a builder for creating a BookDimension entity.
+func (c *BookDimensionClient) Create() *BookDimensionCreate {
+	mutation := newBookDimensionMutation(c.config, OpCreate)
+	return &BookDimensionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of BookDimension entities.
+func (c *BookDimensionClient) CreateBulk(builders ...*BookDimensionCreate) *BookDimensionCreateBulk {
+	return &BookDimensionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *BookDimensionClient) MapCreateBulk(slice any, setFunc func(*BookDimensionCreate, int)) *BookDimensionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &BookDimensionCreateBulk{err: fmt.Errorf("calling to BookDimensionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*BookDimensionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &BookDimensionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for BookDimension.
+func (c *BookDimensionClient) Update() *BookDimensionUpdate {
+	mutation := newBookDimensionMutation(c.config, OpUpdate)
+	return &BookDimensionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BookDimensionClient) UpdateOne(_m *BookDimension) *BookDimensionUpdateOne {
+	mutation := newBookDimensionMutation(c.config, OpUpdateOne, withBookDimension(_m))
+	return &BookDimensionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BookDimensionClient) UpdateOneID(id uuid.UUID) *BookDimensionUpdateOne {
+	mutation := newBookDimensionMutation(c.config, OpUpdateOne, withBookDimensionID(id))
+	return &BookDimensionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for BookDimension.
+func (c *BookDimensionClient) Delete() *BookDimensionDelete {
+	mutation := newBookDimensionMutation(c.config, OpDelete)
+	return &BookDimensionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *BookDimensionClient) DeleteOne(_m *BookDimension) *BookDimensionDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *BookDimensionClient) DeleteOneID(id uuid.UUID) *BookDimensionDeleteOne {
+	builder := c.Delete().Where(bookdimension.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BookDimensionDeleteOne{builder}
+}
+
+// Query returns a query builder for BookDimension.
+func (c *BookDimensionClient) Query() *BookDimensionQuery {
+	return &BookDimensionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeBookDimension},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a BookDimension entity by its id.
+func (c *BookDimensionClient) Get(ctx context.Context, id uuid.UUID) (*BookDimension, error) {
+	return c.Query().Where(bookdimension.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BookDimensionClient) GetX(ctx context.Context, id uuid.UUID) *BookDimension {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryBook queries the book edge of a BookDimension.
+func (c *BookDimensionClient) QueryBook(_m *BookDimension) *BookQuery {
+	query := (&BookClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(bookdimension.Table, bookdimension.FieldID, id),
+			sqlgraph.To(book.Table, book.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, bookdimension.BookTable, bookdimension.BookPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDimension queries the dimension edge of a BookDimension.
+func (c *BookDimensionClient) QueryDimension(_m *BookDimension) *DimensionQuery {
+	query := (&DimensionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(bookdimension.Table, bookdimension.FieldID, id),
+			sqlgraph.To(dimension.Table, dimension.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, bookdimension.DimensionTable, bookdimension.DimensionPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *BookDimensionClient) Hooks() []Hook {
+	return c.hooks.BookDimension
+}
+
+// Interceptors returns the client interceptors.
+func (c *BookDimensionClient) Interceptors() []Interceptor {
+	return c.inters.BookDimension
+}
+
+func (c *BookDimensionClient) mutate(ctx context.Context, m *BookDimensionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&BookDimensionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&BookDimensionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&BookDimensionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&BookDimensionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown BookDimension mutation op: %q", m.Op())
+	}
+}
+
+// DimensionClient is a client for the Dimension schema.
+type DimensionClient struct {
+	config
+}
+
+// NewDimensionClient returns a client for the Dimension from the given config.
+func NewDimensionClient(c config) *DimensionClient {
+	return &DimensionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `dimension.Hooks(f(g(h())))`.
+func (c *DimensionClient) Use(hooks ...Hook) {
+	c.hooks.Dimension = append(c.hooks.Dimension, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `dimension.Intercept(f(g(h())))`.
+func (c *DimensionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Dimension = append(c.inters.Dimension, interceptors...)
+}
+
+// Create returns a builder for creating a Dimension entity.
+func (c *DimensionClient) Create() *DimensionCreate {
+	mutation := newDimensionMutation(c.config, OpCreate)
+	return &DimensionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Dimension entities.
+func (c *DimensionClient) CreateBulk(builders ...*DimensionCreate) *DimensionCreateBulk {
+	return &DimensionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *DimensionClient) MapCreateBulk(slice any, setFunc func(*DimensionCreate, int)) *DimensionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &DimensionCreateBulk{err: fmt.Errorf("calling to DimensionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*DimensionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &DimensionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Dimension.
+func (c *DimensionClient) Update() *DimensionUpdate {
+	mutation := newDimensionMutation(c.config, OpUpdate)
+	return &DimensionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *DimensionClient) UpdateOne(_m *Dimension) *DimensionUpdateOne {
+	mutation := newDimensionMutation(c.config, OpUpdateOne, withDimension(_m))
+	return &DimensionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *DimensionClient) UpdateOneID(id uuid.UUID) *DimensionUpdateOne {
+	mutation := newDimensionMutation(c.config, OpUpdateOne, withDimensionID(id))
+	return &DimensionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Dimension.
+func (c *DimensionClient) Delete() *DimensionDelete {
+	mutation := newDimensionMutation(c.config, OpDelete)
+	return &DimensionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *DimensionClient) DeleteOne(_m *Dimension) *DimensionDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *DimensionClient) DeleteOneID(id uuid.UUID) *DimensionDeleteOne {
+	builder := c.Delete().Where(dimension.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &DimensionDeleteOne{builder}
+}
+
+// Query returns a query builder for Dimension.
+func (c *DimensionClient) Query() *DimensionQuery {
+	return &DimensionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeDimension},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Dimension entity by its id.
+func (c *DimensionClient) Get(ctx context.Context, id uuid.UUID) (*Dimension, error) {
+	return c.Query().Where(dimension.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *DimensionClient) GetX(ctx context.Context, id uuid.UUID) *Dimension {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryParent queries the parent edge of a Dimension.
+func (c *DimensionClient) QueryParent(_m *Dimension) *DimensionQuery {
+	query := (&DimensionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(dimension.Table, dimension.FieldID, id),
+			sqlgraph.To(dimension.Table, dimension.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, dimension.ParentTable, dimension.ParentColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryChildren queries the children edge of a Dimension.
+func (c *DimensionClient) QueryChildren(_m *Dimension) *DimensionQuery {
+	query := (&DimensionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(dimension.Table, dimension.FieldID, id),
+			sqlgraph.To(dimension.Table, dimension.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, dimension.ChildrenTable, dimension.ChildrenColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryBookDimensions queries the book_dimensions edge of a Dimension.
+func (c *DimensionClient) QueryBookDimensions(_m *Dimension) *BookDimensionQuery {
+	query := (&BookDimensionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(dimension.Table, dimension.FieldID, id),
+			sqlgraph.To(bookdimension.Table, bookdimension.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, dimension.BookDimensionsTable, dimension.BookDimensionsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *DimensionClient) Hooks() []Hook {
+	return c.hooks.Dimension
+}
+
+// Interceptors returns the client interceptors.
+func (c *DimensionClient) Interceptors() []Interceptor {
+	return c.inters.Dimension
+}
+
+func (c *DimensionClient) mutate(ctx context.Context, m *DimensionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&DimensionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&DimensionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&DimensionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&DimensionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Dimension mutation op: %q", m.Op())
 	}
 }
 
@@ -509,9 +891,9 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Book, User []ent.Hook
+		Book, BookDimension, Dimension, User []ent.Hook
 	}
 	inters struct {
-		Book, User []ent.Interceptor
+		Book, BookDimension, Dimension, User []ent.Interceptor
 	}
 )

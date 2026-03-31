@@ -52,6 +52,9 @@ func NewGatewayMux(lc fx.Lifecycle, bl *BufListener) (*runtime.ServeMux, error) 
 			if err := bookmgrv1.RegisterUserServiceHandler(ctx, mux, conn); err != nil {
 				return err
 			}
+			if err := bookmgrv1.RegisterDimensionServiceHandler(ctx, mux, conn); err != nil {
+				return err
+			}
 
 			log.Println("gRPC-Gateway handlers registered")
 			return nil
