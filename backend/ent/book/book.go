@@ -71,6 +71,8 @@ const (
 	EdgeFiles = "files"
 	// EdgeReviews holds the string denoting the reviews edge name in mutations.
 	EdgeReviews = "reviews"
+	// EdgeReadingProgress holds the string denoting the reading_progress edge name in mutations.
+	EdgeReadingProgress = "reading_progress"
 	// Table holds the table name of the book in the database.
 	Table = "books"
 	// UploaderTable is the table that holds the uploader relation/edge.
@@ -97,6 +99,11 @@ const (
 	ReviewsInverseTable = "book_reviews"
 	// ReviewsColumn is the table column denoting the reviews relation/edge.
 	ReviewsColumn = "book_reviews"
+	// ReadingProgressTable is the table that holds the reading_progress relation/edge. The primary key declared below.
+	ReadingProgressTable = "book_reading_progress_book"
+	// ReadingProgressInverseTable is the table name for the BookReadingProgress entity.
+	// It exists in this package in order to avoid circular dependency with the "bookreadingprogress" package.
+	ReadingProgressInverseTable = "book_reading_progresses"
 )
 
 // Columns holds all SQL columns for book fields.
@@ -141,6 +148,9 @@ var (
 	// FilesPrimaryKey and FilesColumn2 are the table columns denoting the
 	// primary key for the files relation (M2M).
 	FilesPrimaryKey = []string{"book_file_id", "book_id"}
+	// ReadingProgressPrimaryKey and ReadingProgressColumn2 are the table columns denoting the
+	// primary key for the reading_progress relation (M2M).
+	ReadingProgressPrimaryKey = []string{"book_reading_progress_id", "book_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -393,6 +403,20 @@ func ByReviews(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newReviewsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByReadingProgressCount orders the results by reading_progress count.
+func ByReadingProgressCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newReadingProgressStep(), opts...)
+	}
+}
+
+// ByReadingProgress orders the results by reading_progress terms.
+func ByReadingProgress(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newReadingProgressStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newUploaderStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -419,5 +443,12 @@ func newReviewsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ReviewsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, ReviewsTable, ReviewsColumn),
+	)
+}
+func newReadingProgressStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ReadingProgressInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ReadingProgressTable, ReadingProgressPrimaryKey...),
 	)
 }

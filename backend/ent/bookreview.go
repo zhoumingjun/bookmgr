@@ -36,6 +36,7 @@ type BookReview struct {
 	// The values are being populated by the BookReviewQuery when eager-loading is set.
 	Edges        BookReviewEdges `json:"edges"`
 	book_reviews *uuid.UUID
+	user_reviews *uuid.UUID
 	selectValues sql.SelectValues
 }
 
@@ -80,6 +81,8 @@ func (*BookReview) scanValues(columns []string) ([]any, error) {
 		case bookreview.FieldID, bookreview.FieldBookID, bookreview.FieldReviewerID:
 			values[i] = new(uuid.UUID)
 		case bookreview.ForeignKeys[0]: // book_reviews
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case bookreview.ForeignKeys[1]: // user_reviews
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			values[i] = new(sql.UnknownType)
@@ -150,6 +153,13 @@ func (_m *BookReview) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.book_reviews = new(uuid.UUID)
 				*_m.book_reviews = *value.S.(*uuid.UUID)
+			}
+		case bookreview.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field user_reviews", values[i])
+			} else if value.Valid {
+				_m.user_reviews = new(uuid.UUID)
+				*_m.user_reviews = *value.S.(*uuid.UUID)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

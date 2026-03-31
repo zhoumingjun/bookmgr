@@ -88,6 +88,21 @@ var (
 		Columns:    BookFilesColumns,
 		PrimaryKey: []*schema.Column{BookFilesColumns[0]},
 	}
+	// BookReadingProgressesColumns holds the columns for the "book_reading_progresses" table.
+	BookReadingProgressesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "book_id", Type: field.TypeUUID},
+		{Name: "user_id", Type: field.TypeUUID},
+		{Name: "progress_percent", Type: field.TypeInt, Default: 0},
+		{Name: "last_page", Type: field.TypeInt, Default: 0},
+		{Name: "last_read_at", Type: field.TypeTime},
+	}
+	// BookReadingProgressesTable holds the schema information for the "book_reading_progresses" table.
+	BookReadingProgressesTable = &schema.Table{
+		Name:       "book_reading_progresses",
+		Columns:    BookReadingProgressesColumns,
+		PrimaryKey: []*schema.Column{BookReadingProgressesColumns[0]},
+	}
 	// BookReviewsColumns holds the columns for the "book_reviews" table.
 	BookReviewsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
@@ -99,6 +114,7 @@ var (
 		{Name: "reason", Type: field.TypeString, Nullable: true, Size: 2147483647, Default: ""},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "book_reviews", Type: field.TypeUUID, Nullable: true},
+		{Name: "user_reviews", Type: field.TypeUUID, Nullable: true},
 	}
 	// BookReviewsTable holds the schema information for the "book_reviews" table.
 	BookReviewsTable = &schema.Table{
@@ -110,6 +126,12 @@ var (
 				Symbol:     "book_reviews_books_reviews",
 				Columns:    []*schema.Column{BookReviewsColumns[8]},
 				RefColumns: []*schema.Column{BooksColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "book_reviews_users_reviews",
+				Columns:    []*schema.Column{BookReviewsColumns[9]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -251,6 +273,56 @@ var (
 			},
 		},
 	}
+	// BookReadingProgressBookColumns holds the columns for the "book_reading_progress_book" table.
+	BookReadingProgressBookColumns = []*schema.Column{
+		{Name: "book_reading_progress_id", Type: field.TypeUUID},
+		{Name: "book_id", Type: field.TypeUUID},
+	}
+	// BookReadingProgressBookTable holds the schema information for the "book_reading_progress_book" table.
+	BookReadingProgressBookTable = &schema.Table{
+		Name:       "book_reading_progress_book",
+		Columns:    BookReadingProgressBookColumns,
+		PrimaryKey: []*schema.Column{BookReadingProgressBookColumns[0], BookReadingProgressBookColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "book_reading_progress_book_book_reading_progress_id",
+				Columns:    []*schema.Column{BookReadingProgressBookColumns[0]},
+				RefColumns: []*schema.Column{BookReadingProgressesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "book_reading_progress_book_book_id",
+				Columns:    []*schema.Column{BookReadingProgressBookColumns[1]},
+				RefColumns: []*schema.Column{BooksColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// BookReadingProgressUserColumns holds the columns for the "book_reading_progress_user" table.
+	BookReadingProgressUserColumns = []*schema.Column{
+		{Name: "book_reading_progress_id", Type: field.TypeUUID},
+		{Name: "user_id", Type: field.TypeUUID},
+	}
+	// BookReadingProgressUserTable holds the schema information for the "book_reading_progress_user" table.
+	BookReadingProgressUserTable = &schema.Table{
+		Name:       "book_reading_progress_user",
+		Columns:    BookReadingProgressUserColumns,
+		PrimaryKey: []*schema.Column{BookReadingProgressUserColumns[0], BookReadingProgressUserColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "book_reading_progress_user_book_reading_progress_id",
+				Columns:    []*schema.Column{BookReadingProgressUserColumns[0]},
+				RefColumns: []*schema.Column{BookReadingProgressesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "book_reading_progress_user_user_id",
+				Columns:    []*schema.Column{BookReadingProgressUserColumns[1]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// DimensionBookDimensionsColumns holds the columns for the "dimension_book_dimensions" table.
 	DimensionBookDimensionsColumns = []*schema.Column{
 		{Name: "dimension_id", Type: field.TypeUUID},
@@ -281,12 +353,15 @@ var (
 		BooksTable,
 		BookDimensionsTable,
 		BookFilesTable,
+		BookReadingProgressesTable,
 		BookReviewsTable,
 		DimensionsTable,
 		UsersTable,
 		BookBookDimensionsTable,
 		BookFileBookTable,
 		BookFileUploaderTable,
+		BookReadingProgressBookTable,
+		BookReadingProgressUserTable,
 		DimensionBookDimensionsTable,
 	}
 )
@@ -295,6 +370,7 @@ func init() {
 	BooksTable.ForeignKeys[0].RefTable = BookReviewsTable
 	BooksTable.ForeignKeys[1].RefTable = UsersTable
 	BookReviewsTable.ForeignKeys[0].RefTable = BooksTable
+	BookReviewsTable.ForeignKeys[1].RefTable = UsersTable
 	DimensionsTable.ForeignKeys[0].RefTable = DimensionsTable
 	UsersTable.ForeignKeys[0].RefTable = BookReviewsTable
 	BookBookDimensionsTable.ForeignKeys[0].RefTable = BooksTable
@@ -303,6 +379,10 @@ func init() {
 	BookFileBookTable.ForeignKeys[1].RefTable = BooksTable
 	BookFileUploaderTable.ForeignKeys[0].RefTable = BookFilesTable
 	BookFileUploaderTable.ForeignKeys[1].RefTable = UsersTable
+	BookReadingProgressBookTable.ForeignKeys[0].RefTable = BookReadingProgressesTable
+	BookReadingProgressBookTable.ForeignKeys[1].RefTable = BooksTable
+	BookReadingProgressUserTable.ForeignKeys[0].RefTable = BookReadingProgressesTable
+	BookReadingProgressUserTable.ForeignKeys[1].RefTable = UsersTable
 	DimensionBookDimensionsTable.ForeignKeys[0].RefTable = DimensionsTable
 	DimensionBookDimensionsTable.ForeignKeys[1].RefTable = BookDimensionsTable
 }

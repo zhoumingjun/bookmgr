@@ -43,9 +43,13 @@ type UserEdges struct {
 	Books []*Book `json:"books,omitempty"`
 	// UploadedFiles holds the value of the uploaded_files edge.
 	UploadedFiles []*BookFile `json:"uploaded_files,omitempty"`
+	// ReadingProgress holds the value of the reading_progress edge.
+	ReadingProgress []*BookReadingProgress `json:"reading_progress,omitempty"`
+	// Reviews holds the value of the reviews edge.
+	Reviews []*BookReview `json:"reviews,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [4]bool
 }
 
 // BooksOrErr returns the Books value or an error if the edge
@@ -64,6 +68,24 @@ func (e UserEdges) UploadedFilesOrErr() ([]*BookFile, error) {
 		return e.UploadedFiles, nil
 	}
 	return nil, &NotLoadedError{edge: "uploaded_files"}
+}
+
+// ReadingProgressOrErr returns the ReadingProgress value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) ReadingProgressOrErr() ([]*BookReadingProgress, error) {
+	if e.loadedTypes[2] {
+		return e.ReadingProgress, nil
+	}
+	return nil, &NotLoadedError{edge: "reading_progress"}
+}
+
+// ReviewsOrErr returns the Reviews value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) ReviewsOrErr() ([]*BookReview, error) {
+	if e.loadedTypes[3] {
+		return e.Reviews, nil
+	}
+	return nil, &NotLoadedError{edge: "reviews"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -164,6 +186,16 @@ func (_m *User) QueryBooks() *BookQuery {
 // QueryUploadedFiles queries the "uploaded_files" edge of the User entity.
 func (_m *User) QueryUploadedFiles() *BookFileQuery {
 	return NewUserClient(_m.config).QueryUploadedFiles(_m)
+}
+
+// QueryReadingProgress queries the "reading_progress" edge of the User entity.
+func (_m *User) QueryReadingProgress() *BookReadingProgressQuery {
+	return NewUserClient(_m.config).QueryReadingProgress(_m)
+}
+
+// QueryReviews queries the "reviews" edge of the User entity.
+func (_m *User) QueryReviews() *BookReviewQuery {
+	return NewUserClient(_m.config).QueryReviews(_m)
 }
 
 // Update returns a builder for updating this User.

@@ -32,6 +32,10 @@ const (
 	EdgeBooks = "books"
 	// EdgeUploadedFiles holds the string denoting the uploaded_files edge name in mutations.
 	EdgeUploadedFiles = "uploaded_files"
+	// EdgeReadingProgress holds the string denoting the reading_progress edge name in mutations.
+	EdgeReadingProgress = "reading_progress"
+	// EdgeReviews holds the string denoting the reviews edge name in mutations.
+	EdgeReviews = "reviews"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// BooksTable is the table that holds the books relation/edge.
@@ -46,6 +50,18 @@ const (
 	// UploadedFilesInverseTable is the table name for the BookFile entity.
 	// It exists in this package in order to avoid circular dependency with the "bookfile" package.
 	UploadedFilesInverseTable = "book_files"
+	// ReadingProgressTable is the table that holds the reading_progress relation/edge. The primary key declared below.
+	ReadingProgressTable = "book_reading_progress_user"
+	// ReadingProgressInverseTable is the table name for the BookReadingProgress entity.
+	// It exists in this package in order to avoid circular dependency with the "bookreadingprogress" package.
+	ReadingProgressInverseTable = "book_reading_progresses"
+	// ReviewsTable is the table that holds the reviews relation/edge.
+	ReviewsTable = "book_reviews"
+	// ReviewsInverseTable is the table name for the BookReview entity.
+	// It exists in this package in order to avoid circular dependency with the "bookreview" package.
+	ReviewsInverseTable = "book_reviews"
+	// ReviewsColumn is the table column denoting the reviews relation/edge.
+	ReviewsColumn = "user_reviews"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -69,6 +85,9 @@ var (
 	// UploadedFilesPrimaryKey and UploadedFilesColumn2 are the table columns denoting the
 	// primary key for the uploaded_files relation (M2M).
 	UploadedFilesPrimaryKey = []string{"book_file_id", "user_id"}
+	// ReadingProgressPrimaryKey and ReadingProgressColumn2 are the table columns denoting the
+	// primary key for the reading_progress relation (M2M).
+	ReadingProgressPrimaryKey = []string{"book_reading_progress_id", "user_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -196,6 +215,34 @@ func ByUploadedFiles(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newUploadedFilesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByReadingProgressCount orders the results by reading_progress count.
+func ByReadingProgressCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newReadingProgressStep(), opts...)
+	}
+}
+
+// ByReadingProgress orders the results by reading_progress terms.
+func ByReadingProgress(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newReadingProgressStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByReviewsCount orders the results by reviews count.
+func ByReviewsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newReviewsStep(), opts...)
+	}
+}
+
+// ByReviews orders the results by reviews terms.
+func ByReviews(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newReviewsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newBooksStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -208,5 +255,19 @@ func newUploadedFilesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(UploadedFilesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, UploadedFilesTable, UploadedFilesPrimaryKey...),
+	)
+}
+func newReadingProgressStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ReadingProgressInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ReadingProgressTable, ReadingProgressPrimaryKey...),
+	)
+}
+func newReviewsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ReviewsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ReviewsTable, ReviewsColumn),
 	)
 }

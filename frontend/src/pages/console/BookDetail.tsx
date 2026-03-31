@@ -1,13 +1,25 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Button, Descriptions, Typography, Spin, Space, Grid, Empty } from 'antd';
+import { Card, Button, Descriptions, Typography, Spin, Space, Grid, Empty, Tag, Progress, message } from 'antd';
 import { ArrowLeftOutlined, DownloadOutlined, ReadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { PDFViewer } from '@embedpdf/react-pdf-viewer';
 import { getBook, downloadBookBlob, downloadBookUrl, type BookDTO } from '../../api/books';
+import { getReadingProgress } from '../../api/progress';
 
 const { Title } = Typography;
 const { useBreakpoint } = Grid;
+
+function CoverImage({ url, title }: { url?: string; title: string }) {
+  if (url) {
+    return <img src={url} alt={title} style={{ width: '100%', height: 300, objectFit: 'cover', borderRadius: 8 }} />;
+  }
+  return (
+    <div style={{ width: '100%', height: 300, background: 'linear-gradient(135deg, #ff6a00 0%, #ff9f00 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8 }}>
+      <span style={{ fontSize: 80 }}>📖</span>
+    </div>
+  );
+}
 
 export default function BookDetailPage() {
   const { t, i18n } = useTranslation();
@@ -19,34 +31,32 @@ export default function BookDetailPage() {
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
   const [viewerReady, setViewerReady] = useState(false);
+  const [progress, setProgress] = useState<{ percent: number; page: number } | null>(null);
   const screens = useBreakpoint();
   const isMobile = !screens.md;
 
   useEffect(() => {
     if (!id) return;
-    getBook(id)
-      .then(res => setBook(res.book))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    Promise.all([
+      getBook(id).then(res => setBook(res.book)).catch(() => {}),
+      getReadingProgress(id).then(p => {
+        if (p) setProgress({ percent: p.progress_percent, page: p.last_page });
+      }),
+    ]).finally(() => setLoading(false));
   }, [id]);
 
-  // Cleanup blob URL on unmount
   useEffect(() => {
     return () => {
       if (pdfBlobUrl) URL.revokeObjectURL(pdfBlobUrl);
     };
   }, [pdfBlobUrl]);
 
-  // Delay mounting PDFViewer until container is in the DOM and laid out
   useEffect(() => {
     if (!showReader || !pdfBlobUrl) {
       setViewerReady(false);
       return;
     }
-    // Wait for the container div to be laid out before mounting the viewer
-    const frameId = requestAnimationFrame(() => {
-      setViewerReady(true);
-    });
+    const frameId = requestAnimationFrame(() => setViewerReady(true));
     return () => cancelAnimationFrame(frameId);
   }, [showReader, pdfBlobUrl]);
 
@@ -61,7 +71,7 @@ export default function BookDetailPage() {
         const blob = await downloadBookBlob(id);
         setPdfBlobUrl(URL.createObjectURL(blob));
       } catch {
-        // ignore
+        message.error('加载失败');
       } finally {
         setPdfLoading(false);
       }
@@ -83,6 +93,11 @@ export default function BookDetailPage() {
   if (!book) return <Empty description="Book not found" />;
 
   const pdfLocale = i18n.language === 'zh' ? 'zh-CN' : 'en';
+  const ageMin = book.recommended_age_min || 0;
+  const ageMax = book.recommended_age_max || 216;
+  const ageRange = ageMin > 0 || ageMax < 216
+    ? `${Math.floor(ageMin / 12)}岁 ~ ${Math.floor(ageMax / 12)}岁`
+    : '全部年龄段';
 
   return (
     <div>
@@ -95,32 +110,48 @@ export default function BookDetailPage() {
         {t('bookDetail.back')}
       </Button>
 
-      <Card>
-        <Title level={4} style={{ marginTop: 0 }}>{book.title}</Title>
-        <Descriptions column={isMobile ? 1 : 2} style={{ marginBottom: 16 }}>
-          <Descriptions.Item label={t('books.author')}>{book.author}</Descriptions.Item>
-          <Descriptions.Item label={t('bookDetail.addedAt')}>
-            {new Date(book.create_time).toLocaleDateString()}
-          </Descriptions.Item>
-          {book.description && (
-            <Descriptions.Item label={t('books.description')} span={2}>
-              {book.description}
-            </Descriptions.Item>
-          )}
-        </Descriptions>
+      <Card style={{ marginBottom: 16 }}>
+        <Space align="start" size={16} style={{ width: '100%' }} wrap>
+          <div style={{ flex: '0 0 200px', width: '100%', maxWidth: 220 }}>
+            <CoverImage url={book.cover_image_url} title={book.title} />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <Title level={4} style={{ marginTop: 0 }}>{book.title}</Title>
+            <Descriptions column={isMobile ? 1 : 2} size="small">
+              <Descriptions.Item label="作者">{book.author || '-'}</Descriptions.Item>
+              <Descriptions.Item label="推荐年龄">{ageRange}</Descriptions.Item>
+              {book.core_goal && <Descriptions.Item label="核心目标">{book.core_goal}</Descriptions.Item>}
+              {book.cognitive_level && <Descriptions.Item label="认知适配">{book.cognitive_level}</Descriptions.Item>}
+            </Descriptions>
+            {book.description && (
+              <p style={{ color: '#666', marginTop: 8 }}>{book.description}</p>
+            )}
+            {book.dimensions && book.dimensions.length > 0 && (
+              <div style={{ marginTop: 8 }}>
+                {book.dimensions.map(d => (
+                  <Tag key={d.slug} color="orange">{d.name}</Tag>
+                ))}
+              </div>
+            )}
 
-        <Space wrap>
-          <Button
-            type="primary"
-            icon={<ReadOutlined />}
-            onClick={handleReadOnline}
-            loading={pdfLoading}
-          >
-            {t('bookDetail.readOnline')}
-          </Button>
-          <Button icon={<DownloadOutlined />} onClick={handleDownload}>
-            {t('bookDetail.download')}
-          </Button>
+            {progress && (
+              <div style={{ marginTop: 12 }}>
+                <span style={{ fontSize: 12, color: '#999' }}>阅读进度：第 {progress.page} 页</span>
+                <Progress percent={progress.percent} size="small" showInfo={false} />
+              </div>
+            )}
+
+            <Space wrap style={{ marginTop: 12 }}>
+              <Button type="primary" icon={<ReadOutlined />} onClick={handleReadOnline} loading={pdfLoading}>
+                在线阅读
+              </Button>
+              {book.has_digital && (
+                <Button icon={<DownloadOutlined />} onClick={handleDownload}>
+                  下载
+                </Button>
+              )}
+            </Space>
+          </div>
         </Space>
       </Card>
 

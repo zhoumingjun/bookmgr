@@ -15,6 +15,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookreadingprogress"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookreview"
 	"github.com/zhoumingjun/bookmgr/backend/ent/predicate"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
@@ -22,13 +24,15 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	ctx               *QueryContext
-	order             []user.OrderOption
-	inters            []Interceptor
-	predicates        []predicate.User
-	withBooks         *BookQuery
-	withUploadedFiles *BookFileQuery
-	withFKs           bool
+	ctx                 *QueryContext
+	order               []user.OrderOption
+	inters              []Interceptor
+	predicates          []predicate.User
+	withBooks           *BookQuery
+	withUploadedFiles   *BookFileQuery
+	withReadingProgress *BookReadingProgressQuery
+	withReviews         *BookReviewQuery
+	withFKs             bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -102,6 +106,50 @@ func (_q *UserQuery) QueryUploadedFiles() *BookFileQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(bookfile.Table, bookfile.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, user.UploadedFilesTable, user.UploadedFilesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryReadingProgress chains the current query on the "reading_progress" edge.
+func (_q *UserQuery) QueryReadingProgress() *BookReadingProgressQuery {
+	query := (&BookReadingProgressClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(bookreadingprogress.Table, bookreadingprogress.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, user.ReadingProgressTable, user.ReadingProgressPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryReviews chains the current query on the "reviews" edge.
+func (_q *UserQuery) QueryReviews() *BookReviewQuery {
+	query := (&BookReviewClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(bookreview.Table, bookreview.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.ReviewsTable, user.ReviewsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -296,13 +344,15 @@ func (_q *UserQuery) Clone() *UserQuery {
 		return nil
 	}
 	return &UserQuery{
-		config:            _q.config,
-		ctx:               _q.ctx.Clone(),
-		order:             append([]user.OrderOption{}, _q.order...),
-		inters:            append([]Interceptor{}, _q.inters...),
-		predicates:        append([]predicate.User{}, _q.predicates...),
-		withBooks:         _q.withBooks.Clone(),
-		withUploadedFiles: _q.withUploadedFiles.Clone(),
+		config:              _q.config,
+		ctx:                 _q.ctx.Clone(),
+		order:               append([]user.OrderOption{}, _q.order...),
+		inters:              append([]Interceptor{}, _q.inters...),
+		predicates:          append([]predicate.User{}, _q.predicates...),
+		withBooks:           _q.withBooks.Clone(),
+		withUploadedFiles:   _q.withUploadedFiles.Clone(),
+		withReadingProgress: _q.withReadingProgress.Clone(),
+		withReviews:         _q.withReviews.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -328,6 +378,28 @@ func (_q *UserQuery) WithUploadedFiles(opts ...func(*BookFileQuery)) *UserQuery 
 		opt(query)
 	}
 	_q.withUploadedFiles = query
+	return _q
+}
+
+// WithReadingProgress tells the query-builder to eager-load the nodes that are connected to
+// the "reading_progress" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithReadingProgress(opts ...func(*BookReadingProgressQuery)) *UserQuery {
+	query := (&BookReadingProgressClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withReadingProgress = query
+	return _q
+}
+
+// WithReviews tells the query-builder to eager-load the nodes that are connected to
+// the "reviews" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithReviews(opts ...func(*BookReviewQuery)) *UserQuery {
+	query := (&BookReviewClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withReviews = query
 	return _q
 }
 
@@ -410,9 +482,11 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		nodes       = []*User{}
 		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [4]bool{
 			_q.withBooks != nil,
 			_q.withUploadedFiles != nil,
+			_q.withReadingProgress != nil,
+			_q.withReviews != nil,
 		}
 	)
 	if withFKs {
@@ -447,6 +521,20 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := _q.loadUploadedFiles(ctx, query, nodes,
 			func(n *User) { n.Edges.UploadedFiles = []*BookFile{} },
 			func(n *User, e *BookFile) { n.Edges.UploadedFiles = append(n.Edges.UploadedFiles, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withReadingProgress; query != nil {
+		if err := _q.loadReadingProgress(ctx, query, nodes,
+			func(n *User) { n.Edges.ReadingProgress = []*BookReadingProgress{} },
+			func(n *User, e *BookReadingProgress) { n.Edges.ReadingProgress = append(n.Edges.ReadingProgress, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withReviews; query != nil {
+		if err := _q.loadReviews(ctx, query, nodes,
+			func(n *User) { n.Edges.Reviews = []*BookReview{} },
+			func(n *User, e *BookReview) { n.Edges.Reviews = append(n.Edges.Reviews, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -542,6 +630,98 @@ func (_q *UserQuery) loadUploadedFiles(ctx context.Context, query *BookFileQuery
 		for kn := range nodes {
 			assign(kn, n)
 		}
+	}
+	return nil
+}
+func (_q *UserQuery) loadReadingProgress(ctx context.Context, query *BookReadingProgressQuery, nodes []*User, init func(*User), assign func(*User, *BookReadingProgress)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[uuid.UUID]*User)
+	nids := make(map[uuid.UUID]map[*User]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(user.ReadingProgressTable)
+		s.Join(joinT).On(s.C(bookreadingprogress.FieldID), joinT.C(user.ReadingProgressPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(user.ReadingProgressPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(user.ReadingProgressPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(uuid.UUID)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := *values[0].(*uuid.UUID)
+				inValue := *values[1].(*uuid.UUID)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*BookReadingProgress](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "reading_progress" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (_q *UserQuery) loadReviews(ctx context.Context, query *BookReviewQuery, nodes []*User, init func(*User), assign func(*User, *BookReview)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.BookReview(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.ReviewsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.user_reviews
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "user_reviews" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "user_reviews" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

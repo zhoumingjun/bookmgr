@@ -1498,6 +1498,29 @@ func HasReviewsWith(preds ...predicate.BookReview) predicate.Book {
 	})
 }
 
+// HasReadingProgress applies the HasEdge predicate on the "reading_progress" edge.
+func HasReadingProgress() predicate.Book {
+	return predicate.Book(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, ReadingProgressTable, ReadingProgressPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasReadingProgressWith applies the HasEdge predicate on the "reading_progress" edge with a given conditions (other predicates).
+func HasReadingProgressWith(preds ...predicate.BookReadingProgress) predicate.Book {
+	return predicate.Book(func(s *sql.Selector) {
+		step := newReadingProgressStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Book) predicate.Book {
 	return predicate.Book(sql.AndPredicates(predicates...))

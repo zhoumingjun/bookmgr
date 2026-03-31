@@ -14,6 +14,7 @@ import (
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookdimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookreadingprogress"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreview"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
@@ -401,6 +402,21 @@ func (_c *BookCreate) AddReviews(v ...*BookReview) *BookCreate {
 	return _c.AddReviewIDs(ids...)
 }
 
+// AddReadingProgresIDs adds the "reading_progress" edge to the BookReadingProgress entity by IDs.
+func (_c *BookCreate) AddReadingProgresIDs(ids ...uuid.UUID) *BookCreate {
+	_c.mutation.AddReadingProgresIDs(ids...)
+	return _c
+}
+
+// AddReadingProgress adds the "reading_progress" edges to the BookReadingProgress entity.
+func (_c *BookCreate) AddReadingProgress(v ...*BookReadingProgress) *BookCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddReadingProgresIDs(ids...)
+}
+
 // Mutation returns the BookMutation object of the builder.
 func (_c *BookCreate) Mutation() *BookMutation {
 	return _c.mutation
@@ -782,6 +798,22 @@ func (_c *BookCreate) createSpec() (*Book, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(bookreview.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.ReadingProgressIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   book.ReadingProgressTable,
+			Columns: book.ReadingProgressPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookreadingprogress.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

@@ -19,6 +19,7 @@ import (
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookdimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookreadingprogress"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreview"
 	"github.com/zhoumingjun/bookmgr/backend/ent/dimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
@@ -35,6 +36,8 @@ type Client struct {
 	BookDimension *BookDimensionClient
 	// BookFile is the client for interacting with the BookFile builders.
 	BookFile *BookFileClient
+	// BookReadingProgress is the client for interacting with the BookReadingProgress builders.
+	BookReadingProgress *BookReadingProgressClient
 	// BookReview is the client for interacting with the BookReview builders.
 	BookReview *BookReviewClient
 	// Dimension is the client for interacting with the Dimension builders.
@@ -55,6 +58,7 @@ func (c *Client) init() {
 	c.Book = NewBookClient(c.config)
 	c.BookDimension = NewBookDimensionClient(c.config)
 	c.BookFile = NewBookFileClient(c.config)
+	c.BookReadingProgress = NewBookReadingProgressClient(c.config)
 	c.BookReview = NewBookReviewClient(c.config)
 	c.Dimension = NewDimensionClient(c.config)
 	c.User = NewUserClient(c.config)
@@ -148,14 +152,15 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:           ctx,
-		config:        cfg,
-		Book:          NewBookClient(cfg),
-		BookDimension: NewBookDimensionClient(cfg),
-		BookFile:      NewBookFileClient(cfg),
-		BookReview:    NewBookReviewClient(cfg),
-		Dimension:     NewDimensionClient(cfg),
-		User:          NewUserClient(cfg),
+		ctx:                 ctx,
+		config:              cfg,
+		Book:                NewBookClient(cfg),
+		BookDimension:       NewBookDimensionClient(cfg),
+		BookFile:            NewBookFileClient(cfg),
+		BookReadingProgress: NewBookReadingProgressClient(cfg),
+		BookReview:          NewBookReviewClient(cfg),
+		Dimension:           NewDimensionClient(cfg),
+		User:                NewUserClient(cfg),
 	}, nil
 }
 
@@ -173,14 +178,15 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:           ctx,
-		config:        cfg,
-		Book:          NewBookClient(cfg),
-		BookDimension: NewBookDimensionClient(cfg),
-		BookFile:      NewBookFileClient(cfg),
-		BookReview:    NewBookReviewClient(cfg),
-		Dimension:     NewDimensionClient(cfg),
-		User:          NewUserClient(cfg),
+		ctx:                 ctx,
+		config:              cfg,
+		Book:                NewBookClient(cfg),
+		BookDimension:       NewBookDimensionClient(cfg),
+		BookFile:            NewBookFileClient(cfg),
+		BookReadingProgress: NewBookReadingProgressClient(cfg),
+		BookReview:          NewBookReviewClient(cfg),
+		Dimension:           NewDimensionClient(cfg),
+		User:                NewUserClient(cfg),
 	}, nil
 }
 
@@ -210,7 +216,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Book, c.BookDimension, c.BookFile, c.BookReview, c.Dimension, c.User,
+		c.Book, c.BookDimension, c.BookFile, c.BookReadingProgress, c.BookReview,
+		c.Dimension, c.User,
 	} {
 		n.Use(hooks...)
 	}
@@ -220,7 +227,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Book, c.BookDimension, c.BookFile, c.BookReview, c.Dimension, c.User,
+		c.Book, c.BookDimension, c.BookFile, c.BookReadingProgress, c.BookReview,
+		c.Dimension, c.User,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -235,6 +243,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.BookDimension.mutate(ctx, m)
 	case *BookFileMutation:
 		return c.BookFile.mutate(ctx, m)
+	case *BookReadingProgressMutation:
+		return c.BookReadingProgress.mutate(ctx, m)
 	case *BookReviewMutation:
 		return c.BookReview.mutate(ctx, m)
 	case *DimensionMutation:
@@ -411,6 +421,22 @@ func (c *BookClient) QueryReviews(_m *Book) *BookReviewQuery {
 			sqlgraph.From(book.Table, book.FieldID, id),
 			sqlgraph.To(bookreview.Table, bookreview.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, book.ReviewsTable, book.ReviewsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryReadingProgress queries the reading_progress edge of a Book.
+func (c *BookClient) QueryReadingProgress(_m *Book) *BookReadingProgressQuery {
+	query := (&BookReadingProgressClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(book.Table, book.FieldID, id),
+			sqlgraph.To(bookreadingprogress.Table, bookreadingprogress.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, book.ReadingProgressTable, book.ReadingProgressPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -770,6 +796,171 @@ func (c *BookFileClient) mutate(ctx context.Context, m *BookFileMutation) (Value
 		return (&BookFileDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown BookFile mutation op: %q", m.Op())
+	}
+}
+
+// BookReadingProgressClient is a client for the BookReadingProgress schema.
+type BookReadingProgressClient struct {
+	config
+}
+
+// NewBookReadingProgressClient returns a client for the BookReadingProgress from the given config.
+func NewBookReadingProgressClient(c config) *BookReadingProgressClient {
+	return &BookReadingProgressClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `bookreadingprogress.Hooks(f(g(h())))`.
+func (c *BookReadingProgressClient) Use(hooks ...Hook) {
+	c.hooks.BookReadingProgress = append(c.hooks.BookReadingProgress, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `bookreadingprogress.Intercept(f(g(h())))`.
+func (c *BookReadingProgressClient) Intercept(interceptors ...Interceptor) {
+	c.inters.BookReadingProgress = append(c.inters.BookReadingProgress, interceptors...)
+}
+
+// Create returns a builder for creating a BookReadingProgress entity.
+func (c *BookReadingProgressClient) Create() *BookReadingProgressCreate {
+	mutation := newBookReadingProgressMutation(c.config, OpCreate)
+	return &BookReadingProgressCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of BookReadingProgress entities.
+func (c *BookReadingProgressClient) CreateBulk(builders ...*BookReadingProgressCreate) *BookReadingProgressCreateBulk {
+	return &BookReadingProgressCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *BookReadingProgressClient) MapCreateBulk(slice any, setFunc func(*BookReadingProgressCreate, int)) *BookReadingProgressCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &BookReadingProgressCreateBulk{err: fmt.Errorf("calling to BookReadingProgressClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*BookReadingProgressCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &BookReadingProgressCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for BookReadingProgress.
+func (c *BookReadingProgressClient) Update() *BookReadingProgressUpdate {
+	mutation := newBookReadingProgressMutation(c.config, OpUpdate)
+	return &BookReadingProgressUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BookReadingProgressClient) UpdateOne(_m *BookReadingProgress) *BookReadingProgressUpdateOne {
+	mutation := newBookReadingProgressMutation(c.config, OpUpdateOne, withBookReadingProgress(_m))
+	return &BookReadingProgressUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BookReadingProgressClient) UpdateOneID(id uuid.UUID) *BookReadingProgressUpdateOne {
+	mutation := newBookReadingProgressMutation(c.config, OpUpdateOne, withBookReadingProgressID(id))
+	return &BookReadingProgressUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for BookReadingProgress.
+func (c *BookReadingProgressClient) Delete() *BookReadingProgressDelete {
+	mutation := newBookReadingProgressMutation(c.config, OpDelete)
+	return &BookReadingProgressDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *BookReadingProgressClient) DeleteOne(_m *BookReadingProgress) *BookReadingProgressDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *BookReadingProgressClient) DeleteOneID(id uuid.UUID) *BookReadingProgressDeleteOne {
+	builder := c.Delete().Where(bookreadingprogress.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BookReadingProgressDeleteOne{builder}
+}
+
+// Query returns a query builder for BookReadingProgress.
+func (c *BookReadingProgressClient) Query() *BookReadingProgressQuery {
+	return &BookReadingProgressQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeBookReadingProgress},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a BookReadingProgress entity by its id.
+func (c *BookReadingProgressClient) Get(ctx context.Context, id uuid.UUID) (*BookReadingProgress, error) {
+	return c.Query().Where(bookreadingprogress.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BookReadingProgressClient) GetX(ctx context.Context, id uuid.UUID) *BookReadingProgress {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryBook queries the book edge of a BookReadingProgress.
+func (c *BookReadingProgressClient) QueryBook(_m *BookReadingProgress) *BookQuery {
+	query := (&BookClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(bookreadingprogress.Table, bookreadingprogress.FieldID, id),
+			sqlgraph.To(book.Table, book.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, bookreadingprogress.BookTable, bookreadingprogress.BookPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUser queries the user edge of a BookReadingProgress.
+func (c *BookReadingProgressClient) QueryUser(_m *BookReadingProgress) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(bookreadingprogress.Table, bookreadingprogress.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, bookreadingprogress.UserTable, bookreadingprogress.UserPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *BookReadingProgressClient) Hooks() []Hook {
+	return c.hooks.BookReadingProgress
+}
+
+// Interceptors returns the client interceptors.
+func (c *BookReadingProgressClient) Interceptors() []Interceptor {
+	return c.inters.BookReadingProgress
+}
+
+func (c *BookReadingProgressClient) mutate(ctx context.Context, m *BookReadingProgressMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&BookReadingProgressCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&BookReadingProgressUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&BookReadingProgressUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&BookReadingProgressDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown BookReadingProgress mutation op: %q", m.Op())
 	}
 }
 
@@ -1259,6 +1450,38 @@ func (c *UserClient) QueryUploadedFiles(_m *User) *BookFileQuery {
 	return query
 }
 
+// QueryReadingProgress queries the reading_progress edge of a User.
+func (c *UserClient) QueryReadingProgress(_m *User) *BookReadingProgressQuery {
+	query := (&BookReadingProgressClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(bookreadingprogress.Table, bookreadingprogress.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, user.ReadingProgressTable, user.ReadingProgressPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryReviews queries the reviews edge of a User.
+func (c *UserClient) QueryReviews(_m *User) *BookReviewQuery {
+	query := (&BookReviewClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(bookreview.Table, bookreview.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.ReviewsTable, user.ReviewsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
@@ -1287,9 +1510,11 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Book, BookDimension, BookFile, BookReview, Dimension, User []ent.Hook
+		Book, BookDimension, BookFile, BookReadingProgress, BookReview, Dimension,
+		User []ent.Hook
 	}
 	inters struct {
-		Book, BookDimension, BookFile, BookReview, Dimension, User []ent.Interceptor
+		Book, BookDimension, BookFile, BookReadingProgress, BookReview, Dimension,
+		User []ent.Interceptor
 	}
 )

@@ -67,6 +67,7 @@ var Columns = []string{
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"book_reviews",
+	"user_reviews",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

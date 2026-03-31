@@ -15,6 +15,7 @@ import (
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookdimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookreadingprogress"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreview"
 	"github.com/zhoumingjun/bookmgr/backend/ent/dimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
@@ -78,12 +79,13 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			book.Table:          book.ValidColumn,
-			bookdimension.Table: bookdimension.ValidColumn,
-			bookfile.Table:      bookfile.ValidColumn,
-			bookreview.Table:    bookreview.ValidColumn,
-			dimension.Table:     dimension.ValidColumn,
-			user.Table:          user.ValidColumn,
+			book.Table:                book.ValidColumn,
+			bookdimension.Table:       bookdimension.ValidColumn,
+			bookfile.Table:            bookfile.ValidColumn,
+			bookreadingprogress.Table: bookreadingprogress.ValidColumn,
+			bookreview.Table:          bookreview.ValidColumn,
+			dimension.Table:           dimension.ValidColumn,
+			user.Table:                user.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

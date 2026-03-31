@@ -37,12 +37,7 @@ func (BookReadingProgress) Fields() []ent.Field {
 // Edges of the BookReadingProgress.
 func (BookReadingProgress) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("book", Book.Type).
-			Ref("reading_progress").
-			Field("book_id").
-			Required(),
-		edge.To("user", User.Type).
-			Field("user_id").
-			Required(),
+		edge.To("book", Book.Type),
+		edge.To("user", User.Type),
 	}
 }

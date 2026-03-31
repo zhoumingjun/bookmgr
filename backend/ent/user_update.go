@@ -14,6 +14,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookreadingprogress"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookreview"
 	"github.com/zhoumingjun/bookmgr/backend/ent/predicate"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
 )
@@ -123,6 +125,36 @@ func (_u *UserUpdate) AddUploadedFiles(v ...*BookFile) *UserUpdate {
 	return _u.AddUploadedFileIDs(ids...)
 }
 
+// AddReadingProgresIDs adds the "reading_progress" edge to the BookReadingProgress entity by IDs.
+func (_u *UserUpdate) AddReadingProgresIDs(ids ...uuid.UUID) *UserUpdate {
+	_u.mutation.AddReadingProgresIDs(ids...)
+	return _u
+}
+
+// AddReadingProgress adds the "reading_progress" edges to the BookReadingProgress entity.
+func (_u *UserUpdate) AddReadingProgress(v ...*BookReadingProgress) *UserUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddReadingProgresIDs(ids...)
+}
+
+// AddReviewIDs adds the "reviews" edge to the BookReview entity by IDs.
+func (_u *UserUpdate) AddReviewIDs(ids ...uuid.UUID) *UserUpdate {
+	_u.mutation.AddReviewIDs(ids...)
+	return _u
+}
+
+// AddReviews adds the "reviews" edges to the BookReview entity.
+func (_u *UserUpdate) AddReviews(v ...*BookReview) *UserUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddReviewIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (_u *UserUpdate) Mutation() *UserMutation {
 	return _u.mutation
@@ -168,6 +200,48 @@ func (_u *UserUpdate) RemoveUploadedFiles(v ...*BookFile) *UserUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveUploadedFileIDs(ids...)
+}
+
+// ClearReadingProgress clears all "reading_progress" edges to the BookReadingProgress entity.
+func (_u *UserUpdate) ClearReadingProgress() *UserUpdate {
+	_u.mutation.ClearReadingProgress()
+	return _u
+}
+
+// RemoveReadingProgresIDs removes the "reading_progress" edge to BookReadingProgress entities by IDs.
+func (_u *UserUpdate) RemoveReadingProgresIDs(ids ...uuid.UUID) *UserUpdate {
+	_u.mutation.RemoveReadingProgresIDs(ids...)
+	return _u
+}
+
+// RemoveReadingProgress removes "reading_progress" edges to BookReadingProgress entities.
+func (_u *UserUpdate) RemoveReadingProgress(v ...*BookReadingProgress) *UserUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveReadingProgresIDs(ids...)
+}
+
+// ClearReviews clears all "reviews" edges to the BookReview entity.
+func (_u *UserUpdate) ClearReviews() *UserUpdate {
+	_u.mutation.ClearReviews()
+	return _u
+}
+
+// RemoveReviewIDs removes the "reviews" edge to BookReview entities by IDs.
+func (_u *UserUpdate) RemoveReviewIDs(ids ...uuid.UUID) *UserUpdate {
+	_u.mutation.RemoveReviewIDs(ids...)
+	return _u
+}
+
+// RemoveReviews removes "reviews" edges to BookReview entities.
+func (_u *UserUpdate) RemoveReviews(v ...*BookReview) *UserUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveReviewIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -348,6 +422,96 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.ReadingProgressCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.ReadingProgressTable,
+			Columns: user.ReadingProgressPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookreadingprogress.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedReadingProgressIDs(); len(nodes) > 0 && !_u.mutation.ReadingProgressCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.ReadingProgressTable,
+			Columns: user.ReadingProgressPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookreadingprogress.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ReadingProgressIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.ReadingProgressTable,
+			Columns: user.ReadingProgressPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookreadingprogress.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ReviewsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ReviewsTable,
+			Columns: []string{user.ReviewsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookreview.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedReviewsIDs(); len(nodes) > 0 && !_u.mutation.ReviewsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ReviewsTable,
+			Columns: []string{user.ReviewsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookreview.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ReviewsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ReviewsTable,
+			Columns: []string{user.ReviewsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookreview.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -460,6 +624,36 @@ func (_u *UserUpdateOne) AddUploadedFiles(v ...*BookFile) *UserUpdateOne {
 	return _u.AddUploadedFileIDs(ids...)
 }
 
+// AddReadingProgresIDs adds the "reading_progress" edge to the BookReadingProgress entity by IDs.
+func (_u *UserUpdateOne) AddReadingProgresIDs(ids ...uuid.UUID) *UserUpdateOne {
+	_u.mutation.AddReadingProgresIDs(ids...)
+	return _u
+}
+
+// AddReadingProgress adds the "reading_progress" edges to the BookReadingProgress entity.
+func (_u *UserUpdateOne) AddReadingProgress(v ...*BookReadingProgress) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddReadingProgresIDs(ids...)
+}
+
+// AddReviewIDs adds the "reviews" edge to the BookReview entity by IDs.
+func (_u *UserUpdateOne) AddReviewIDs(ids ...uuid.UUID) *UserUpdateOne {
+	_u.mutation.AddReviewIDs(ids...)
+	return _u
+}
+
+// AddReviews adds the "reviews" edges to the BookReview entity.
+func (_u *UserUpdateOne) AddReviews(v ...*BookReview) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddReviewIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (_u *UserUpdateOne) Mutation() *UserMutation {
 	return _u.mutation
@@ -505,6 +699,48 @@ func (_u *UserUpdateOne) RemoveUploadedFiles(v ...*BookFile) *UserUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveUploadedFileIDs(ids...)
+}
+
+// ClearReadingProgress clears all "reading_progress" edges to the BookReadingProgress entity.
+func (_u *UserUpdateOne) ClearReadingProgress() *UserUpdateOne {
+	_u.mutation.ClearReadingProgress()
+	return _u
+}
+
+// RemoveReadingProgresIDs removes the "reading_progress" edge to BookReadingProgress entities by IDs.
+func (_u *UserUpdateOne) RemoveReadingProgresIDs(ids ...uuid.UUID) *UserUpdateOne {
+	_u.mutation.RemoveReadingProgresIDs(ids...)
+	return _u
+}
+
+// RemoveReadingProgress removes "reading_progress" edges to BookReadingProgress entities.
+func (_u *UserUpdateOne) RemoveReadingProgress(v ...*BookReadingProgress) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveReadingProgresIDs(ids...)
+}
+
+// ClearReviews clears all "reviews" edges to the BookReview entity.
+func (_u *UserUpdateOne) ClearReviews() *UserUpdateOne {
+	_u.mutation.ClearReviews()
+	return _u
+}
+
+// RemoveReviewIDs removes the "reviews" edge to BookReview entities by IDs.
+func (_u *UserUpdateOne) RemoveReviewIDs(ids ...uuid.UUID) *UserUpdateOne {
+	_u.mutation.RemoveReviewIDs(ids...)
+	return _u
+}
+
+// RemoveReviews removes "reviews" edges to BookReview entities.
+func (_u *UserUpdateOne) RemoveReviews(v ...*BookReview) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveReviewIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -708,6 +944,96 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(bookfile.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ReadingProgressCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.ReadingProgressTable,
+			Columns: user.ReadingProgressPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookreadingprogress.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedReadingProgressIDs(); len(nodes) > 0 && !_u.mutation.ReadingProgressCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.ReadingProgressTable,
+			Columns: user.ReadingProgressPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookreadingprogress.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ReadingProgressIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.ReadingProgressTable,
+			Columns: user.ReadingProgressPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookreadingprogress.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ReviewsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ReviewsTable,
+			Columns: []string{user.ReviewsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookreview.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedReviewsIDs(); len(nodes) > 0 && !_u.mutation.ReviewsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ReviewsTable,
+			Columns: []string{user.ReviewsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookreview.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ReviewsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ReviewsTable,
+			Columns: []string{user.ReviewsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(bookreview.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

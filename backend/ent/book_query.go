@@ -16,6 +16,7 @@ import (
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookdimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookreadingprogress"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreview"
 	"github.com/zhoumingjun/bookmgr/backend/ent/predicate"
 	"github.com/zhoumingjun/bookmgr/backend/ent/user"
@@ -24,15 +25,16 @@ import (
 // BookQuery is the builder for querying Book entities.
 type BookQuery struct {
 	config
-	ctx                *QueryContext
-	order              []book.OrderOption
-	inters             []Interceptor
-	predicates         []predicate.Book
-	withUploader       *UserQuery
-	withBookDimensions *BookDimensionQuery
-	withFiles          *BookFileQuery
-	withReviews        *BookReviewQuery
-	withFKs            bool
+	ctx                 *QueryContext
+	order               []book.OrderOption
+	inters              []Interceptor
+	predicates          []predicate.Book
+	withUploader        *UserQuery
+	withBookDimensions  *BookDimensionQuery
+	withFiles           *BookFileQuery
+	withReviews         *BookReviewQuery
+	withReadingProgress *BookReadingProgressQuery
+	withFKs             bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -150,6 +152,28 @@ func (_q *BookQuery) QueryReviews() *BookReviewQuery {
 			sqlgraph.From(book.Table, book.FieldID, selector),
 			sqlgraph.To(bookreview.Table, bookreview.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, book.ReviewsTable, book.ReviewsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryReadingProgress chains the current query on the "reading_progress" edge.
+func (_q *BookQuery) QueryReadingProgress() *BookReadingProgressQuery {
+	query := (&BookReadingProgressClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(book.Table, book.FieldID, selector),
+			sqlgraph.To(bookreadingprogress.Table, bookreadingprogress.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, book.ReadingProgressTable, book.ReadingProgressPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -344,15 +368,16 @@ func (_q *BookQuery) Clone() *BookQuery {
 		return nil
 	}
 	return &BookQuery{
-		config:             _q.config,
-		ctx:                _q.ctx.Clone(),
-		order:              append([]book.OrderOption{}, _q.order...),
-		inters:             append([]Interceptor{}, _q.inters...),
-		predicates:         append([]predicate.Book{}, _q.predicates...),
-		withUploader:       _q.withUploader.Clone(),
-		withBookDimensions: _q.withBookDimensions.Clone(),
-		withFiles:          _q.withFiles.Clone(),
-		withReviews:        _q.withReviews.Clone(),
+		config:              _q.config,
+		ctx:                 _q.ctx.Clone(),
+		order:               append([]book.OrderOption{}, _q.order...),
+		inters:              append([]Interceptor{}, _q.inters...),
+		predicates:          append([]predicate.Book{}, _q.predicates...),
+		withUploader:        _q.withUploader.Clone(),
+		withBookDimensions:  _q.withBookDimensions.Clone(),
+		withFiles:           _q.withFiles.Clone(),
+		withReviews:         _q.withReviews.Clone(),
+		withReadingProgress: _q.withReadingProgress.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -400,6 +425,17 @@ func (_q *BookQuery) WithReviews(opts ...func(*BookReviewQuery)) *BookQuery {
 		opt(query)
 	}
 	_q.withReviews = query
+	return _q
+}
+
+// WithReadingProgress tells the query-builder to eager-load the nodes that are connected to
+// the "reading_progress" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *BookQuery) WithReadingProgress(opts ...func(*BookReadingProgressQuery)) *BookQuery {
+	query := (&BookReadingProgressClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withReadingProgress = query
 	return _q
 }
 
@@ -482,11 +518,12 @@ func (_q *BookQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Book, e
 		nodes       = []*Book{}
 		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [5]bool{
 			_q.withUploader != nil,
 			_q.withBookDimensions != nil,
 			_q.withFiles != nil,
 			_q.withReviews != nil,
+			_q.withReadingProgress != nil,
 		}
 	)
 	if withFKs {
@@ -534,6 +571,13 @@ func (_q *BookQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Book, e
 		if err := _q.loadReviews(ctx, query, nodes,
 			func(n *Book) { n.Edges.Reviews = []*BookReview{} },
 			func(n *Book, e *BookReview) { n.Edges.Reviews = append(n.Edges.Reviews, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withReadingProgress; query != nil {
+		if err := _q.loadReadingProgress(ctx, query, nodes,
+			func(n *Book) { n.Edges.ReadingProgress = []*BookReadingProgress{} },
+			func(n *Book, e *BookReadingProgress) { n.Edges.ReadingProgress = append(n.Edges.ReadingProgress, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -719,6 +763,67 @@ func (_q *BookQuery) loadReviews(ctx context.Context, query *BookReviewQuery, no
 			return fmt.Errorf(`unexpected referenced foreign-key "book_reviews" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
+	}
+	return nil
+}
+func (_q *BookQuery) loadReadingProgress(ctx context.Context, query *BookReadingProgressQuery, nodes []*Book, init func(*Book), assign func(*Book, *BookReadingProgress)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[uuid.UUID]*Book)
+	nids := make(map[uuid.UUID]map[*Book]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(book.ReadingProgressTable)
+		s.Join(joinT).On(s.C(bookreadingprogress.FieldID), joinT.C(book.ReadingProgressPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(book.ReadingProgressPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(book.ReadingProgressPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(uuid.UUID)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := *values[0].(*uuid.UUID)
+				inValue := *values[1].(*uuid.UUID)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Book]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*BookReadingProgress](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "reading_progress" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
 	}
 	return nil
 }

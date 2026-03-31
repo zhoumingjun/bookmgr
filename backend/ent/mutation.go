@@ -15,6 +15,7 @@ import (
 	"github.com/zhoumingjun/bookmgr/backend/ent/book"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookdimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfile"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookreadingprogress"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookreview"
 	"github.com/zhoumingjun/bookmgr/backend/ent/dimension"
 	"github.com/zhoumingjun/bookmgr/backend/ent/predicate"
@@ -30,63 +31,67 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeBook          = "Book"
-	TypeBookDimension = "BookDimension"
-	TypeBookFile      = "BookFile"
-	TypeBookReview    = "BookReview"
-	TypeDimension     = "Dimension"
-	TypeUser          = "User"
+	TypeBook                = "Book"
+	TypeBookDimension       = "BookDimension"
+	TypeBookFile            = "BookFile"
+	TypeBookReadingProgress = "BookReadingProgress"
+	TypeBookReview          = "BookReview"
+	TypeDimension           = "Dimension"
+	TypeUser                = "User"
 )
 
 // BookMutation represents an operation that mutates the Book nodes in the graph.
 type BookMutation struct {
 	config
-	op                     Op
-	typ                    string
-	id                     *uuid.UUID
-	title                  *string
-	author                 *string
-	description            *string
-	page_count             *int
-	addpage_count          *int
-	duration_minutes       *int
-	addduration_minutes    *int
-	core_goal              *string
-	cognitive_level        *string
-	resource_type          *string
-	has_print              *bool
-	has_digital            *bool
-	has_audio              *bool
-	has_video              *bool
-	teaching_suggestion    *string
-	parent_reading_guide   *string
-	recommended_age_min    *int
-	addrecommended_age_min *int
-	recommended_age_max    *int
-	addrecommended_age_max *int
-	cover_image_url        *string
-	cover_url              *string
-	file_path              *string
-	status                 *string
-	view_count             *int
-	addview_count          *int
-	created_at             *time.Time
-	updated_at             *time.Time
-	clearedFields          map[string]struct{}
-	uploader               *uuid.UUID
-	cleareduploader        bool
-	book_dimensions        map[uuid.UUID]struct{}
-	removedbook_dimensions map[uuid.UUID]struct{}
-	clearedbook_dimensions bool
-	files                  map[uuid.UUID]struct{}
-	removedfiles           map[uuid.UUID]struct{}
-	clearedfiles           bool
-	reviews                map[uuid.UUID]struct{}
-	removedreviews         map[uuid.UUID]struct{}
-	clearedreviews         bool
-	done                   bool
-	oldValue               func(context.Context) (*Book, error)
-	predicates             []predicate.Book
+	op                      Op
+	typ                     string
+	id                      *uuid.UUID
+	title                   *string
+	author                  *string
+	description             *string
+	page_count              *int
+	addpage_count           *int
+	duration_minutes        *int
+	addduration_minutes     *int
+	core_goal               *string
+	cognitive_level         *string
+	resource_type           *string
+	has_print               *bool
+	has_digital             *bool
+	has_audio               *bool
+	has_video               *bool
+	teaching_suggestion     *string
+	parent_reading_guide    *string
+	recommended_age_min     *int
+	addrecommended_age_min  *int
+	recommended_age_max     *int
+	addrecommended_age_max  *int
+	cover_image_url         *string
+	cover_url               *string
+	file_path               *string
+	status                  *string
+	view_count              *int
+	addview_count           *int
+	created_at              *time.Time
+	updated_at              *time.Time
+	clearedFields           map[string]struct{}
+	uploader                *uuid.UUID
+	cleareduploader         bool
+	book_dimensions         map[uuid.UUID]struct{}
+	removedbook_dimensions  map[uuid.UUID]struct{}
+	clearedbook_dimensions  bool
+	files                   map[uuid.UUID]struct{}
+	removedfiles            map[uuid.UUID]struct{}
+	clearedfiles            bool
+	reviews                 map[uuid.UUID]struct{}
+	removedreviews          map[uuid.UUID]struct{}
+	clearedreviews          bool
+	reading_progress        map[uuid.UUID]struct{}
+	removedreading_progress map[uuid.UUID]struct{}
+	clearedreading_progress bool
+	done                    bool
+	oldValue                func(context.Context) (*Book, error)
+	predicates              []predicate.Book
 }
 
 var _ ent.Mutation = (*BookMutation)(nil)
@@ -1491,6 +1496,60 @@ func (m *BookMutation) ResetReviews() {
 	m.removedreviews = nil
 }
 
+// AddReadingProgresIDs adds the "reading_progress" edge to the BookReadingProgress entity by ids.
+func (m *BookMutation) AddReadingProgresIDs(ids ...uuid.UUID) {
+	if m.reading_progress == nil {
+		m.reading_progress = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.reading_progress[ids[i]] = struct{}{}
+	}
+}
+
+// ClearReadingProgress clears the "reading_progress" edge to the BookReadingProgress entity.
+func (m *BookMutation) ClearReadingProgress() {
+	m.clearedreading_progress = true
+}
+
+// ReadingProgressCleared reports if the "reading_progress" edge to the BookReadingProgress entity was cleared.
+func (m *BookMutation) ReadingProgressCleared() bool {
+	return m.clearedreading_progress
+}
+
+// RemoveReadingProgresIDs removes the "reading_progress" edge to the BookReadingProgress entity by IDs.
+func (m *BookMutation) RemoveReadingProgresIDs(ids ...uuid.UUID) {
+	if m.removedreading_progress == nil {
+		m.removedreading_progress = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.reading_progress, ids[i])
+		m.removedreading_progress[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedReadingProgress returns the removed IDs of the "reading_progress" edge to the BookReadingProgress entity.
+func (m *BookMutation) RemovedReadingProgressIDs() (ids []uuid.UUID) {
+	for id := range m.removedreading_progress {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ReadingProgressIDs returns the "reading_progress" edge IDs in the mutation.
+func (m *BookMutation) ReadingProgressIDs() (ids []uuid.UUID) {
+	for id := range m.reading_progress {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetReadingProgress resets all changes to the "reading_progress" edge.
+func (m *BookMutation) ResetReadingProgress() {
+	m.reading_progress = nil
+	m.clearedreading_progress = false
+	m.removedreading_progress = nil
+}
+
 // Where appends a list predicates to the BookMutation builder.
 func (m *BookMutation) Where(ps ...predicate.Book) {
 	m.predicates = append(m.predicates, ps...)
@@ -2147,7 +2206,7 @@ func (m *BookMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *BookMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.uploader != nil {
 		edges = append(edges, book.EdgeUploader)
 	}
@@ -2159,6 +2218,9 @@ func (m *BookMutation) AddedEdges() []string {
 	}
 	if m.reviews != nil {
 		edges = append(edges, book.EdgeReviews)
+	}
+	if m.reading_progress != nil {
+		edges = append(edges, book.EdgeReadingProgress)
 	}
 	return edges
 }
@@ -2189,13 +2251,19 @@ func (m *BookMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case book.EdgeReadingProgress:
+		ids := make([]ent.Value, 0, len(m.reading_progress))
+		for id := range m.reading_progress {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *BookMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.removedbook_dimensions != nil {
 		edges = append(edges, book.EdgeBookDimensions)
 	}
@@ -2204,6 +2272,9 @@ func (m *BookMutation) RemovedEdges() []string {
 	}
 	if m.removedreviews != nil {
 		edges = append(edges, book.EdgeReviews)
+	}
+	if m.removedreading_progress != nil {
+		edges = append(edges, book.EdgeReadingProgress)
 	}
 	return edges
 }
@@ -2230,13 +2301,19 @@ func (m *BookMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case book.EdgeReadingProgress:
+		ids := make([]ent.Value, 0, len(m.removedreading_progress))
+		for id := range m.removedreading_progress {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *BookMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.cleareduploader {
 		edges = append(edges, book.EdgeUploader)
 	}
@@ -2248,6 +2325,9 @@ func (m *BookMutation) ClearedEdges() []string {
 	}
 	if m.clearedreviews {
 		edges = append(edges, book.EdgeReviews)
+	}
+	if m.clearedreading_progress {
+		edges = append(edges, book.EdgeReadingProgress)
 	}
 	return edges
 }
@@ -2264,6 +2344,8 @@ func (m *BookMutation) EdgeCleared(name string) bool {
 		return m.clearedfiles
 	case book.EdgeReviews:
 		return m.clearedreviews
+	case book.EdgeReadingProgress:
+		return m.clearedreading_progress
 	}
 	return false
 }
@@ -2294,6 +2376,9 @@ func (m *BookMutation) ResetEdge(name string) error {
 		return nil
 	case book.EdgeReviews:
 		m.ResetReviews()
+		return nil
+	case book.EdgeReadingProgress:
+		m.ResetReadingProgress()
 		return nil
 	}
 	return fmt.Errorf("unknown Book edge %s", name)
@@ -3857,6 +3942,799 @@ func (m *BookFileMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown BookFile edge %s", name)
+}
+
+// BookReadingProgressMutation represents an operation that mutates the BookReadingProgress nodes in the graph.
+type BookReadingProgressMutation struct {
+	config
+	op                  Op
+	typ                 string
+	id                  *uuid.UUID
+	book_id             *uuid.UUID
+	user_id             *uuid.UUID
+	progress_percent    *int
+	addprogress_percent *int
+	last_page           *int
+	addlast_page        *int
+	last_read_at        *time.Time
+	clearedFields       map[string]struct{}
+	book                map[uuid.UUID]struct{}
+	removedbook         map[uuid.UUID]struct{}
+	clearedbook         bool
+	user                map[uuid.UUID]struct{}
+	removeduser         map[uuid.UUID]struct{}
+	cleareduser         bool
+	done                bool
+	oldValue            func(context.Context) (*BookReadingProgress, error)
+	predicates          []predicate.BookReadingProgress
+}
+
+var _ ent.Mutation = (*BookReadingProgressMutation)(nil)
+
+// bookreadingprogressOption allows management of the mutation configuration using functional options.
+type bookreadingprogressOption func(*BookReadingProgressMutation)
+
+// newBookReadingProgressMutation creates new mutation for the BookReadingProgress entity.
+func newBookReadingProgressMutation(c config, op Op, opts ...bookreadingprogressOption) *BookReadingProgressMutation {
+	m := &BookReadingProgressMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeBookReadingProgress,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withBookReadingProgressID sets the ID field of the mutation.
+func withBookReadingProgressID(id uuid.UUID) bookreadingprogressOption {
+	return func(m *BookReadingProgressMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *BookReadingProgress
+		)
+		m.oldValue = func(ctx context.Context) (*BookReadingProgress, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().BookReadingProgress.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withBookReadingProgress sets the old BookReadingProgress of the mutation.
+func withBookReadingProgress(node *BookReadingProgress) bookreadingprogressOption {
+	return func(m *BookReadingProgressMutation) {
+		m.oldValue = func(context.Context) (*BookReadingProgress, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m BookReadingProgressMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m BookReadingProgressMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of BookReadingProgress entities.
+func (m *BookReadingProgressMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *BookReadingProgressMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *BookReadingProgressMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().BookReadingProgress.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetBookID sets the "book_id" field.
+func (m *BookReadingProgressMutation) SetBookID(u uuid.UUID) {
+	m.book_id = &u
+}
+
+// BookID returns the value of the "book_id" field in the mutation.
+func (m *BookReadingProgressMutation) BookID() (r uuid.UUID, exists bool) {
+	v := m.book_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBookID returns the old "book_id" field's value of the BookReadingProgress entity.
+// If the BookReadingProgress object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookReadingProgressMutation) OldBookID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBookID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBookID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBookID: %w", err)
+	}
+	return oldValue.BookID, nil
+}
+
+// ResetBookID resets all changes to the "book_id" field.
+func (m *BookReadingProgressMutation) ResetBookID() {
+	m.book_id = nil
+}
+
+// SetUserID sets the "user_id" field.
+func (m *BookReadingProgressMutation) SetUserID(u uuid.UUID) {
+	m.user_id = &u
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *BookReadingProgressMutation) UserID() (r uuid.UUID, exists bool) {
+	v := m.user_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the BookReadingProgress entity.
+// If the BookReadingProgress object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookReadingProgressMutation) OldUserID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *BookReadingProgressMutation) ResetUserID() {
+	m.user_id = nil
+}
+
+// SetProgressPercent sets the "progress_percent" field.
+func (m *BookReadingProgressMutation) SetProgressPercent(i int) {
+	m.progress_percent = &i
+	m.addprogress_percent = nil
+}
+
+// ProgressPercent returns the value of the "progress_percent" field in the mutation.
+func (m *BookReadingProgressMutation) ProgressPercent() (r int, exists bool) {
+	v := m.progress_percent
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProgressPercent returns the old "progress_percent" field's value of the BookReadingProgress entity.
+// If the BookReadingProgress object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookReadingProgressMutation) OldProgressPercent(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProgressPercent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProgressPercent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProgressPercent: %w", err)
+	}
+	return oldValue.ProgressPercent, nil
+}
+
+// AddProgressPercent adds i to the "progress_percent" field.
+func (m *BookReadingProgressMutation) AddProgressPercent(i int) {
+	if m.addprogress_percent != nil {
+		*m.addprogress_percent += i
+	} else {
+		m.addprogress_percent = &i
+	}
+}
+
+// AddedProgressPercent returns the value that was added to the "progress_percent" field in this mutation.
+func (m *BookReadingProgressMutation) AddedProgressPercent() (r int, exists bool) {
+	v := m.addprogress_percent
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetProgressPercent resets all changes to the "progress_percent" field.
+func (m *BookReadingProgressMutation) ResetProgressPercent() {
+	m.progress_percent = nil
+	m.addprogress_percent = nil
+}
+
+// SetLastPage sets the "last_page" field.
+func (m *BookReadingProgressMutation) SetLastPage(i int) {
+	m.last_page = &i
+	m.addlast_page = nil
+}
+
+// LastPage returns the value of the "last_page" field in the mutation.
+func (m *BookReadingProgressMutation) LastPage() (r int, exists bool) {
+	v := m.last_page
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastPage returns the old "last_page" field's value of the BookReadingProgress entity.
+// If the BookReadingProgress object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookReadingProgressMutation) OldLastPage(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastPage is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastPage requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastPage: %w", err)
+	}
+	return oldValue.LastPage, nil
+}
+
+// AddLastPage adds i to the "last_page" field.
+func (m *BookReadingProgressMutation) AddLastPage(i int) {
+	if m.addlast_page != nil {
+		*m.addlast_page += i
+	} else {
+		m.addlast_page = &i
+	}
+}
+
+// AddedLastPage returns the value that was added to the "last_page" field in this mutation.
+func (m *BookReadingProgressMutation) AddedLastPage() (r int, exists bool) {
+	v := m.addlast_page
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetLastPage resets all changes to the "last_page" field.
+func (m *BookReadingProgressMutation) ResetLastPage() {
+	m.last_page = nil
+	m.addlast_page = nil
+}
+
+// SetLastReadAt sets the "last_read_at" field.
+func (m *BookReadingProgressMutation) SetLastReadAt(t time.Time) {
+	m.last_read_at = &t
+}
+
+// LastReadAt returns the value of the "last_read_at" field in the mutation.
+func (m *BookReadingProgressMutation) LastReadAt() (r time.Time, exists bool) {
+	v := m.last_read_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastReadAt returns the old "last_read_at" field's value of the BookReadingProgress entity.
+// If the BookReadingProgress object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookReadingProgressMutation) OldLastReadAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastReadAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastReadAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastReadAt: %w", err)
+	}
+	return oldValue.LastReadAt, nil
+}
+
+// ResetLastReadAt resets all changes to the "last_read_at" field.
+func (m *BookReadingProgressMutation) ResetLastReadAt() {
+	m.last_read_at = nil
+}
+
+// AddBookIDs adds the "book" edge to the Book entity by ids.
+func (m *BookReadingProgressMutation) AddBookIDs(ids ...uuid.UUID) {
+	if m.book == nil {
+		m.book = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.book[ids[i]] = struct{}{}
+	}
+}
+
+// ClearBook clears the "book" edge to the Book entity.
+func (m *BookReadingProgressMutation) ClearBook() {
+	m.clearedbook = true
+}
+
+// BookCleared reports if the "book" edge to the Book entity was cleared.
+func (m *BookReadingProgressMutation) BookCleared() bool {
+	return m.clearedbook
+}
+
+// RemoveBookIDs removes the "book" edge to the Book entity by IDs.
+func (m *BookReadingProgressMutation) RemoveBookIDs(ids ...uuid.UUID) {
+	if m.removedbook == nil {
+		m.removedbook = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.book, ids[i])
+		m.removedbook[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedBook returns the removed IDs of the "book" edge to the Book entity.
+func (m *BookReadingProgressMutation) RemovedBookIDs() (ids []uuid.UUID) {
+	for id := range m.removedbook {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// BookIDs returns the "book" edge IDs in the mutation.
+func (m *BookReadingProgressMutation) BookIDs() (ids []uuid.UUID) {
+	for id := range m.book {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetBook resets all changes to the "book" edge.
+func (m *BookReadingProgressMutation) ResetBook() {
+	m.book = nil
+	m.clearedbook = false
+	m.removedbook = nil
+}
+
+// AddUserIDs adds the "user" edge to the User entity by ids.
+func (m *BookReadingProgressMutation) AddUserIDs(ids ...uuid.UUID) {
+	if m.user == nil {
+		m.user = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.user[ids[i]] = struct{}{}
+	}
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (m *BookReadingProgressMutation) ClearUser() {
+	m.cleareduser = true
+}
+
+// UserCleared reports if the "user" edge to the User entity was cleared.
+func (m *BookReadingProgressMutation) UserCleared() bool {
+	return m.cleareduser
+}
+
+// RemoveUserIDs removes the "user" edge to the User entity by IDs.
+func (m *BookReadingProgressMutation) RemoveUserIDs(ids ...uuid.UUID) {
+	if m.removeduser == nil {
+		m.removeduser = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.user, ids[i])
+		m.removeduser[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedUser returns the removed IDs of the "user" edge to the User entity.
+func (m *BookReadingProgressMutation) RemovedUserIDs() (ids []uuid.UUID) {
+	for id := range m.removeduser {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// UserIDs returns the "user" edge IDs in the mutation.
+func (m *BookReadingProgressMutation) UserIDs() (ids []uuid.UUID) {
+	for id := range m.user {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetUser resets all changes to the "user" edge.
+func (m *BookReadingProgressMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
+	m.removeduser = nil
+}
+
+// Where appends a list predicates to the BookReadingProgressMutation builder.
+func (m *BookReadingProgressMutation) Where(ps ...predicate.BookReadingProgress) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the BookReadingProgressMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *BookReadingProgressMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.BookReadingProgress, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *BookReadingProgressMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *BookReadingProgressMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (BookReadingProgress).
+func (m *BookReadingProgressMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *BookReadingProgressMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m.book_id != nil {
+		fields = append(fields, bookreadingprogress.FieldBookID)
+	}
+	if m.user_id != nil {
+		fields = append(fields, bookreadingprogress.FieldUserID)
+	}
+	if m.progress_percent != nil {
+		fields = append(fields, bookreadingprogress.FieldProgressPercent)
+	}
+	if m.last_page != nil {
+		fields = append(fields, bookreadingprogress.FieldLastPage)
+	}
+	if m.last_read_at != nil {
+		fields = append(fields, bookreadingprogress.FieldLastReadAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *BookReadingProgressMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case bookreadingprogress.FieldBookID:
+		return m.BookID()
+	case bookreadingprogress.FieldUserID:
+		return m.UserID()
+	case bookreadingprogress.FieldProgressPercent:
+		return m.ProgressPercent()
+	case bookreadingprogress.FieldLastPage:
+		return m.LastPage()
+	case bookreadingprogress.FieldLastReadAt:
+		return m.LastReadAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *BookReadingProgressMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case bookreadingprogress.FieldBookID:
+		return m.OldBookID(ctx)
+	case bookreadingprogress.FieldUserID:
+		return m.OldUserID(ctx)
+	case bookreadingprogress.FieldProgressPercent:
+		return m.OldProgressPercent(ctx)
+	case bookreadingprogress.FieldLastPage:
+		return m.OldLastPage(ctx)
+	case bookreadingprogress.FieldLastReadAt:
+		return m.OldLastReadAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown BookReadingProgress field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *BookReadingProgressMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case bookreadingprogress.FieldBookID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBookID(v)
+		return nil
+	case bookreadingprogress.FieldUserID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
+	case bookreadingprogress.FieldProgressPercent:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProgressPercent(v)
+		return nil
+	case bookreadingprogress.FieldLastPage:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastPage(v)
+		return nil
+	case bookreadingprogress.FieldLastReadAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastReadAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown BookReadingProgress field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *BookReadingProgressMutation) AddedFields() []string {
+	var fields []string
+	if m.addprogress_percent != nil {
+		fields = append(fields, bookreadingprogress.FieldProgressPercent)
+	}
+	if m.addlast_page != nil {
+		fields = append(fields, bookreadingprogress.FieldLastPage)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *BookReadingProgressMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case bookreadingprogress.FieldProgressPercent:
+		return m.AddedProgressPercent()
+	case bookreadingprogress.FieldLastPage:
+		return m.AddedLastPage()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *BookReadingProgressMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case bookreadingprogress.FieldProgressPercent:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddProgressPercent(v)
+		return nil
+	case bookreadingprogress.FieldLastPage:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLastPage(v)
+		return nil
+	}
+	return fmt.Errorf("unknown BookReadingProgress numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *BookReadingProgressMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *BookReadingProgressMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *BookReadingProgressMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown BookReadingProgress nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *BookReadingProgressMutation) ResetField(name string) error {
+	switch name {
+	case bookreadingprogress.FieldBookID:
+		m.ResetBookID()
+		return nil
+	case bookreadingprogress.FieldUserID:
+		m.ResetUserID()
+		return nil
+	case bookreadingprogress.FieldProgressPercent:
+		m.ResetProgressPercent()
+		return nil
+	case bookreadingprogress.FieldLastPage:
+		m.ResetLastPage()
+		return nil
+	case bookreadingprogress.FieldLastReadAt:
+		m.ResetLastReadAt()
+		return nil
+	}
+	return fmt.Errorf("unknown BookReadingProgress field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *BookReadingProgressMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.book != nil {
+		edges = append(edges, bookreadingprogress.EdgeBook)
+	}
+	if m.user != nil {
+		edges = append(edges, bookreadingprogress.EdgeUser)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *BookReadingProgressMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case bookreadingprogress.EdgeBook:
+		ids := make([]ent.Value, 0, len(m.book))
+		for id := range m.book {
+			ids = append(ids, id)
+		}
+		return ids
+	case bookreadingprogress.EdgeUser:
+		ids := make([]ent.Value, 0, len(m.user))
+		for id := range m.user {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *BookReadingProgressMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.removedbook != nil {
+		edges = append(edges, bookreadingprogress.EdgeBook)
+	}
+	if m.removeduser != nil {
+		edges = append(edges, bookreadingprogress.EdgeUser)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *BookReadingProgressMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case bookreadingprogress.EdgeBook:
+		ids := make([]ent.Value, 0, len(m.removedbook))
+		for id := range m.removedbook {
+			ids = append(ids, id)
+		}
+		return ids
+	case bookreadingprogress.EdgeUser:
+		ids := make([]ent.Value, 0, len(m.removeduser))
+		for id := range m.removeduser {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *BookReadingProgressMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedbook {
+		edges = append(edges, bookreadingprogress.EdgeBook)
+	}
+	if m.cleareduser {
+		edges = append(edges, bookreadingprogress.EdgeUser)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *BookReadingProgressMutation) EdgeCleared(name string) bool {
+	switch name {
+	case bookreadingprogress.EdgeBook:
+		return m.clearedbook
+	case bookreadingprogress.EdgeUser:
+		return m.cleareduser
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *BookReadingProgressMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown BookReadingProgress unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *BookReadingProgressMutation) ResetEdge(name string) error {
+	switch name {
+	case bookreadingprogress.EdgeBook:
+		m.ResetBook()
+		return nil
+	case bookreadingprogress.EdgeUser:
+		m.ResetUser()
+		return nil
+	}
+	return fmt.Errorf("unknown BookReadingProgress edge %s", name)
 }
 
 // BookReviewMutation represents an operation that mutates the BookReview nodes in the graph.
@@ -5611,25 +6489,31 @@ func (m *DimensionMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op                    Op
-	typ                   string
-	id                    *uuid.UUID
-	username              *string
-	email                 *string
-	password_hash         *string
-	role                  *user.Role
-	created_at            *time.Time
-	updated_at            *time.Time
-	clearedFields         map[string]struct{}
-	books                 map[uuid.UUID]struct{}
-	removedbooks          map[uuid.UUID]struct{}
-	clearedbooks          bool
-	uploaded_files        map[uuid.UUID]struct{}
-	removeduploaded_files map[uuid.UUID]struct{}
-	cleareduploaded_files bool
-	done                  bool
-	oldValue              func(context.Context) (*User, error)
-	predicates            []predicate.User
+	op                      Op
+	typ                     string
+	id                      *uuid.UUID
+	username                *string
+	email                   *string
+	password_hash           *string
+	role                    *user.Role
+	created_at              *time.Time
+	updated_at              *time.Time
+	clearedFields           map[string]struct{}
+	books                   map[uuid.UUID]struct{}
+	removedbooks            map[uuid.UUID]struct{}
+	clearedbooks            bool
+	uploaded_files          map[uuid.UUID]struct{}
+	removeduploaded_files   map[uuid.UUID]struct{}
+	cleareduploaded_files   bool
+	reading_progress        map[uuid.UUID]struct{}
+	removedreading_progress map[uuid.UUID]struct{}
+	clearedreading_progress bool
+	reviews                 map[uuid.UUID]struct{}
+	removedreviews          map[uuid.UUID]struct{}
+	clearedreviews          bool
+	done                    bool
+	oldValue                func(context.Context) (*User, error)
+	predicates              []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -6060,6 +6944,114 @@ func (m *UserMutation) ResetUploadedFiles() {
 	m.removeduploaded_files = nil
 }
 
+// AddReadingProgresIDs adds the "reading_progress" edge to the BookReadingProgress entity by ids.
+func (m *UserMutation) AddReadingProgresIDs(ids ...uuid.UUID) {
+	if m.reading_progress == nil {
+		m.reading_progress = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.reading_progress[ids[i]] = struct{}{}
+	}
+}
+
+// ClearReadingProgress clears the "reading_progress" edge to the BookReadingProgress entity.
+func (m *UserMutation) ClearReadingProgress() {
+	m.clearedreading_progress = true
+}
+
+// ReadingProgressCleared reports if the "reading_progress" edge to the BookReadingProgress entity was cleared.
+func (m *UserMutation) ReadingProgressCleared() bool {
+	return m.clearedreading_progress
+}
+
+// RemoveReadingProgresIDs removes the "reading_progress" edge to the BookReadingProgress entity by IDs.
+func (m *UserMutation) RemoveReadingProgresIDs(ids ...uuid.UUID) {
+	if m.removedreading_progress == nil {
+		m.removedreading_progress = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.reading_progress, ids[i])
+		m.removedreading_progress[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedReadingProgress returns the removed IDs of the "reading_progress" edge to the BookReadingProgress entity.
+func (m *UserMutation) RemovedReadingProgressIDs() (ids []uuid.UUID) {
+	for id := range m.removedreading_progress {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ReadingProgressIDs returns the "reading_progress" edge IDs in the mutation.
+func (m *UserMutation) ReadingProgressIDs() (ids []uuid.UUID) {
+	for id := range m.reading_progress {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetReadingProgress resets all changes to the "reading_progress" edge.
+func (m *UserMutation) ResetReadingProgress() {
+	m.reading_progress = nil
+	m.clearedreading_progress = false
+	m.removedreading_progress = nil
+}
+
+// AddReviewIDs adds the "reviews" edge to the BookReview entity by ids.
+func (m *UserMutation) AddReviewIDs(ids ...uuid.UUID) {
+	if m.reviews == nil {
+		m.reviews = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.reviews[ids[i]] = struct{}{}
+	}
+}
+
+// ClearReviews clears the "reviews" edge to the BookReview entity.
+func (m *UserMutation) ClearReviews() {
+	m.clearedreviews = true
+}
+
+// ReviewsCleared reports if the "reviews" edge to the BookReview entity was cleared.
+func (m *UserMutation) ReviewsCleared() bool {
+	return m.clearedreviews
+}
+
+// RemoveReviewIDs removes the "reviews" edge to the BookReview entity by IDs.
+func (m *UserMutation) RemoveReviewIDs(ids ...uuid.UUID) {
+	if m.removedreviews == nil {
+		m.removedreviews = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.reviews, ids[i])
+		m.removedreviews[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedReviews returns the removed IDs of the "reviews" edge to the BookReview entity.
+func (m *UserMutation) RemovedReviewsIDs() (ids []uuid.UUID) {
+	for id := range m.removedreviews {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ReviewsIDs returns the "reviews" edge IDs in the mutation.
+func (m *UserMutation) ReviewsIDs() (ids []uuid.UUID) {
+	for id := range m.reviews {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetReviews resets all changes to the "reviews" edge.
+func (m *UserMutation) ResetReviews() {
+	m.reviews = nil
+	m.clearedreviews = false
+	m.removedreviews = nil
+}
+
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -6278,12 +7270,18 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
 	if m.books != nil {
 		edges = append(edges, user.EdgeBooks)
 	}
 	if m.uploaded_files != nil {
 		edges = append(edges, user.EdgeUploadedFiles)
+	}
+	if m.reading_progress != nil {
+		edges = append(edges, user.EdgeReadingProgress)
+	}
+	if m.reviews != nil {
+		edges = append(edges, user.EdgeReviews)
 	}
 	return edges
 }
@@ -6304,18 +7302,36 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeReadingProgress:
+		ids := make([]ent.Value, 0, len(m.reading_progress))
+		for id := range m.reading_progress {
+			ids = append(ids, id)
+		}
+		return ids
+	case user.EdgeReviews:
+		ids := make([]ent.Value, 0, len(m.reviews))
+		for id := range m.reviews {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
 	if m.removedbooks != nil {
 		edges = append(edges, user.EdgeBooks)
 	}
 	if m.removeduploaded_files != nil {
 		edges = append(edges, user.EdgeUploadedFiles)
+	}
+	if m.removedreading_progress != nil {
+		edges = append(edges, user.EdgeReadingProgress)
+	}
+	if m.removedreviews != nil {
+		edges = append(edges, user.EdgeReviews)
 	}
 	return edges
 }
@@ -6336,18 +7352,36 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeReadingProgress:
+		ids := make([]ent.Value, 0, len(m.removedreading_progress))
+		for id := range m.removedreading_progress {
+			ids = append(ids, id)
+		}
+		return ids
+	case user.EdgeReviews:
+		ids := make([]ent.Value, 0, len(m.removedreviews))
+		for id := range m.removedreviews {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
 	if m.clearedbooks {
 		edges = append(edges, user.EdgeBooks)
 	}
 	if m.cleareduploaded_files {
 		edges = append(edges, user.EdgeUploadedFiles)
+	}
+	if m.clearedreading_progress {
+		edges = append(edges, user.EdgeReadingProgress)
+	}
+	if m.clearedreviews {
+		edges = append(edges, user.EdgeReviews)
 	}
 	return edges
 }
@@ -6360,6 +7394,10 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 		return m.clearedbooks
 	case user.EdgeUploadedFiles:
 		return m.cleareduploaded_files
+	case user.EdgeReadingProgress:
+		return m.clearedreading_progress
+	case user.EdgeReviews:
+		return m.clearedreviews
 	}
 	return false
 }
@@ -6381,6 +7419,12 @@ func (m *UserMutation) ResetEdge(name string) error {
 		return nil
 	case user.EdgeUploadedFiles:
 		m.ResetUploadedFiles()
+		return nil
+	case user.EdgeReadingProgress:
+		m.ResetReadingProgress()
+		return nil
+	case user.EdgeReviews:
+		m.ResetReviews()
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)
