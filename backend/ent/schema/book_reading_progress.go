@@ -41,8 +41,7 @@ func (BookReadingProgress) Edges() []ent.Edge {
 			Ref("reading_progress").
 			Field("book_id").
 			Required(),
-		edge.From("user", User.Type).
-			Ref("reading_progress").
+		edge.To("user", User.Type).
 			Field("user_id").
 			Required(),
 	}
