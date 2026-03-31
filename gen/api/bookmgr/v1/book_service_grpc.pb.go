@@ -19,12 +19,17 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	BookService_ListBooks_FullMethodName    = "/bookmgr.v1.BookService/ListBooks"
-	BookService_GetBook_FullMethodName      = "/bookmgr.v1.BookService/GetBook"
-	BookService_CreateBook_FullMethodName   = "/bookmgr.v1.BookService/CreateBook"
-	BookService_UpdateBook_FullMethodName   = "/bookmgr.v1.BookService/UpdateBook"
-	BookService_DeleteBook_FullMethodName   = "/bookmgr.v1.BookService/DeleteBook"
-	BookService_DownloadBook_FullMethodName = "/bookmgr.v1.BookService/DownloadBook"
+	BookService_ListBooks_FullMethodName        = "/bookmgr.v1.BookService/ListBooks"
+	BookService_GetBook_FullMethodName          = "/bookmgr.v1.BookService/GetBook"
+	BookService_CreateBook_FullMethodName       = "/bookmgr.v1.BookService/CreateBook"
+	BookService_UpdateBook_FullMethodName       = "/bookmgr.v1.BookService/UpdateBook"
+	BookService_DeleteBook_FullMethodName       = "/bookmgr.v1.BookService/DeleteBook"
+	BookService_DownloadBook_FullMethodName     = "/bookmgr.v1.BookService/DownloadBook"
+	BookService_FavoriteBook_FullMethodName     = "/bookmgr.v1.BookService/FavoriteBook"
+	BookService_UnfavoriteBook_FullMethodName   = "/bookmgr.v1.BookService/UnfavoriteBook"
+	BookService_GetFavorite_FullMethodName      = "/bookmgr.v1.BookService/GetFavorite"
+	BookService_SubmitFeedback_FullMethodName   = "/bookmgr.v1.BookService/SubmitFeedback"
+	BookService_GetFeedbackStats_FullMethodName = "/bookmgr.v1.BookService/GetFeedbackStats"
 )
 
 // BookServiceClient is the client API for BookService service.
@@ -45,6 +50,16 @@ type BookServiceClient interface {
 	DeleteBook(ctx context.Context, in *DeleteBookRequest, opts ...grpc.CallOption) (*DeleteBookResponse, error)
 	// DownloadBook returns the book's PDF file as binary content.
 	DownloadBook(ctx context.Context, in *DownloadBookRequest, opts ...grpc.CallOption) (*DownloadBookResponse, error)
+	// FavoriteBook adds a book to the user's favorites.
+	FavoriteBook(ctx context.Context, in *FavoriteBookRequest, opts ...grpc.CallOption) (*FavoriteBookResponse, error)
+	// UnfavoriteBook removes a book from the user's favorites.
+	UnfavoriteBook(ctx context.Context, in *UnfavoriteBookRequest, opts ...grpc.CallOption) (*UnfavoriteBookResponse, error)
+	// GetFavorite checks whether a book is favorited by the current user.
+	GetFavorite(ctx context.Context, in *GetFavoriteRequest, opts ...grpc.CallOption) (*GetFavoriteResponse, error)
+	// SubmitFeedback submits user feedback for a book.
+	SubmitFeedback(ctx context.Context, in *SubmitFeedbackRequest, opts ...grpc.CallOption) (*SubmitFeedbackResponse, error)
+	// GetFeedbackStats returns aggregated feedback statistics for a book.
+	GetFeedbackStats(ctx context.Context, in *GetFeedbackStatsRequest, opts ...grpc.CallOption) (*GetFeedbackStatsResponse, error)
 }
 
 type bookServiceClient struct {
@@ -115,6 +130,56 @@ func (c *bookServiceClient) DownloadBook(ctx context.Context, in *DownloadBookRe
 	return out, nil
 }
 
+func (c *bookServiceClient) FavoriteBook(ctx context.Context, in *FavoriteBookRequest, opts ...grpc.CallOption) (*FavoriteBookResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FavoriteBookResponse)
+	err := c.cc.Invoke(ctx, BookService_FavoriteBook_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bookServiceClient) UnfavoriteBook(ctx context.Context, in *UnfavoriteBookRequest, opts ...grpc.CallOption) (*UnfavoriteBookResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UnfavoriteBookResponse)
+	err := c.cc.Invoke(ctx, BookService_UnfavoriteBook_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bookServiceClient) GetFavorite(ctx context.Context, in *GetFavoriteRequest, opts ...grpc.CallOption) (*GetFavoriteResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetFavoriteResponse)
+	err := c.cc.Invoke(ctx, BookService_GetFavorite_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bookServiceClient) SubmitFeedback(ctx context.Context, in *SubmitFeedbackRequest, opts ...grpc.CallOption) (*SubmitFeedbackResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SubmitFeedbackResponse)
+	err := c.cc.Invoke(ctx, BookService_SubmitFeedback_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bookServiceClient) GetFeedbackStats(ctx context.Context, in *GetFeedbackStatsRequest, opts ...grpc.CallOption) (*GetFeedbackStatsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetFeedbackStatsResponse)
+	err := c.cc.Invoke(ctx, BookService_GetFeedbackStats_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BookServiceServer is the server API for BookService service.
 // All implementations must embed UnimplementedBookServiceServer
 // for forward compatibility.
@@ -133,6 +198,16 @@ type BookServiceServer interface {
 	DeleteBook(context.Context, *DeleteBookRequest) (*DeleteBookResponse, error)
 	// DownloadBook returns the book's PDF file as binary content.
 	DownloadBook(context.Context, *DownloadBookRequest) (*DownloadBookResponse, error)
+	// FavoriteBook adds a book to the user's favorites.
+	FavoriteBook(context.Context, *FavoriteBookRequest) (*FavoriteBookResponse, error)
+	// UnfavoriteBook removes a book from the user's favorites.
+	UnfavoriteBook(context.Context, *UnfavoriteBookRequest) (*UnfavoriteBookResponse, error)
+	// GetFavorite checks whether a book is favorited by the current user.
+	GetFavorite(context.Context, *GetFavoriteRequest) (*GetFavoriteResponse, error)
+	// SubmitFeedback submits user feedback for a book.
+	SubmitFeedback(context.Context, *SubmitFeedbackRequest) (*SubmitFeedbackResponse, error)
+	// GetFeedbackStats returns aggregated feedback statistics for a book.
+	GetFeedbackStats(context.Context, *GetFeedbackStatsRequest) (*GetFeedbackStatsResponse, error)
 	mustEmbedUnimplementedBookServiceServer()
 }
 
@@ -160,6 +235,21 @@ func (UnimplementedBookServiceServer) DeleteBook(context.Context, *DeleteBookReq
 }
 func (UnimplementedBookServiceServer) DownloadBook(context.Context, *DownloadBookRequest) (*DownloadBookResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DownloadBook not implemented")
+}
+func (UnimplementedBookServiceServer) FavoriteBook(context.Context, *FavoriteBookRequest) (*FavoriteBookResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method FavoriteBook not implemented")
+}
+func (UnimplementedBookServiceServer) UnfavoriteBook(context.Context, *UnfavoriteBookRequest) (*UnfavoriteBookResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UnfavoriteBook not implemented")
+}
+func (UnimplementedBookServiceServer) GetFavorite(context.Context, *GetFavoriteRequest) (*GetFavoriteResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetFavorite not implemented")
+}
+func (UnimplementedBookServiceServer) SubmitFeedback(context.Context, *SubmitFeedbackRequest) (*SubmitFeedbackResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SubmitFeedback not implemented")
+}
+func (UnimplementedBookServiceServer) GetFeedbackStats(context.Context, *GetFeedbackStatsRequest) (*GetFeedbackStatsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetFeedbackStats not implemented")
 }
 func (UnimplementedBookServiceServer) mustEmbedUnimplementedBookServiceServer() {}
 func (UnimplementedBookServiceServer) testEmbeddedByValue()                     {}
@@ -290,6 +380,96 @@ func _BookService_DownloadBook_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BookService_FavoriteBook_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FavoriteBookRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookServiceServer).FavoriteBook(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BookService_FavoriteBook_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookServiceServer).FavoriteBook(ctx, req.(*FavoriteBookRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BookService_UnfavoriteBook_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UnfavoriteBookRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookServiceServer).UnfavoriteBook(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BookService_UnfavoriteBook_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookServiceServer).UnfavoriteBook(ctx, req.(*UnfavoriteBookRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BookService_GetFavorite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFavoriteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookServiceServer).GetFavorite(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BookService_GetFavorite_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookServiceServer).GetFavorite(ctx, req.(*GetFavoriteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BookService_SubmitFeedback_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SubmitFeedbackRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookServiceServer).SubmitFeedback(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BookService_SubmitFeedback_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookServiceServer).SubmitFeedback(ctx, req.(*SubmitFeedbackRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BookService_GetFeedbackStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFeedbackStatsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookServiceServer).GetFeedbackStats(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BookService_GetFeedbackStats_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookServiceServer).GetFeedbackStats(ctx, req.(*GetFeedbackStatsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BookService_ServiceDesc is the grpc.ServiceDesc for BookService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -320,6 +500,26 @@ var BookService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DownloadBook",
 			Handler:    _BookService_DownloadBook_Handler,
+		},
+		{
+			MethodName: "FavoriteBook",
+			Handler:    _BookService_FavoriteBook_Handler,
+		},
+		{
+			MethodName: "UnfavoriteBook",
+			Handler:    _BookService_UnfavoriteBook_Handler,
+		},
+		{
+			MethodName: "GetFavorite",
+			Handler:    _BookService_GetFavorite_Handler,
+		},
+		{
+			MethodName: "SubmitFeedback",
+			Handler:    _BookService_SubmitFeedback_Handler,
+		},
+		{
+			MethodName: "GetFeedbackStats",
+			Handler:    _BookService_GetFeedbackStats_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

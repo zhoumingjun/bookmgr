@@ -179,6 +179,178 @@
         ]
       }
     },
+    "/api/v1/books/{bookId}/favorite": {
+      "get": {
+        "summary": "GetFavorite checks whether a book is favorited by the current user.",
+        "operationId": "BookService_GetFavorite",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetFavoriteResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookId",
+            "description": "The ID of the book.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "BookService"
+        ]
+      },
+      "delete": {
+        "summary": "UnfavoriteBook removes a book from the user's favorites.",
+        "operationId": "BookService_UnfavoriteBook",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UnfavoriteBookResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookId",
+            "description": "The ID of the book to unfavorite.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "BookService"
+        ]
+      },
+      "post": {
+        "summary": "FavoriteBook adds a book to the user's favorites.",
+        "operationId": "BookService_FavoriteBook",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1FavoriteBookResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookId",
+            "description": "The ID of the book to favorite.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BookServiceFavoriteBookBody"
+            }
+          }
+        ],
+        "tags": [
+          "BookService"
+        ]
+      }
+    },
+    "/api/v1/books/{bookId}/feedback": {
+      "post": {
+        "summary": "SubmitFeedback submits user feedback for a book.",
+        "operationId": "BookService_SubmitFeedback",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SubmitFeedbackResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookId",
+            "description": "The ID of the book.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BookServiceSubmitFeedbackBody"
+            }
+          }
+        ],
+        "tags": [
+          "BookService"
+        ]
+      }
+    },
+    "/api/v1/books/{bookId}/feedback/stats": {
+      "get": {
+        "summary": "GetFeedbackStats returns aggregated feedback statistics for a book.",
+        "operationId": "BookService_GetFeedbackStats",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetFeedbackStatsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bookId",
+            "description": "The ID of the book.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "BookService"
+        ]
+      }
+    },
     "/api/v1/books/{id}": {
       "get": {
         "summary": "GetBook returns a single book by ID.",
@@ -275,6 +447,25 @@
     }
   },
   "definitions": {
+    "BookServiceSubmitFeedbackBody": {
+      "type": "object",
+      "properties": {
+        "feedbackType": {
+          "type": "string",
+          "title": "Feedback type: read_start / read_complete / difficulty_rating / use_scenario"
+        },
+        "difficultyRating": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Difficulty rating (1-5), required when feedback_type is difficulty_rating."
+        },
+        "useScenario": {
+          "type": "string",
+          "description": "Use scenario text, required when feedback_type is use_scenario."
+        }
+      },
+      "description": "SubmitFeedbackRequest is the request for SubmitFeedback."
+    },
     "BookServiceUpdateBookBody": {
       "type": "object",
       "properties": {
@@ -561,6 +752,46 @@
       },
       "description": "Book represents a picturebook resource."
     },
+    "v1BookFeedback": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier."
+        },
+        "bookId": {
+          "type": "string",
+          "description": "The book ID."
+        },
+        "userId": {
+          "type": "string",
+          "description": "The user ID."
+        },
+        "feedbackType": {
+          "type": "string",
+          "description": "Feedback type."
+        },
+        "difficultyRating": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Difficulty rating (1-5)."
+        },
+        "useScenario": {
+          "type": "string",
+          "description": "Use scenario."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the feedback was created."
+        }
+      },
+      "description": "BookFeedback represents a user's feedback on a book."
+    },
+    "v1BookServiceFavoriteBookBody": {
+      "type": "object",
+      "description": "FavoriteBookRequest is the request for FavoriteBook."
+    },
     "v1CreateBookRequest": {
       "type": "object",
       "properties": {
@@ -701,6 +932,15 @@
       },
       "description": "DownloadBookResponse is the response for DownloadBook."
     },
+    "v1FavoriteBookResponse": {
+      "type": "object",
+      "properties": {
+        "favorited": {
+          "type": "boolean"
+        }
+      },
+      "description": "FavoriteBookResponse is the response for FavoriteBook."
+    },
     "v1GetBookResponse": {
       "type": "object",
       "properties": {
@@ -710,6 +950,36 @@
         }
       },
       "description": "GetBookResponse is the response for GetBook."
+    },
+    "v1GetFavoriteResponse": {
+      "type": "object",
+      "properties": {
+        "isFavorited": {
+          "type": "boolean"
+        }
+      },
+      "description": "GetFavoriteResponse is the response for GetFavorite."
+    },
+    "v1GetFeedbackStatsResponse": {
+      "type": "object",
+      "properties": {
+        "favoriteCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of users who favorited this book."
+        },
+        "readCompleteCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of users who marked as read_complete."
+        },
+        "avgDifficultyRating": {
+          "type": "number",
+          "format": "double",
+          "description": "Average difficulty rating (0 if no ratings)."
+        }
+      },
+      "description": "GetFeedbackStatsResponse is the response for GetFeedbackStats."
     },
     "v1ListBooksResponse": {
       "type": "object",
@@ -728,6 +998,19 @@
         }
       },
       "description": "ListBooksResponse is the response for ListBooks."
+    },
+    "v1SubmitFeedbackResponse": {
+      "type": "object",
+      "properties": {
+        "feedback": {
+          "$ref": "#/definitions/v1BookFeedback"
+        }
+      },
+      "description": "SubmitFeedbackResponse is the response for SubmitFeedback."
+    },
+    "v1UnfavoriteBookResponse": {
+      "type": "object",
+      "description": "UnfavoriteBookResponse is the response for UnfavoriteBook."
     },
     "v1UpdateBookResponse": {
       "type": "object",

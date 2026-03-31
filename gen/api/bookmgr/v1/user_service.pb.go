@@ -641,12 +641,292 @@ func (x *CreateUserResponse) GetGeneratedPassword() string {
 	return ""
 }
 
+// FavoriteBook represents a user's favorite book entry.
+type FavoriteBook struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The unique identifier.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// The book.
+	Book *Book `protobuf:"bytes,2,opt,name=book,proto3" json:"book,omitempty"`
+	// When the book was favorited.
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FavoriteBook) Reset() {
+	*x = FavoriteBook{}
+	mi := &file_bookmgr_v1_user_service_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FavoriteBook) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FavoriteBook) ProtoMessage() {}
+
+func (x *FavoriteBook) ProtoReflect() protoreflect.Message {
+	mi := &file_bookmgr_v1_user_service_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FavoriteBook.ProtoReflect.Descriptor instead.
+func (*FavoriteBook) Descriptor() ([]byte, []int) {
+	return file_bookmgr_v1_user_service_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *FavoriteBook) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *FavoriteBook) GetBook() *Book {
+	if x != nil {
+		return x.Book
+	}
+	return nil
+}
+
+func (x *FavoriteBook) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+// ListMyFavoritesRequest is the request for ListMyFavorites.
+type ListMyFavoritesRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Maximum number of results. Default 20.
+	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	// Token for the next page of results.
+	PageToken     string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListMyFavoritesRequest) Reset() {
+	*x = ListMyFavoritesRequest{}
+	mi := &file_bookmgr_v1_user_service_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListMyFavoritesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListMyFavoritesRequest) ProtoMessage() {}
+
+func (x *ListMyFavoritesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bookmgr_v1_user_service_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListMyFavoritesRequest.ProtoReflect.Descriptor instead.
+func (*ListMyFavoritesRequest) Descriptor() ([]byte, []int) {
+	return file_bookmgr_v1_user_service_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *ListMyFavoritesRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListMyFavoritesRequest) GetPageToken() string {
+	if x != nil {
+		return x.PageToken
+	}
+	return ""
+}
+
+// ListMyFavoritesResponse is the response for ListMyFavorites.
+type ListMyFavoritesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Favorites     []*FavoriteBook        `protobuf:"bytes,1,rep,name=favorites,proto3" json:"favorites,omitempty"`
+	NextPageToken string                 `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListMyFavoritesResponse) Reset() {
+	*x = ListMyFavoritesResponse{}
+	mi := &file_bookmgr_v1_user_service_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListMyFavoritesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListMyFavoritesResponse) ProtoMessage() {}
+
+func (x *ListMyFavoritesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bookmgr_v1_user_service_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListMyFavoritesResponse.ProtoReflect.Descriptor instead.
+func (*ListMyFavoritesResponse) Descriptor() ([]byte, []int) {
+	return file_bookmgr_v1_user_service_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *ListMyFavoritesResponse) GetFavorites() []*FavoriteBook {
+	if x != nil {
+		return x.Favorites
+	}
+	return nil
+}
+
+func (x *ListMyFavoritesResponse) GetNextPageToken() string {
+	if x != nil {
+		return x.NextPageToken
+	}
+	return ""
+}
+
+// ListMyFeedbackRequest is the request for ListMyFeedback.
+type ListMyFeedbackRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Maximum number of results. Default 20.
+	PageSize int32 `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	// Token for the next page of results.
+	PageToken     string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListMyFeedbackRequest) Reset() {
+	*x = ListMyFeedbackRequest{}
+	mi := &file_bookmgr_v1_user_service_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListMyFeedbackRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListMyFeedbackRequest) ProtoMessage() {}
+
+func (x *ListMyFeedbackRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bookmgr_v1_user_service_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListMyFeedbackRequest.ProtoReflect.Descriptor instead.
+func (*ListMyFeedbackRequest) Descriptor() ([]byte, []int) {
+	return file_bookmgr_v1_user_service_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *ListMyFeedbackRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListMyFeedbackRequest) GetPageToken() string {
+	if x != nil {
+		return x.PageToken
+	}
+	return ""
+}
+
+// ListMyFeedbackResponse is the response for ListMyFeedback.
+type ListMyFeedbackResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Feedbacks     []*BookFeedback        `protobuf:"bytes,1,rep,name=feedbacks,proto3" json:"feedbacks,omitempty"`
+	NextPageToken string                 `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListMyFeedbackResponse) Reset() {
+	*x = ListMyFeedbackResponse{}
+	mi := &file_bookmgr_v1_user_service_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListMyFeedbackResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListMyFeedbackResponse) ProtoMessage() {}
+
+func (x *ListMyFeedbackResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bookmgr_v1_user_service_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListMyFeedbackResponse.ProtoReflect.Descriptor instead.
+func (*ListMyFeedbackResponse) Descriptor() ([]byte, []int) {
+	return file_bookmgr_v1_user_service_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *ListMyFeedbackResponse) GetFeedbacks() []*BookFeedback {
+	if x != nil {
+		return x.Feedbacks
+	}
+	return nil
+}
+
+func (x *ListMyFeedbackResponse) GetNextPageToken() string {
+	if x != nil {
+		return x.NextPageToken
+	}
+	return ""
+}
+
 var File_bookmgr_v1_user_service_proto protoreflect.FileDescriptor
 
 const file_bookmgr_v1_user_service_proto_rawDesc = "" +
 	"\n" +
 	"\x1dbookmgr/v1/user_service.proto\x12\n" +
-	"bookmgr.v1\x1a\x17bookmgr/v1/common.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe8\x01\n" +
+	"bookmgr.v1\x1a\x17bookmgr/v1/common.proto\x1a\x1dbookmgr/v1/book_service.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe8\x01\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x14\n" +
@@ -684,7 +964,26 @@ const file_bookmgr_v1_user_service_proto_rawDesc = "" +
 	"\bpassword\x18\x04 \x01(\tR\bpassword\"i\n" +
 	"\x12CreateUserResponse\x12$\n" +
 	"\x04user\x18\x01 \x01(\v2\x10.bookmgr.v1.UserR\x04user\x12-\n" +
-	"\x12generated_password\x18\x02 \x01(\tR\x11generatedPassword2\x8f\x04\n" +
+	"\x12generated_password\x18\x02 \x01(\tR\x11generatedPassword\"\x7f\n" +
+	"\fFavoriteBook\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12$\n" +
+	"\x04book\x18\x02 \x01(\v2\x10.bookmgr.v1.BookR\x04book\x129\n" +
+	"\n" +
+	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"_\n" +
+	"\x16ListMyFavoritesRequest\x12&\n" +
+	"\tpage_size\x18\x01 \x01(\x05B\t\xbaH\x06\x1a\x04\x18d(\x00R\bpageSize\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x02 \x01(\tR\tpageToken\"y\n" +
+	"\x17ListMyFavoritesResponse\x126\n" +
+	"\tfavorites\x18\x01 \x03(\v2\x18.bookmgr.v1.FavoriteBookR\tfavorites\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"^\n" +
+	"\x15ListMyFeedbackRequest\x12&\n" +
+	"\tpage_size\x18\x01 \x01(\x05B\t\xbaH\x06\x1a\x04\x18d(\x00R\bpageSize\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x02 \x01(\tR\tpageToken\"x\n" +
+	"\x16ListMyFeedbackResponse\x126\n" +
+	"\tfeedbacks\x18\x01 \x03(\v2\x18.bookmgr.v1.BookFeedbackR\tfeedbacks\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken2\x8b\x06\n" +
 	"\vUserService\x12e\n" +
 	"\n" +
 	"CreateUser\x12\x1d.bookmgr.v1.CreateUserRequest\x1a\x1e.bookmgr.v1.CreateUserResponse\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/v1/users\x12_\n" +
@@ -693,7 +992,9 @@ const file_bookmgr_v1_user_service_proto_rawDesc = "" +
 	"\n" +
 	"UpdateUser\x12\x1d.bookmgr.v1.UpdateUserRequest\x1a\x1e.bookmgr.v1.UpdateUserResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*2\x17/api/v1/users/{user.id}\x12g\n" +
 	"\n" +
-	"DeleteUser\x12\x1d.bookmgr.v1.DeleteUserRequest\x1a\x1e.bookmgr.v1.DeleteUserResponse\"\x1a\x82\xd3\xe4\x93\x02\x14*\x12/api/v1/users/{id}B=Z;github.com/zhoumingjun/bookmgr/gen/api/bookmgr/v1;bookmgrv1b\x06proto3"
+	"DeleteUser\x12\x1d.bookmgr.v1.DeleteUserRequest\x1a\x1e.bookmgr.v1.DeleteUserResponse\"\x1a\x82\xd3\xe4\x93\x02\x14*\x12/api/v1/users/{id}\x12~\n" +
+	"\x0fListMyFavorites\x12\".bookmgr.v1.ListMyFavoritesRequest\x1a#.bookmgr.v1.ListMyFavoritesResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v1/users/me/favorites\x12z\n" +
+	"\x0eListMyFeedback\x12!.bookmgr.v1.ListMyFeedbackRequest\x1a\".bookmgr.v1.ListMyFeedbackResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/users/me/feedbackB=Z;github.com/zhoumingjun/bookmgr/gen/api/bookmgr/v1;bookmgrv1b\x06proto3"
 
 var (
 	file_bookmgr_v1_user_service_proto_rawDescOnce sync.Once
@@ -707,49 +1008,64 @@ func file_bookmgr_v1_user_service_proto_rawDescGZIP() []byte {
 	return file_bookmgr_v1_user_service_proto_rawDescData
 }
 
-var file_bookmgr_v1_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_bookmgr_v1_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_bookmgr_v1_user_service_proto_goTypes = []any{
-	(*User)(nil),                  // 0: bookmgr.v1.User
-	(*ListUsersRequest)(nil),      // 1: bookmgr.v1.ListUsersRequest
-	(*ListUsersResponse)(nil),     // 2: bookmgr.v1.ListUsersResponse
-	(*GetUserRequest)(nil),        // 3: bookmgr.v1.GetUserRequest
-	(*UpdateUserRequest)(nil),     // 4: bookmgr.v1.UpdateUserRequest
-	(*GetUserResponse)(nil),       // 5: bookmgr.v1.GetUserResponse
-	(*UpdateUserResponse)(nil),    // 6: bookmgr.v1.UpdateUserResponse
-	(*DeleteUserRequest)(nil),     // 7: bookmgr.v1.DeleteUserRequest
-	(*DeleteUserResponse)(nil),    // 8: bookmgr.v1.DeleteUserResponse
-	(*CreateUserRequest)(nil),     // 9: bookmgr.v1.CreateUserRequest
-	(*CreateUserResponse)(nil),    // 10: bookmgr.v1.CreateUserResponse
-	(Role)(0),                     // 11: bookmgr.v1.Role
-	(*timestamppb.Timestamp)(nil), // 12: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil), // 13: google.protobuf.FieldMask
+	(*User)(nil),                    // 0: bookmgr.v1.User
+	(*ListUsersRequest)(nil),        // 1: bookmgr.v1.ListUsersRequest
+	(*ListUsersResponse)(nil),       // 2: bookmgr.v1.ListUsersResponse
+	(*GetUserRequest)(nil),          // 3: bookmgr.v1.GetUserRequest
+	(*UpdateUserRequest)(nil),       // 4: bookmgr.v1.UpdateUserRequest
+	(*GetUserResponse)(nil),         // 5: bookmgr.v1.GetUserResponse
+	(*UpdateUserResponse)(nil),      // 6: bookmgr.v1.UpdateUserResponse
+	(*DeleteUserRequest)(nil),       // 7: bookmgr.v1.DeleteUserRequest
+	(*DeleteUserResponse)(nil),      // 8: bookmgr.v1.DeleteUserResponse
+	(*CreateUserRequest)(nil),       // 9: bookmgr.v1.CreateUserRequest
+	(*CreateUserResponse)(nil),      // 10: bookmgr.v1.CreateUserResponse
+	(*FavoriteBook)(nil),            // 11: bookmgr.v1.FavoriteBook
+	(*ListMyFavoritesRequest)(nil),  // 12: bookmgr.v1.ListMyFavoritesRequest
+	(*ListMyFavoritesResponse)(nil), // 13: bookmgr.v1.ListMyFavoritesResponse
+	(*ListMyFeedbackRequest)(nil),   // 14: bookmgr.v1.ListMyFeedbackRequest
+	(*ListMyFeedbackResponse)(nil),  // 15: bookmgr.v1.ListMyFeedbackResponse
+	(Role)(0),                       // 16: bookmgr.v1.Role
+	(*timestamppb.Timestamp)(nil),   // 17: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil),   // 18: google.protobuf.FieldMask
+	(*Book)(nil),                    // 19: bookmgr.v1.Book
+	(*BookFeedback)(nil),            // 20: bookmgr.v1.BookFeedback
 }
 var file_bookmgr_v1_user_service_proto_depIdxs = []int32{
-	11, // 0: bookmgr.v1.User.role:type_name -> bookmgr.v1.Role
-	12, // 1: bookmgr.v1.User.create_time:type_name -> google.protobuf.Timestamp
-	12, // 2: bookmgr.v1.User.update_time:type_name -> google.protobuf.Timestamp
+	16, // 0: bookmgr.v1.User.role:type_name -> bookmgr.v1.Role
+	17, // 1: bookmgr.v1.User.create_time:type_name -> google.protobuf.Timestamp
+	17, // 2: bookmgr.v1.User.update_time:type_name -> google.protobuf.Timestamp
 	0,  // 3: bookmgr.v1.ListUsersResponse.users:type_name -> bookmgr.v1.User
 	0,  // 4: bookmgr.v1.UpdateUserRequest.user:type_name -> bookmgr.v1.User
-	13, // 5: bookmgr.v1.UpdateUserRequest.update_mask:type_name -> google.protobuf.FieldMask
+	18, // 5: bookmgr.v1.UpdateUserRequest.update_mask:type_name -> google.protobuf.FieldMask
 	0,  // 6: bookmgr.v1.GetUserResponse.user:type_name -> bookmgr.v1.User
 	0,  // 7: bookmgr.v1.UpdateUserResponse.user:type_name -> bookmgr.v1.User
-	11, // 8: bookmgr.v1.CreateUserRequest.role:type_name -> bookmgr.v1.Role
+	16, // 8: bookmgr.v1.CreateUserRequest.role:type_name -> bookmgr.v1.Role
 	0,  // 9: bookmgr.v1.CreateUserResponse.user:type_name -> bookmgr.v1.User
-	9,  // 10: bookmgr.v1.UserService.CreateUser:input_type -> bookmgr.v1.CreateUserRequest
-	1,  // 11: bookmgr.v1.UserService.ListUsers:input_type -> bookmgr.v1.ListUsersRequest
-	3,  // 12: bookmgr.v1.UserService.GetUser:input_type -> bookmgr.v1.GetUserRequest
-	4,  // 13: bookmgr.v1.UserService.UpdateUser:input_type -> bookmgr.v1.UpdateUserRequest
-	7,  // 14: bookmgr.v1.UserService.DeleteUser:input_type -> bookmgr.v1.DeleteUserRequest
-	10, // 15: bookmgr.v1.UserService.CreateUser:output_type -> bookmgr.v1.CreateUserResponse
-	2,  // 16: bookmgr.v1.UserService.ListUsers:output_type -> bookmgr.v1.ListUsersResponse
-	5,  // 17: bookmgr.v1.UserService.GetUser:output_type -> bookmgr.v1.GetUserResponse
-	6,  // 18: bookmgr.v1.UserService.UpdateUser:output_type -> bookmgr.v1.UpdateUserResponse
-	8,  // 19: bookmgr.v1.UserService.DeleteUser:output_type -> bookmgr.v1.DeleteUserResponse
-	15, // [15:20] is the sub-list for method output_type
-	10, // [10:15] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	19, // 10: bookmgr.v1.FavoriteBook.book:type_name -> bookmgr.v1.Book
+	17, // 11: bookmgr.v1.FavoriteBook.created_at:type_name -> google.protobuf.Timestamp
+	11, // 12: bookmgr.v1.ListMyFavoritesResponse.favorites:type_name -> bookmgr.v1.FavoriteBook
+	20, // 13: bookmgr.v1.ListMyFeedbackResponse.feedbacks:type_name -> bookmgr.v1.BookFeedback
+	9,  // 14: bookmgr.v1.UserService.CreateUser:input_type -> bookmgr.v1.CreateUserRequest
+	1,  // 15: bookmgr.v1.UserService.ListUsers:input_type -> bookmgr.v1.ListUsersRequest
+	3,  // 16: bookmgr.v1.UserService.GetUser:input_type -> bookmgr.v1.GetUserRequest
+	4,  // 17: bookmgr.v1.UserService.UpdateUser:input_type -> bookmgr.v1.UpdateUserRequest
+	7,  // 18: bookmgr.v1.UserService.DeleteUser:input_type -> bookmgr.v1.DeleteUserRequest
+	12, // 19: bookmgr.v1.UserService.ListMyFavorites:input_type -> bookmgr.v1.ListMyFavoritesRequest
+	14, // 20: bookmgr.v1.UserService.ListMyFeedback:input_type -> bookmgr.v1.ListMyFeedbackRequest
+	10, // 21: bookmgr.v1.UserService.CreateUser:output_type -> bookmgr.v1.CreateUserResponse
+	2,  // 22: bookmgr.v1.UserService.ListUsers:output_type -> bookmgr.v1.ListUsersResponse
+	5,  // 23: bookmgr.v1.UserService.GetUser:output_type -> bookmgr.v1.GetUserResponse
+	6,  // 24: bookmgr.v1.UserService.UpdateUser:output_type -> bookmgr.v1.UpdateUserResponse
+	8,  // 25: bookmgr.v1.UserService.DeleteUser:output_type -> bookmgr.v1.DeleteUserResponse
+	13, // 26: bookmgr.v1.UserService.ListMyFavorites:output_type -> bookmgr.v1.ListMyFavoritesResponse
+	15, // 27: bookmgr.v1.UserService.ListMyFeedback:output_type -> bookmgr.v1.ListMyFeedbackResponse
+	21, // [21:28] is the sub-list for method output_type
+	14, // [14:21] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_bookmgr_v1_user_service_proto_init() }
@@ -758,13 +1074,14 @@ func file_bookmgr_v1_user_service_proto_init() {
 		return
 	}
 	file_bookmgr_v1_common_proto_init()
+	file_bookmgr_v1_book_service_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_bookmgr_v1_user_service_proto_rawDesc), len(file_bookmgr_v1_user_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

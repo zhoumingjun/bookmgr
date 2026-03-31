@@ -1056,6 +1056,599 @@ func (x *DownloadBookResponse) GetHttpBody() *httpbody.HttpBody {
 	return nil
 }
 
+// FavoriteBookRequest is the request for FavoriteBook.
+type FavoriteBookRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The ID of the book to favorite.
+	BookId        string `protobuf:"bytes,1,opt,name=book_id,json=bookId,proto3" json:"book_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FavoriteBookRequest) Reset() {
+	*x = FavoriteBookRequest{}
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FavoriteBookRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FavoriteBookRequest) ProtoMessage() {}
+
+func (x *FavoriteBookRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FavoriteBookRequest.ProtoReflect.Descriptor instead.
+func (*FavoriteBookRequest) Descriptor() ([]byte, []int) {
+	return file_bookmgr_v1_book_service_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *FavoriteBookRequest) GetBookId() string {
+	if x != nil {
+		return x.BookId
+	}
+	return ""
+}
+
+// FavoriteBookResponse is the response for FavoriteBook.
+type FavoriteBookResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Favorited     bool                   `protobuf:"varint,1,opt,name=favorited,proto3" json:"favorited,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FavoriteBookResponse) Reset() {
+	*x = FavoriteBookResponse{}
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FavoriteBookResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FavoriteBookResponse) ProtoMessage() {}
+
+func (x *FavoriteBookResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FavoriteBookResponse.ProtoReflect.Descriptor instead.
+func (*FavoriteBookResponse) Descriptor() ([]byte, []int) {
+	return file_bookmgr_v1_book_service_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *FavoriteBookResponse) GetFavorited() bool {
+	if x != nil {
+		return x.Favorited
+	}
+	return false
+}
+
+// UnfavoriteBookRequest is the request for UnfavoriteBook.
+type UnfavoriteBookRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The ID of the book to unfavorite.
+	BookId        string `protobuf:"bytes,1,opt,name=book_id,json=bookId,proto3" json:"book_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UnfavoriteBookRequest) Reset() {
+	*x = UnfavoriteBookRequest{}
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UnfavoriteBookRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UnfavoriteBookRequest) ProtoMessage() {}
+
+func (x *UnfavoriteBookRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UnfavoriteBookRequest.ProtoReflect.Descriptor instead.
+func (*UnfavoriteBookRequest) Descriptor() ([]byte, []int) {
+	return file_bookmgr_v1_book_service_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *UnfavoriteBookRequest) GetBookId() string {
+	if x != nil {
+		return x.BookId
+	}
+	return ""
+}
+
+// UnfavoriteBookResponse is the response for UnfavoriteBook.
+type UnfavoriteBookResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UnfavoriteBookResponse) Reset() {
+	*x = UnfavoriteBookResponse{}
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UnfavoriteBookResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UnfavoriteBookResponse) ProtoMessage() {}
+
+func (x *UnfavoriteBookResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UnfavoriteBookResponse.ProtoReflect.Descriptor instead.
+func (*UnfavoriteBookResponse) Descriptor() ([]byte, []int) {
+	return file_bookmgr_v1_book_service_proto_rawDescGZIP(), []int{16}
+}
+
+// GetFavoriteRequest is the request for GetFavorite.
+type GetFavoriteRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The ID of the book.
+	BookId        string `protobuf:"bytes,1,opt,name=book_id,json=bookId,proto3" json:"book_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetFavoriteRequest) Reset() {
+	*x = GetFavoriteRequest{}
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetFavoriteRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetFavoriteRequest) ProtoMessage() {}
+
+func (x *GetFavoriteRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetFavoriteRequest.ProtoReflect.Descriptor instead.
+func (*GetFavoriteRequest) Descriptor() ([]byte, []int) {
+	return file_bookmgr_v1_book_service_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *GetFavoriteRequest) GetBookId() string {
+	if x != nil {
+		return x.BookId
+	}
+	return ""
+}
+
+// GetFavoriteResponse is the response for GetFavorite.
+type GetFavoriteResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	IsFavorited   bool                   `protobuf:"varint,1,opt,name=is_favorited,json=isFavorited,proto3" json:"is_favorited,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetFavoriteResponse) Reset() {
+	*x = GetFavoriteResponse{}
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetFavoriteResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetFavoriteResponse) ProtoMessage() {}
+
+func (x *GetFavoriteResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetFavoriteResponse.ProtoReflect.Descriptor instead.
+func (*GetFavoriteResponse) Descriptor() ([]byte, []int) {
+	return file_bookmgr_v1_book_service_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *GetFavoriteResponse) GetIsFavorited() bool {
+	if x != nil {
+		return x.IsFavorited
+	}
+	return false
+}
+
+// SubmitFeedbackRequest is the request for SubmitFeedback.
+type SubmitFeedbackRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The ID of the book.
+	BookId string `protobuf:"bytes,1,opt,name=book_id,json=bookId,proto3" json:"book_id,omitempty"`
+	// Feedback type: read_start / read_complete / difficulty_rating / use_scenario
+	FeedbackType string `protobuf:"bytes,2,opt,name=feedback_type,json=feedbackType,proto3" json:"feedback_type,omitempty"`
+	// Difficulty rating (1-5), required when feedback_type is difficulty_rating.
+	DifficultyRating int32 `protobuf:"varint,3,opt,name=difficulty_rating,json=difficultyRating,proto3" json:"difficulty_rating,omitempty"`
+	// Use scenario text, required when feedback_type is use_scenario.
+	UseScenario   string `protobuf:"bytes,4,opt,name=use_scenario,json=useScenario,proto3" json:"use_scenario,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SubmitFeedbackRequest) Reset() {
+	*x = SubmitFeedbackRequest{}
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SubmitFeedbackRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SubmitFeedbackRequest) ProtoMessage() {}
+
+func (x *SubmitFeedbackRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SubmitFeedbackRequest.ProtoReflect.Descriptor instead.
+func (*SubmitFeedbackRequest) Descriptor() ([]byte, []int) {
+	return file_bookmgr_v1_book_service_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *SubmitFeedbackRequest) GetBookId() string {
+	if x != nil {
+		return x.BookId
+	}
+	return ""
+}
+
+func (x *SubmitFeedbackRequest) GetFeedbackType() string {
+	if x != nil {
+		return x.FeedbackType
+	}
+	return ""
+}
+
+func (x *SubmitFeedbackRequest) GetDifficultyRating() int32 {
+	if x != nil {
+		return x.DifficultyRating
+	}
+	return 0
+}
+
+func (x *SubmitFeedbackRequest) GetUseScenario() string {
+	if x != nil {
+		return x.UseScenario
+	}
+	return ""
+}
+
+// SubmitFeedbackResponse is the response for SubmitFeedback.
+type SubmitFeedbackResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Feedback      *BookFeedback          `protobuf:"bytes,1,opt,name=feedback,proto3" json:"feedback,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SubmitFeedbackResponse) Reset() {
+	*x = SubmitFeedbackResponse{}
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SubmitFeedbackResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SubmitFeedbackResponse) ProtoMessage() {}
+
+func (x *SubmitFeedbackResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SubmitFeedbackResponse.ProtoReflect.Descriptor instead.
+func (*SubmitFeedbackResponse) Descriptor() ([]byte, []int) {
+	return file_bookmgr_v1_book_service_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *SubmitFeedbackResponse) GetFeedback() *BookFeedback {
+	if x != nil {
+		return x.Feedback
+	}
+	return nil
+}
+
+// BookFeedback represents a user's feedback on a book.
+type BookFeedback struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The unique identifier.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// The book ID.
+	BookId string `protobuf:"bytes,2,opt,name=book_id,json=bookId,proto3" json:"book_id,omitempty"`
+	// The user ID.
+	UserId string `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	// Feedback type.
+	FeedbackType string `protobuf:"bytes,4,opt,name=feedback_type,json=feedbackType,proto3" json:"feedback_type,omitempty"`
+	// Difficulty rating (1-5).
+	DifficultyRating int32 `protobuf:"varint,5,opt,name=difficulty_rating,json=difficultyRating,proto3" json:"difficulty_rating,omitempty"`
+	// Use scenario.
+	UseScenario string `protobuf:"bytes,6,opt,name=use_scenario,json=useScenario,proto3" json:"use_scenario,omitempty"`
+	// When the feedback was created.
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BookFeedback) Reset() {
+	*x = BookFeedback{}
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BookFeedback) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BookFeedback) ProtoMessage() {}
+
+func (x *BookFeedback) ProtoReflect() protoreflect.Message {
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BookFeedback.ProtoReflect.Descriptor instead.
+func (*BookFeedback) Descriptor() ([]byte, []int) {
+	return file_bookmgr_v1_book_service_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *BookFeedback) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *BookFeedback) GetBookId() string {
+	if x != nil {
+		return x.BookId
+	}
+	return ""
+}
+
+func (x *BookFeedback) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *BookFeedback) GetFeedbackType() string {
+	if x != nil {
+		return x.FeedbackType
+	}
+	return ""
+}
+
+func (x *BookFeedback) GetDifficultyRating() int32 {
+	if x != nil {
+		return x.DifficultyRating
+	}
+	return 0
+}
+
+func (x *BookFeedback) GetUseScenario() string {
+	if x != nil {
+		return x.UseScenario
+	}
+	return ""
+}
+
+func (x *BookFeedback) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+// GetFeedbackStatsRequest is the request for GetFeedbackStats.
+type GetFeedbackStatsRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The ID of the book.
+	BookId        string `protobuf:"bytes,1,opt,name=book_id,json=bookId,proto3" json:"book_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetFeedbackStatsRequest) Reset() {
+	*x = GetFeedbackStatsRequest{}
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetFeedbackStatsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetFeedbackStatsRequest) ProtoMessage() {}
+
+func (x *GetFeedbackStatsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetFeedbackStatsRequest.ProtoReflect.Descriptor instead.
+func (*GetFeedbackStatsRequest) Descriptor() ([]byte, []int) {
+	return file_bookmgr_v1_book_service_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *GetFeedbackStatsRequest) GetBookId() string {
+	if x != nil {
+		return x.BookId
+	}
+	return ""
+}
+
+// GetFeedbackStatsResponse is the response for GetFeedbackStats.
+type GetFeedbackStatsResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Number of users who favorited this book.
+	FavoriteCount int32 `protobuf:"varint,1,opt,name=favorite_count,json=favoriteCount,proto3" json:"favorite_count,omitempty"`
+	// Number of users who marked as read_complete.
+	ReadCompleteCount int32 `protobuf:"varint,2,opt,name=read_complete_count,json=readCompleteCount,proto3" json:"read_complete_count,omitempty"`
+	// Average difficulty rating (0 if no ratings).
+	AvgDifficultyRating float64 `protobuf:"fixed64,3,opt,name=avg_difficulty_rating,json=avgDifficultyRating,proto3" json:"avg_difficulty_rating,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *GetFeedbackStatsResponse) Reset() {
+	*x = GetFeedbackStatsResponse{}
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetFeedbackStatsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetFeedbackStatsResponse) ProtoMessage() {}
+
+func (x *GetFeedbackStatsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bookmgr_v1_book_service_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetFeedbackStatsResponse.ProtoReflect.Descriptor instead.
+func (*GetFeedbackStatsResponse) Descriptor() ([]byte, []int) {
+	return file_bookmgr_v1_book_service_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *GetFeedbackStatsResponse) GetFavoriteCount() int32 {
+	if x != nil {
+		return x.FavoriteCount
+	}
+	return 0
+}
+
+func (x *GetFeedbackStatsResponse) GetReadCompleteCount() int32 {
+	if x != nil {
+		return x.ReadCompleteCount
+	}
+	return 0
+}
+
+func (x *GetFeedbackStatsResponse) GetAvgDifficultyRating() float64 {
+	if x != nil {
+		return x.AvgDifficultyRating
+	}
+	return 0
+}
+
 var File_bookmgr_v1_book_service_proto protoreflect.FileDescriptor
 
 const file_bookmgr_v1_book_service_proto_rawDesc = "" +
@@ -1151,7 +1744,42 @@ const file_bookmgr_v1_book_service_proto_rawDesc = "" +
 	"\x13DownloadBookRequest\x12\x17\n" +
 	"\x02id\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x02id\"I\n" +
 	"\x14DownloadBookResponse\x121\n" +
-	"\thttp_body\x18\x01 \x01(\v2\x14.google.api.HttpBodyR\bhttpBody2\x87\x05\n" +
+	"\thttp_body\x18\x01 \x01(\v2\x14.google.api.HttpBodyR\bhttpBody\"7\n" +
+	"\x13FavoriteBookRequest\x12 \n" +
+	"\abook_id\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x06bookId\"4\n" +
+	"\x14FavoriteBookResponse\x12\x1c\n" +
+	"\tfavorited\x18\x01 \x01(\bR\tfavorited\"9\n" +
+	"\x15UnfavoriteBookRequest\x12 \n" +
+	"\abook_id\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x06bookId\"\x18\n" +
+	"\x16UnfavoriteBookResponse\"6\n" +
+	"\x12GetFavoriteRequest\x12 \n" +
+	"\abook_id\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x06bookId\"8\n" +
+	"\x13GetFavoriteResponse\x12!\n" +
+	"\fis_favorited\x18\x01 \x01(\bR\visFavorited\"\xfb\x01\n" +
+	"\x15SubmitFeedbackRequest\x12 \n" +
+	"\abook_id\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x06bookId\x12f\n" +
+	"\rfeedback_type\x18\x02 \x01(\tBA\xbaH>r<R\n" +
+	"read_startR\rread_completeR\x11difficulty_ratingR\fuse_scenarioR\ffeedbackType\x12+\n" +
+	"\x11difficulty_rating\x18\x03 \x01(\x05R\x10difficultyRating\x12+\n" +
+	"\fuse_scenario\x18\x04 \x01(\tB\b\xbaH\x05r\x03\x18\xc8\x01R\vuseScenario\"N\n" +
+	"\x16SubmitFeedbackResponse\x124\n" +
+	"\bfeedback\x18\x01 \x01(\v2\x18.bookmgr.v1.BookFeedbackR\bfeedback\"\x80\x02\n" +
+	"\fBookFeedback\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
+	"\abook_id\x18\x02 \x01(\tR\x06bookId\x12\x17\n" +
+	"\auser_id\x18\x03 \x01(\tR\x06userId\x12#\n" +
+	"\rfeedback_type\x18\x04 \x01(\tR\ffeedbackType\x12+\n" +
+	"\x11difficulty_rating\x18\x05 \x01(\x05R\x10difficultyRating\x12!\n" +
+	"\fuse_scenario\x18\x06 \x01(\tR\vuseScenario\x129\n" +
+	"\n" +
+	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\";\n" +
+	"\x17GetFeedbackStatsRequest\x12 \n" +
+	"\abook_id\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x06bookId\"\xa5\x01\n" +
+	"\x18GetFeedbackStatsResponse\x12%\n" +
+	"\x0efavorite_count\x18\x01 \x01(\x05R\rfavoriteCount\x12.\n" +
+	"\x13read_complete_count\x18\x02 \x01(\x05R\x11readCompleteCount\x122\n" +
+	"\x15avg_difficulty_rating\x18\x03 \x01(\x01R\x13avgDifficultyRating2\x9c\n" +
+	"\n" +
 	"\vBookService\x12_\n" +
 	"\tListBooks\x12\x1c.bookmgr.v1.ListBooksRequest\x1a\x1d.bookmgr.v1.ListBooksResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/api/v1/books\x12^\n" +
 	"\aGetBook\x12\x1a.bookmgr.v1.GetBookRequest\x1a\x1b.bookmgr.v1.GetBookResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/api/v1/books/{id}\x12e\n" +
@@ -1161,7 +1789,12 @@ const file_bookmgr_v1_book_service_proto_rawDesc = "" +
 	"UpdateBook\x12\x1d.bookmgr.v1.UpdateBookRequest\x1a\x1e.bookmgr.v1.UpdateBookResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*2\x17/api/v1/books/{book.id}\x12g\n" +
 	"\n" +
 	"DeleteBook\x12\x1d.bookmgr.v1.DeleteBookRequest\x1a\x1e.bookmgr.v1.DeleteBookResponse\"\x1a\x82\xd3\xe4\x93\x02\x14*\x12/api/v1/books/{id}\x12v\n" +
-	"\fDownloadBook\x12\x1f.bookmgr.v1.DownloadBookRequest\x1a .bookmgr.v1.DownloadBookResponse\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/api/v1/books/{id}/downloadB=Z;github.com/zhoumingjun/bookmgr/gen/api/bookmgr/v1;bookmgrv1b\x06proto3"
+	"\fDownloadBook\x12\x1f.bookmgr.v1.DownloadBookRequest\x1a .bookmgr.v1.DownloadBookResponse\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/api/v1/books/{id}/download\x12~\n" +
+	"\fFavoriteBook\x12\x1f.bookmgr.v1.FavoriteBookRequest\x1a .bookmgr.v1.FavoriteBookResponse\"+\x82\xd3\xe4\x93\x02%:\x01*\" /api/v1/books/{book_id}/favorite\x12\x81\x01\n" +
+	"\x0eUnfavoriteBook\x12!.bookmgr.v1.UnfavoriteBookRequest\x1a\".bookmgr.v1.UnfavoriteBookResponse\"(\x82\xd3\xe4\x93\x02\"* /api/v1/books/{book_id}/favorite\x12x\n" +
+	"\vGetFavorite\x12\x1e.bookmgr.v1.GetFavoriteRequest\x1a\x1f.bookmgr.v1.GetFavoriteResponse\"(\x82\xd3\xe4\x93\x02\"\x12 /api/v1/books/{book_id}/favorite\x12\x84\x01\n" +
+	"\x0eSubmitFeedback\x12!.bookmgr.v1.SubmitFeedbackRequest\x1a\".bookmgr.v1.SubmitFeedbackResponse\"+\x82\xd3\xe4\x93\x02%:\x01*\" /api/v1/books/{book_id}/feedback\x12\x8d\x01\n" +
+	"\x10GetFeedbackStats\x12#.bookmgr.v1.GetFeedbackStatsRequest\x1a$.bookmgr.v1.GetFeedbackStatsResponse\".\x82\xd3\xe4\x93\x02(\x12&/api/v1/books/{book_id}/feedback/statsB=Z;github.com/zhoumingjun/bookmgr/gen/api/bookmgr/v1;bookmgrv1b\x06proto3"
 
 var (
 	file_bookmgr_v1_book_service_proto_rawDescOnce sync.Once
@@ -1175,54 +1808,77 @@ func file_bookmgr_v1_book_service_proto_rawDescGZIP() []byte {
 	return file_bookmgr_v1_book_service_proto_rawDescData
 }
 
-var file_bookmgr_v1_book_service_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_bookmgr_v1_book_service_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_bookmgr_v1_book_service_proto_goTypes = []any{
-	(*Book)(nil),                  // 0: bookmgr.v1.Book
-	(*ListBooksRequest)(nil),      // 1: bookmgr.v1.ListBooksRequest
-	(*ListBooksResponse)(nil),     // 2: bookmgr.v1.ListBooksResponse
-	(*GetBookRequest)(nil),        // 3: bookmgr.v1.GetBookRequest
-	(*GetBookResponse)(nil),       // 4: bookmgr.v1.GetBookResponse
-	(*CreateBookRequest)(nil),     // 5: bookmgr.v1.CreateBookRequest
-	(*CreateBookResponse)(nil),    // 6: bookmgr.v1.CreateBookResponse
-	(*UpdateBookRequest)(nil),     // 7: bookmgr.v1.UpdateBookRequest
-	(*UpdateBookResponse)(nil),    // 8: bookmgr.v1.UpdateBookResponse
-	(*DeleteBookRequest)(nil),     // 9: bookmgr.v1.DeleteBookRequest
-	(*DeleteBookResponse)(nil),    // 10: bookmgr.v1.DeleteBookResponse
-	(*DownloadBookRequest)(nil),   // 11: bookmgr.v1.DownloadBookRequest
-	(*DownloadBookResponse)(nil),  // 12: bookmgr.v1.DownloadBookResponse
-	(*Dimension)(nil),             // 13: bookmgr.v1.Dimension
-	(*timestamppb.Timestamp)(nil), // 14: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil), // 15: google.protobuf.FieldMask
-	(*httpbody.HttpBody)(nil),     // 16: google.api.HttpBody
+	(*Book)(nil),                     // 0: bookmgr.v1.Book
+	(*ListBooksRequest)(nil),         // 1: bookmgr.v1.ListBooksRequest
+	(*ListBooksResponse)(nil),        // 2: bookmgr.v1.ListBooksResponse
+	(*GetBookRequest)(nil),           // 3: bookmgr.v1.GetBookRequest
+	(*GetBookResponse)(nil),          // 4: bookmgr.v1.GetBookResponse
+	(*CreateBookRequest)(nil),        // 5: bookmgr.v1.CreateBookRequest
+	(*CreateBookResponse)(nil),       // 6: bookmgr.v1.CreateBookResponse
+	(*UpdateBookRequest)(nil),        // 7: bookmgr.v1.UpdateBookRequest
+	(*UpdateBookResponse)(nil),       // 8: bookmgr.v1.UpdateBookResponse
+	(*DeleteBookRequest)(nil),        // 9: bookmgr.v1.DeleteBookRequest
+	(*DeleteBookResponse)(nil),       // 10: bookmgr.v1.DeleteBookResponse
+	(*DownloadBookRequest)(nil),      // 11: bookmgr.v1.DownloadBookRequest
+	(*DownloadBookResponse)(nil),     // 12: bookmgr.v1.DownloadBookResponse
+	(*FavoriteBookRequest)(nil),      // 13: bookmgr.v1.FavoriteBookRequest
+	(*FavoriteBookResponse)(nil),     // 14: bookmgr.v1.FavoriteBookResponse
+	(*UnfavoriteBookRequest)(nil),    // 15: bookmgr.v1.UnfavoriteBookRequest
+	(*UnfavoriteBookResponse)(nil),   // 16: bookmgr.v1.UnfavoriteBookResponse
+	(*GetFavoriteRequest)(nil),       // 17: bookmgr.v1.GetFavoriteRequest
+	(*GetFavoriteResponse)(nil),      // 18: bookmgr.v1.GetFavoriteResponse
+	(*SubmitFeedbackRequest)(nil),    // 19: bookmgr.v1.SubmitFeedbackRequest
+	(*SubmitFeedbackResponse)(nil),   // 20: bookmgr.v1.SubmitFeedbackResponse
+	(*BookFeedback)(nil),             // 21: bookmgr.v1.BookFeedback
+	(*GetFeedbackStatsRequest)(nil),  // 22: bookmgr.v1.GetFeedbackStatsRequest
+	(*GetFeedbackStatsResponse)(nil), // 23: bookmgr.v1.GetFeedbackStatsResponse
+	(*Dimension)(nil),                // 24: bookmgr.v1.Dimension
+	(*timestamppb.Timestamp)(nil),    // 25: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil),    // 26: google.protobuf.FieldMask
+	(*httpbody.HttpBody)(nil),        // 27: google.api.HttpBody
 }
 var file_bookmgr_v1_book_service_proto_depIdxs = []int32{
-	13, // 0: bookmgr.v1.Book.dimensions:type_name -> bookmgr.v1.Dimension
-	14, // 1: bookmgr.v1.Book.create_time:type_name -> google.protobuf.Timestamp
-	14, // 2: bookmgr.v1.Book.update_time:type_name -> google.protobuf.Timestamp
+	24, // 0: bookmgr.v1.Book.dimensions:type_name -> bookmgr.v1.Dimension
+	25, // 1: bookmgr.v1.Book.create_time:type_name -> google.protobuf.Timestamp
+	25, // 2: bookmgr.v1.Book.update_time:type_name -> google.protobuf.Timestamp
 	0,  // 3: bookmgr.v1.ListBooksResponse.books:type_name -> bookmgr.v1.Book
 	0,  // 4: bookmgr.v1.GetBookResponse.book:type_name -> bookmgr.v1.Book
 	0,  // 5: bookmgr.v1.CreateBookResponse.book:type_name -> bookmgr.v1.Book
 	0,  // 6: bookmgr.v1.UpdateBookRequest.book:type_name -> bookmgr.v1.Book
-	15, // 7: bookmgr.v1.UpdateBookRequest.update_mask:type_name -> google.protobuf.FieldMask
+	26, // 7: bookmgr.v1.UpdateBookRequest.update_mask:type_name -> google.protobuf.FieldMask
 	0,  // 8: bookmgr.v1.UpdateBookResponse.book:type_name -> bookmgr.v1.Book
-	16, // 9: bookmgr.v1.DownloadBookResponse.http_body:type_name -> google.api.HttpBody
-	1,  // 10: bookmgr.v1.BookService.ListBooks:input_type -> bookmgr.v1.ListBooksRequest
-	3,  // 11: bookmgr.v1.BookService.GetBook:input_type -> bookmgr.v1.GetBookRequest
-	5,  // 12: bookmgr.v1.BookService.CreateBook:input_type -> bookmgr.v1.CreateBookRequest
-	7,  // 13: bookmgr.v1.BookService.UpdateBook:input_type -> bookmgr.v1.UpdateBookRequest
-	9,  // 14: bookmgr.v1.BookService.DeleteBook:input_type -> bookmgr.v1.DeleteBookRequest
-	11, // 15: bookmgr.v1.BookService.DownloadBook:input_type -> bookmgr.v1.DownloadBookRequest
-	2,  // 16: bookmgr.v1.BookService.ListBooks:output_type -> bookmgr.v1.ListBooksResponse
-	4,  // 17: bookmgr.v1.BookService.GetBook:output_type -> bookmgr.v1.GetBookResponse
-	6,  // 18: bookmgr.v1.BookService.CreateBook:output_type -> bookmgr.v1.CreateBookResponse
-	8,  // 19: bookmgr.v1.BookService.UpdateBook:output_type -> bookmgr.v1.UpdateBookResponse
-	10, // 20: bookmgr.v1.BookService.DeleteBook:output_type -> bookmgr.v1.DeleteBookResponse
-	12, // 21: bookmgr.v1.BookService.DownloadBook:output_type -> bookmgr.v1.DownloadBookResponse
-	16, // [16:22] is the sub-list for method output_type
-	10, // [10:16] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	27, // 9: bookmgr.v1.DownloadBookResponse.http_body:type_name -> google.api.HttpBody
+	21, // 10: bookmgr.v1.SubmitFeedbackResponse.feedback:type_name -> bookmgr.v1.BookFeedback
+	25, // 11: bookmgr.v1.BookFeedback.created_at:type_name -> google.protobuf.Timestamp
+	1,  // 12: bookmgr.v1.BookService.ListBooks:input_type -> bookmgr.v1.ListBooksRequest
+	3,  // 13: bookmgr.v1.BookService.GetBook:input_type -> bookmgr.v1.GetBookRequest
+	5,  // 14: bookmgr.v1.BookService.CreateBook:input_type -> bookmgr.v1.CreateBookRequest
+	7,  // 15: bookmgr.v1.BookService.UpdateBook:input_type -> bookmgr.v1.UpdateBookRequest
+	9,  // 16: bookmgr.v1.BookService.DeleteBook:input_type -> bookmgr.v1.DeleteBookRequest
+	11, // 17: bookmgr.v1.BookService.DownloadBook:input_type -> bookmgr.v1.DownloadBookRequest
+	13, // 18: bookmgr.v1.BookService.FavoriteBook:input_type -> bookmgr.v1.FavoriteBookRequest
+	15, // 19: bookmgr.v1.BookService.UnfavoriteBook:input_type -> bookmgr.v1.UnfavoriteBookRequest
+	17, // 20: bookmgr.v1.BookService.GetFavorite:input_type -> bookmgr.v1.GetFavoriteRequest
+	19, // 21: bookmgr.v1.BookService.SubmitFeedback:input_type -> bookmgr.v1.SubmitFeedbackRequest
+	22, // 22: bookmgr.v1.BookService.GetFeedbackStats:input_type -> bookmgr.v1.GetFeedbackStatsRequest
+	2,  // 23: bookmgr.v1.BookService.ListBooks:output_type -> bookmgr.v1.ListBooksResponse
+	4,  // 24: bookmgr.v1.BookService.GetBook:output_type -> bookmgr.v1.GetBookResponse
+	6,  // 25: bookmgr.v1.BookService.CreateBook:output_type -> bookmgr.v1.CreateBookResponse
+	8,  // 26: bookmgr.v1.BookService.UpdateBook:output_type -> bookmgr.v1.UpdateBookResponse
+	10, // 27: bookmgr.v1.BookService.DeleteBook:output_type -> bookmgr.v1.DeleteBookResponse
+	12, // 28: bookmgr.v1.BookService.DownloadBook:output_type -> bookmgr.v1.DownloadBookResponse
+	14, // 29: bookmgr.v1.BookService.FavoriteBook:output_type -> bookmgr.v1.FavoriteBookResponse
+	16, // 30: bookmgr.v1.BookService.UnfavoriteBook:output_type -> bookmgr.v1.UnfavoriteBookResponse
+	18, // 31: bookmgr.v1.BookService.GetFavorite:output_type -> bookmgr.v1.GetFavoriteResponse
+	20, // 32: bookmgr.v1.BookService.SubmitFeedback:output_type -> bookmgr.v1.SubmitFeedbackResponse
+	23, // 33: bookmgr.v1.BookService.GetFeedbackStats:output_type -> bookmgr.v1.GetFeedbackStatsResponse
+	23, // [23:34] is the sub-list for method output_type
+	12, // [12:23] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_bookmgr_v1_book_service_proto_init() }
@@ -1237,7 +1893,7 @@ func file_bookmgr_v1_book_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_bookmgr_v1_book_service_proto_rawDesc), len(file_bookmgr_v1_book_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   24,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

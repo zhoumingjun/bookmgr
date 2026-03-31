@@ -56,6 +56,43 @@ service BookService {
       get: "/api/v1/books/{id}/download"
     };
   }
+
+  // FavoriteBook adds a book to the user's favorites.
+  rpc FavoriteBook(FavoriteBookRequest) returns (FavoriteBookResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/books/{book_id}/favorite"
+      body: "*"
+    };
+  }
+
+  // UnfavoriteBook removes a book from the user's favorites.
+  rpc UnfavoriteBook(UnfavoriteBookRequest) returns (UnfavoriteBookResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/books/{book_id}/favorite"
+    };
+  }
+
+  // GetFavorite checks whether a book is favorited by the current user.
+  rpc GetFavorite(GetFavoriteRequest) returns (GetFavoriteResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/books/{book_id}/favorite"
+    };
+  }
+
+  // SubmitFeedback submits user feedback for a book.
+  rpc SubmitFeedback(SubmitFeedbackRequest) returns (SubmitFeedbackResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/books/{book_id}/feedback"
+      body: "*"
+    };
+  }
+
+  // GetFeedbackStats returns aggregated feedback statistics for a book.
+  rpc GetFeedbackStats(GetFeedbackStatsRequest) returns (GetFeedbackStatsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/books/{book_id}/feedback/stats"
+    };
+  }
 }
 
 // Book represents a picturebook resource.
@@ -285,5 +322,100 @@ message DownloadBookRequest {
 message DownloadBookResponse {
   // The HTTP body containing the PDF file.
   google.api.HttpBody http_body = 1;
+}
+
+// FavoriteBookRequest is the request for FavoriteBook.
+message FavoriteBookRequest {
+  // The ID of the book to favorite.
+  string book_id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+// FavoriteBookResponse is the response for FavoriteBook.
+message FavoriteBookResponse {
+  bool favorited = 1;
+}
+
+// UnfavoriteBookRequest is the request for UnfavoriteBook.
+message UnfavoriteBookRequest {
+  // The ID of the book to unfavorite.
+  string book_id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+// UnfavoriteBookResponse is the response for UnfavoriteBook.
+message UnfavoriteBookResponse {}
+
+// GetFavoriteRequest is the request for GetFavorite.
+message GetFavoriteRequest {
+  // The ID of the book.
+  string book_id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+// GetFavoriteResponse is the response for GetFavorite.
+message GetFavoriteResponse {
+  bool is_favorited = 1;
+}
+
+// SubmitFeedbackRequest is the request for SubmitFeedback.
+message SubmitFeedbackRequest {
+  // The ID of the book.
+  string book_id = 1 [(buf.validate.field).string.min_len = 1];
+
+  // Feedback type: read_start / read_complete / difficulty_rating / use_scenario
+  string feedback_type = 2 [
+    (buf.validate.field).string = { in: ["read_start", "read_complete", "difficulty_rating", "use_scenario"] }
+  ];
+
+  // Difficulty rating (1-5), required when feedback_type is difficulty_rating.
+  int32 difficulty_rating = 3;
+
+  // Use scenario text, required when feedback_type is use_scenario.
+  string use_scenario = 4 [(buf.validate.field).string.max_len = 200];
+}
+
+// SubmitFeedbackResponse is the response for SubmitFeedback.
+message SubmitFeedbackResponse {
+  BookFeedback feedback = 1;
+}
+
+// BookFeedback represents a user's feedback on a book.
+message BookFeedback {
+  // The unique identifier.
+  string id = 1;
+
+  // The book ID.
+  string book_id = 2;
+
+  // The user ID.
+  string user_id = 3;
+
+  // Feedback type.
+  string feedback_type = 4;
+
+  // Difficulty rating (1-5).
+  int32 difficulty_rating = 5;
+
+  // Use scenario.
+  string use_scenario = 6;
+
+  // When the feedback was created.
+  google.protobuf.Timestamp created_at = 7;
+}
+
+// GetFeedbackStatsRequest is the request for GetFeedbackStats.
+message GetFeedbackStatsRequest {
+  // The ID of the book.
+  string book_id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+// GetFeedbackStatsResponse is the response for GetFeedbackStats.
+message GetFeedbackStatsResponse {
+  // Number of users who favorited this book.
+  int32 favorite_count = 1;
+
+  // Number of users who marked as read_complete.
+  int32 read_complete_count = 2;
+
+  // Average difficulty rating (0 if no ratings).
+  double avg_difficulty_rating = 3;
 }
 

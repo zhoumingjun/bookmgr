@@ -3,6 +3,7 @@ syntax = "proto3";
 package bookmgr.v1;
 
 import "bookmgr/v1/common.proto";
+import "bookmgr/v1/book_service.proto";
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/field_mask.proto";
@@ -47,6 +48,20 @@ service UserService {
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
     option (google.api.http) = {
       delete: "/api/v1/users/{id}"
+    };
+  }
+
+  // ListMyFavorites returns the current user's favorited books.
+  rpc ListMyFavorites(ListMyFavoritesRequest) returns (ListMyFavoritesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/users/me/favorites"
+    };
+  }
+
+  // ListMyFeedback returns the current user's feedback history.
+  rpc ListMyFeedback(ListMyFeedbackRequest) returns (ListMyFeedbackResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/users/me/feedback"
     };
   }
 }
@@ -168,4 +183,46 @@ message CreateUserResponse {
   // The initial password (only set if auto-generated).
   // Admin must communicate this to the user.
   string generated_password = 2;
+}
+
+// FavoriteBook represents a user's favorite book entry.
+message FavoriteBook {
+  // The unique identifier.
+  string id = 1;
+
+  // The book.
+  Book book = 2;
+
+  // When the book was favorited.
+  google.protobuf.Timestamp created_at = 3;
+}
+
+// ListMyFavoritesRequest is the request for ListMyFavorites.
+message ListMyFavoritesRequest {
+  // Maximum number of results. Default 20.
+  int32 page_size = 1 [(buf.validate.field).int32 = { gte: 0, lte: 100 }];
+
+  // Token for the next page of results.
+  string page_token = 2;
+}
+
+// ListMyFavoritesResponse is the response for ListMyFavorites.
+message ListMyFavoritesResponse {
+  repeated FavoriteBook favorites = 1;
+  string next_page_token = 2;
+}
+
+// ListMyFeedbackRequest is the request for ListMyFeedback.
+message ListMyFeedbackRequest {
+  // Maximum number of results. Default 20.
+  int32 page_size = 1 [(buf.validate.field).int32 = { gte: 0, lte: 100 }];
+
+  // Token for the next page of results.
+  string page_token = 2;
+}
+
+// ListMyFeedbackResponse is the response for ListMyFeedback.
+message ListMyFeedbackResponse {
+  repeated BookFeedback feedbacks = 1;
+  string next_page_token = 2;
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/zhoumingjun/bookmgr/backend/ent"
+	"github.com/zhoumingjun/bookmgr/backend/ent/bookfavorite"
 	"github.com/zhoumingjun/bookmgr/backend/ent/bookfeedback"
 )
 

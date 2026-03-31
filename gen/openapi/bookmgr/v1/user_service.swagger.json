@@ -88,6 +88,86 @@
         ]
       }
     },
+    "/api/v1/users/me/favorites": {
+      "get": {
+        "summary": "ListMyFavorites returns the current user's favorited books.",
+        "operationId": "UserService_ListMyFavorites",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListMyFavoritesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pageSize",
+            "description": "Maximum number of results. Default 20.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageToken",
+            "description": "Token for the next page of results.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/api/v1/users/me/feedback": {
+      "get": {
+        "summary": "ListMyFeedback returns the current user's feedback history.",
+        "operationId": "UserService_ListMyFeedback",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListMyFeedbackResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pageSize",
+            "description": "Maximum number of results. Default 20.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageToken",
+            "description": "Token for the next page of results.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
     "/api/v1/users/{id}": {
       "get": {
         "summary": "GetUser returns a single user by ID.",
@@ -235,6 +315,25 @@
       },
       "description": "UpdateUserRequest is the request for UpdateUser."
     },
+    "bookmgrV1FavoriteBook": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier."
+        },
+        "book": {
+          "$ref": "#/definitions/v1Book",
+          "description": "The book."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the book was favorited."
+        }
+      },
+      "description": "FavoriteBook represents a user's favorite book entry."
+    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -264,6 +363,155 @@
           }
         }
       }
+    },
+    "v1Book": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the book."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the book."
+        },
+        "author": {
+          "type": "string",
+          "description": "The author of the book."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the book."
+        },
+        "pageCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of pages (for print edition)."
+        },
+        "durationMinutes": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Duration in minutes (for audio/animation editions)."
+        },
+        "coreGoal": {
+          "type": "string",
+          "description": "The core adaptation goal of the book."
+        },
+        "cognitiveLevel": {
+          "type": "string",
+          "description": "The cognitive adaptation level: light/moderate/severe (轻度/中度/重度)."
+        },
+        "resourceType": {
+          "type": "string",
+          "description": "Primary resource type: print/digital/audio/video."
+        },
+        "hasPrint": {
+          "type": "boolean",
+          "description": "Whether print edition is available."
+        },
+        "hasDigital": {
+          "type": "boolean",
+          "description": "Whether digital edition is available."
+        },
+        "hasAudio": {
+          "type": "boolean",
+          "description": "Whether audio edition is available."
+        },
+        "hasVideo": {
+          "type": "boolean",
+          "description": "Whether video/animation edition is available."
+        },
+        "teachingSuggestion": {
+          "type": "string",
+          "description": "Teaching usage suggestions."
+        },
+        "parentReadingGuide": {
+          "type": "string",
+          "description": "Parent-child co-reading guide."
+        },
+        "recommendedAgeMin": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Minimum recommended age in months."
+        },
+        "recommendedAgeMax": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Maximum recommended age in months."
+        },
+        "coverImageUrl": {
+          "type": "string",
+          "description": "URL to the book's cover image."
+        },
+        "status": {
+          "type": "string",
+          "description": "Status: draft/pending/approved/rejected."
+        },
+        "uploaderId": {
+          "type": "string",
+          "description": "The ID of the user who uploaded/created this book."
+        },
+        "viewCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "View count."
+        },
+        "dimensions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Dimension"
+          },
+          "description": "Associated dimensions (loaded with eager)."
+        },
+        "createTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the book was created."
+        },
+        "updateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the book was last updated."
+        }
+      },
+      "description": "Book represents a picturebook resource."
+    },
+    "v1BookFeedback": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier."
+        },
+        "bookId": {
+          "type": "string",
+          "description": "The book ID."
+        },
+        "userId": {
+          "type": "string",
+          "description": "The user ID."
+        },
+        "feedbackType": {
+          "type": "string",
+          "description": "Feedback type."
+        },
+        "difficultyRating": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Difficulty rating (1-5)."
+        },
+        "useScenario": {
+          "type": "string",
+          "description": "Use scenario."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the feedback was created."
+        }
+      },
+      "description": "BookFeedback represents a user's feedback on a book."
     },
     "v1CreateUserRequest": {
       "type": "object",
@@ -305,6 +553,41 @@
       "type": "object",
       "description": "DeleteUserResponse is the response for DeleteUser."
     },
+    "v1Dimension": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier."
+        },
+        "name": {
+          "type": "string",
+          "description": "Dimension name (e.g., \"身心准备\")."
+        },
+        "slug": {
+          "type": "string",
+          "description": "URL-safe slug (e.g., \"physical\")."
+        },
+        "parentId": {
+          "type": "string",
+          "description": "Parent dimension ID (null for top-level)."
+        },
+        "sortOrder": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Display order."
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Dimension"
+          },
+          "description": "Child subcategories."
+        }
+      },
+      "description": "Dimension represents a category dimension for picturebooks."
+    },
     "v1GetUserResponse": {
       "type": "object",
       "properties": {
@@ -314,6 +597,38 @@
         }
       },
       "description": "GetUserResponse is the response for GetUser."
+    },
+    "v1ListMyFavoritesResponse": {
+      "type": "object",
+      "properties": {
+        "favorites": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/bookmgrV1FavoriteBook"
+          }
+        },
+        "nextPageToken": {
+          "type": "string"
+        }
+      },
+      "description": "ListMyFavoritesResponse is the response for ListMyFavorites."
+    },
+    "v1ListMyFeedbackResponse": {
+      "type": "object",
+      "properties": {
+        "feedbacks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1BookFeedback"
+          }
+        },
+        "nextPageToken": {
+          "type": "string"
+        }
+      },
+      "description": "ListMyFeedbackResponse is the response for ListMyFeedback."
     },
     "v1ListUsersResponse": {
       "type": "object",
