@@ -1,5 +1,6 @@
 // Steps for 绘本数据管理 feature
 import { createBdd } from 'playwright-bdd';
+import { expect } from '@playwright/test';
 const { When, Then } = createBdd();
 
 async function fillFormRow(page: any, label: string, value: string): Promise<void> {

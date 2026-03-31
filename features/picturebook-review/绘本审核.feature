@@ -110,47 +110,47 @@
   场景: API 提交审核
     假设 王老师 已创建绘本《API待审绘本》（草稿状态）
     假设 王老师 已登录系统
-    When 王老师 发送 POST 请求到 "/api/v1/books/{id}:submit"
-    Then 响应状态码为 200
+    当 王老师 发送 POST 请求到 /api/v1/books/{id}:submit
+    那么 响应状态码为 200
     而且 绘本状态为"pending"
 
   @api-only
   场景: API 审核通过
     假设 绘本《API审核绘本》状态为"pending"
     假设 王老师 已登录系统
-    When 王老师 发送 POST 请求到 "/api/v1/books/{id}:approve"
-    Then 响应状态码为 200
+    当 王老师 发送 POST 请求到 /api/v1/books/{id}:approve
+    那么 响应状态码为 200
     而且 绘本状态为"approved"
 
   @api-only
   场景: API 审核拒绝（原因必填）
     假设 绘本《API待拒绘本》状态为"pending"
     假设 王老师 已登录系统
-    When 王老师 发送 POST 请求到 "/api/v1/books/{id}:reject" 包含：
+    当 王老师 发送 POST 请求到 /api/v1/books/{id}:reject 包含：
       | reason | 格式不对 |
-    Then 响应状态码为 200
+    那么 响应状态码为 200
     而且 绘本状态为"rejected"
 
   @api-only
   场景: API 审核拒绝（无原因，返回错误）
     假设 绘本《API待拒绘本》状态为"pending"
     假设 王老师 已登录系统
-    When 王老师 发送 POST 请求到 "/api/v1/books/{id}:reject" 不包含 reason
-    Then 响应状态码为 400
+    当 王老师 发送 POST 请求到 /api/v1/books/{id}:reject 不包含 reason
+    那么 响应状态码为 400
     而且 错误信息包含"拒绝原因必填"
 
   @api-only
   场景: API 撤回审核
     假设 绘本状态为"pending"
     假设 王老师 已登录系统
-    When 王老师 发送 POST 请求到 "/api/v1/books/{id}:recall"
-    Then 响应状态码为 200
+    当 王老师 发送 POST 请求到 /api/v1/books/{id}:recall
+    那么 响应状态码为 200
     而且 绘本状态为"draft"
 
   @api-only
   场景: API 获取审核历史
     假设 绘本有审核历史记录
     假设 王老师 已登录系统
-    When 王老师 发送 GET 请求到 "/api/v1/books/{id}/reviews"
-    Then 响应状态码为 200
+    当 王老师 发送 GET 请求到 /api/v1/books/{id}/reviews
+    那么 响应状态码为 200
     而且 响应包含审核历史列表

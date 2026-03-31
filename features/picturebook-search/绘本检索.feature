@@ -101,20 +101,20 @@
   @api-only
   场景: API 关键词搜索
     假设 李老师 已登录系统
-    When 李老师 发送 GET 请求到 "/api/v1/books?q=情绪"
-    Then 响应状态码为 200
+    当 李老师 发送 GET 请求到 /api/v1/books?q=情绪
+    那么 响应状态码为 200
     而且 结果包含《情绪小怪兽》
 
   @api-only
   场景: API 维度筛选
     假设 李老师 已登录系统
-    When 李老师 发送 GET 请求到 "/api/v1/books?dimensions=physical"
-    Then 响应状态码为 200
+    当 李老师 发送 GET 请求到 /api/v1/books?dimensions=physical
+    那么 响应状态码为 200
     而且 结果仅包含《我爱学校》
 
   @api-only
   场景: API 组合筛选
     假设 李老师 已登录系统
-    When 李老师 发送 GET 请求到 "/api/v1/books?q=学校&dimensions=physical&sort=created_at&order=desc"
-    Then 响应状态码为 200
+    当 李老师 发送 GET 请求到 /api/v1/books?q=学校&dimensions=physical&sort=created_at&order=desc
+    那么 响应状态码为 200
     而且 结果包含《我爱学校》

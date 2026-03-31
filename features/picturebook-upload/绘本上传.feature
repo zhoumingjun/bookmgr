@@ -83,39 +83,39 @@
   场景: API 单文件上传
     假设 王老师 已登录系统
     假设 王老师 已创建绘本《API测试绘本》
-    当 王老师 发送 POST 请求到 "/api/v1/books/{id}/files" 上传 PDF 文件
-    Then 响应状态码为 200
+    当 王老师 发送 POST 请求到 /api/v1/books/{id}/files 上传 PDF 文件
+    那么 响应状态码为 200
     而且 响应包含文件 ID 和 URL
 
   @api-only
   场景: API 批量上传
     假设 王老师 已登录系统
     假设 王老师 已创建绘本《API批量测试》
-    When 王老师 发送 POST 请求到 "/api/v1/books/{id}/files/batch" 上传多个文件
-    Then 响应状态码为 200
+    当 王老师 发送 POST 请求到 /api/v1/books/{id}/files/batch 上传多个文件
+    那么 响应状态码为 200
     而且 响应包含 3 个文件 ID
 
   @api-only
   场景: API 获取文件列表
     假设 王老师 已上传 2 个文件到绘本
     假设 王老师 已登录系统
-    When 王老师 发送 GET 请求到 "/api/v1/books/{id}/files"
-    Then 响应状态码为 200
+    当 王老师 发送 GET 请求到 /api/v1/books/{id}/files
+    那么 响应状态码为 200
     而且 响应包含 2 个文件记录
 
   @api-only
   场景: API 删除文件
     假设 王老师 已上传文件到绘本
     假设 王老师 已登录系统
-    When 王老师 发送 DELETE 请求到 "/api/v1/books/{id}/files/{file_id}"
-    Then 响应状态码为 200
+    当 王老师 发送 DELETE 请求到 /api/v1/books/{id}/files/{file_id}
+    那么 响应状态码为 200
     而且 GET /api/v1/books/{id}/files 不包含该文件
 
   @api-only
   场景: API 下载文件（流式）
     假设 王老师 已上传 PDF 文件到绘本
     假设 王老师 已登录系统
-    When 王老师 发送 GET 请求到 "/api/v1/books/{id}/files/{file_id}"
-    Then 响应状态码为 200
+    当 王老师 发送 GET 请求到 /api/v1/books/{id}/files/{file_id}
+    那么 响应状态码为 200
     而且 Content-Type 为 application/pdf
     而且 响应体为文件二进制流

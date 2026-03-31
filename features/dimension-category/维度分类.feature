@@ -73,7 +73,7 @@
 
   场景: 普通管理员无权创建一级维度（限制场景）
     假设 普通管理员"张管理员"已存在（产品决策：普通管理员可创建维度）
-    （本场景备用，如产品决策变更可启用）
+    # （本场景备用，如产品决策变更可启用）
     假设 张管理员 已登录系统
     当 张管理员 尝试创建一级维度
     那么 系统返回 403 无权限错误
@@ -83,18 +83,18 @@
       | 维度名称 | 子分类 |
       | 身心准备 | 校园作息适应、身体动作发展 |
       | 生活准备 | 穿衣、洗漱 |
-    当 王老师 发送 GET 请求到 "/api/v1/dimensions"
+    当 王老师 发送 GET 请求到 /api/v1/dimensions
     那么 响应返回树形结构，包含两个一级维度
     而且 每个一级维度包含其子分类列表
 
   场景: 按父维度筛选子分类
     假设 王老师 已创建维度结构
-    当 王老师 发送 GET 请求到 "/api/v1/dimensions?parent=physical"
+    当 王老师 发送 GET 请求到 /api/v1/dimensions?parent=physical
     那么 响应仅返回"身心准备"下的子分类
 
   场景: 获取单个维度详情
     假设 王老师 已创建维度"身心准备"
-    当 王老师 发送 GET 请求到 "/api/v1/dimensions/physical"
+    当 王老师 发送 GET 请求到 /api/v1/dimensions/physical
     那么 响应返回维度完整信息，包括名称、Slug、描述、子分类列表
 
   场景: 创建重复 Slug 的维度
@@ -112,33 +112,33 @@
   @api-only
   场景: API 创建维度
     假设 王老师 已登录系统
-    当 王老师 发送 POST 请求到 "/api/v1/dimensions" 包含：
+    当 王老师 发送 POST 请求到 /api/v1/dimensions 包含：
       | 字段 | 值 |
       | name | 情绪准备 |
       | slug | emotional |
-    Then 响应状态码为 200
+    那么 响应状态码为 200
     而且 响应包含 id 和 slug
 
   @api-only
   场景: API 更新维度
     假设 王老师 已创建维度"情绪准备"
     假设 王老师 已登录系统
-    When 王老师 发送 PUT 请求到 "/api/v1/dimensions/{id}" 包含：
+    当 王老师 发送 PUT 请求到 /api/v1/dimensions/{id} 包含：
       | 字段 | 值 |
       | name | 情绪行为 |
-    Then 响应状态码为 200
+    那么 响应状态码为 200
     而且 维度名称为"情绪行为"
 
   @api-only
   场景: API 删除维度（无关联）
     假设 王老师 已创建空维度"测试"
     假设 王老师 已登录系统
-    When 王老师 发送 DELETE 请求到 "/api/v1/dimensions/{id}"
-    Then 响应状态码为 204
+    当 王老师 发送 DELETE 请求到 /api/v1/dimensions/{id}
+    那么 响应状态码为 204
 
   @api-only
   场景: API 获取子分类列表
     假设 王老师 已创建维度及其子分类
     假设 王老师 已登录系统
-    When 王老师 发送 GET 请求到 "/api/v1/dimensions/physical/subcategories"
-    Then 响应返回子分类列表
+    当 王老师 发送 GET 请求到 /api/v1/dimensions/physical/subcategories
+    那么 响应返回子分类列表

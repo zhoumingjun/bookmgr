@@ -1,3 +1,4 @@
+declare const Buffer: any;
 // Steps for 绘本资源上传 feature
 import { createBdd } from 'playwright-bdd';
 const { When, Then } = createBdd();

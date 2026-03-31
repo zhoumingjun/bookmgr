@@ -103,27 +103,27 @@
     而且 李老师 翻到第 3 页
     而且 李老师 关闭阅读器
     而且 李老师 重新打开《我爱学校》的阅读器
-    Then 阅读器显示第 3 页
+    而且 阅读器显示第 3 页
 
   @api-only
   场景: API 获取绘本列表
     假设 王老师 已登录系统
-    When 王老师 发送 GET 请求到 "/api/v1/books"
-    Then 响应状态码为 200
+    当 王老师 发送 GET 请求到 /api/v1/books
+    那么 响应状态码为 200
     而且 响应包含绘本列表（分页）
 
   @api-only
   场景: API 获取绘本详情
     假设 绘本《API详情绘本》已审核通过
     假设 王老师 已登录系统
-    When 王老师 发送 GET 请求到 "/api/v1/books/{id}"
-    Then 响应状态码为 200
+    当 王老师 发送 GET 请求到 /api/v1/books/{id}
+    那么 响应状态码为 200
     而且 响应包含绘本完整信息
 
   @api-only
   场景: API 获取阅读进度
     假设 李老师 已阅读绘本到第 5 页
     假设 李老师 已登录系统
-    When 李老师 发送 GET 请求到 "/api/v1/books/{id}/reading-progress"
-    Then 响应状态码为 200
+    当 李老师 发送 GET 请求到 /api/v1/books/{id}/reading-progress
+    那么 响应状态码为 200
     而且 响应中 last_page 为 5

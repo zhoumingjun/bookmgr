@@ -106,7 +106,7 @@
   @api-only
   场景: API 创建绘本
     假设 王老师 已登录系统并持有有效 token
-    当 王老师 发送 POST 请求到 "/api/v1/books" 包含以下数据：
+    当 王老师 发送 POST 请求到 /api/v1/books 包含以下数据：
       | 字段 | 值 |
       | title | 《API创建绘本》 |
       | author | API作者 |
@@ -121,7 +121,7 @@
   场景: API 更新绘本
     假设 王老师 已创建绘本《待更新绘本》
     假设 王老师 已登录系统
-    当 王老师 发送 PUT 请求到 "/api/v1/books/{id}" 包含：
+    当 王老师 发送 PUT 请求到 /api/v1/books/{id} 包含：
       | 字段 | 值 |
       | core_goal | 更新后的核心目标 |
     那么 响应状态码为 200
@@ -131,7 +131,7 @@
   场景: API 列表查询绘本（分页）
     假设 王老师 已创建 5 本绘本
     假设 王老师 已登录系统
-    当 王老师 发送 GET 请求到 "/api/v1/books?page_size=2"
+    当 王老师 发送 GET 请求到 /api/v1/books?page_size=2
     那么 响应状态码为 200
     而且 响应包含 next_page_token
     而且 绘本数量为 2
@@ -140,6 +140,6 @@
   场景: API 删除绘本
     假设 王老师 已创建绘本《待API删除》
     假设 王老师 已登录系统
-    当 王老师 发送 DELETE 请求到 "/api/v1/books/{id}"
+    当 王老师 发送 DELETE 请求到 /api/v1/books/{id}
     那么 响应状态码为 200
     而且 GET /api/v1/books/{id} 返回 404

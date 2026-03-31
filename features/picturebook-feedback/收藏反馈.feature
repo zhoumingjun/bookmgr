@@ -110,37 +110,37 @@
   场景: API 收藏绘本
     假设 李老师 已登录系统
     假设 绘本 ID 已知
-    When 李老师 发送 POST 请求到 "/api/v1/books/{id}/favorite"
-    Then 响应状态码为 200
+    当 李老师 发送 POST 请求到 /api/v1/books/{id}/favorite
+    那么 响应状态码为 200
 
   @api-only
   场景: API 取消收藏
     假设 李老师 已收藏绘本
     假设 李老师 已登录系统
-    When 李老师 发送 DELETE 请求到 "/api/v1/books/{id}/favorite"
-    Then 响应状态码为 200
+    当 李老师 发送 DELETE 请求到 /api/v1/books/{id}/favorite
+    那么 响应状态码为 200
 
   @api-only
   场景: API 获取我的收藏列表
     假设 李老师 已收藏 2 本绘本
     假设 李老师 已登录系统
-    When 李老师 发送 GET 请求到 "/api/v1/users/me/favorites"
-    Then 响应状态码为 200
+    当 李老师 发送 GET 请求到 /api/v1/users/me/favorites
+    那么 响应状态码为 200
     而且 响应包含 2 个收藏记录
 
   @api-only
   场景: API 提交反馈
     假设 李老师 已登录系统
     假设 绘本 ID 已知
-    When 李老师 发送 POST 请求到 "/api/v1/books/{id}/feedback" 包含：
+    当 李老师 发送 POST 请求到 /api/v1/books/{id}/feedback 包含：
       | type | read_complete |
       | difficulty_rating | 4 |
-    Then 响应状态码为 200
+    那么 响应状态码为 200
 
   @api-only
   场景: API 获取反馈统计
     假设 绘本有 5 条反馈记录
     假设 李老师 已登录系统
-    When 李老师 发送 GET 请求到 "/api/v1/books/{id}/feedback"
-    Then 响应状态码为 200
+    当 李老师 发送 GET 请求到 /api/v1/books/{id}/feedback
+    那么 响应状态码为 200
     而且 响应包含聚合统计（平均分、总收藏数等）
